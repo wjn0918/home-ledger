@@ -27,6 +27,19 @@ def create_family(payload: FamilyCreateIn, db: Session = Depends(get_db), user: 
     return {"id": family.id, "name": family.name}
 
 
+
+
+@router.get("/families/mine")
+def my_families(db: Session = Depends(get_db), user: User = Depends(get_current_user)):
+    rows = (
+        db.query(Family.id, Family.name)
+        .join(FamilyMember, FamilyMember.family_id == Family.id)
+        .filter(FamilyMember.user_id == user.id)
+        .order_by(Family.id.desc())
+        .all()
+    )
+    return [{"id": item.id, "name": item.name} for item in rows]
+
 @router.post("/families/{family_id}/members")
 def add_member(family_id: int, payload: FamilyMemberIn, db: Session = Depends(get_db), user: User = Depends(get_current_user)):
     family = db.query(Family).filter(Family.id == family_id).first()

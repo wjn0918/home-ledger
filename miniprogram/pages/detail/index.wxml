@@ -1,4 +1,8 @@
 <view>
+  <view>当前家庭：{{currentFamilyName || '未选择'}}</view>
+  <picker mode="selector" range="{{families}}" range-key="name" value="{{familyIndex}}" bindchange="onFamilyChange">
+    <view>切换家庭</view>
+  </picker>
   <block wx:for="{{bills}}" wx:key="id">
     <view>{{item.bill_date}} {{item.category}} ¥{{item.amount}} {{item.note}}</view>
   </block>
