@@ -1,0 +1,26 @@
+<view class="lin-container">
+  <view class="lin-card">
+    <view class="lin-row">
+      <view class="lin-title">明细</view>
+      <view class="lin-subtitle">当前家庭：{{currentFamilyName || '未选择'}}</view>
+    </view>
+    <picker mode="selector" range="{{families}}" range-key="name" value="{{familyIndex}}" bindchange="onFamilyChange">
+      <view class="lin-tab">切换家庭</view>
+    </picker>
+  </view>
+
+  <block wx:for="{{groupedBills}}" wx:key="day">
+    <view class="lin-card">
+      <view class="lin-row">
+        <view>{{item.day}}</view>
+        <view>¥{{item.total}}</view>
+      </view>
+      <block wx:for="{{item.items}}" wx:key="id">
+        <view class="lin-row" style="margin-top:10rpx;">
+          <view>{{item.category}} {{item.note}}</view>
+          <view>¥{{item.amount}}</view>
+        </view>
+      </block>
+    </view>
+  </block>
+</view>

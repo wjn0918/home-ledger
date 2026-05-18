@@ -1,0 +1,14 @@
+<view class="lin-container">
+  <view class="lin-card">
+    <view class="lin-title">我的</view>
+    <view class="lin-subtitle">状态：{{loggedIn ? '已登录' : '未登录，请先登录/注册'}}</view>
+    <button class="lin-btn" bindtap="onLogin">微信登录/注册</button>
+  </view>
+
+  <view class="lin-card">
+    <view class="lin-title">家庭管理</view>
+    <input class="lin-input" placeholder="输入家庭名称" bindinput="bindName" />
+    <button class="lin-btn" bindtap="onCreateFamily">创建家庭</button>
+    <view class="lin-subtitle">当前家庭ID：{{familyId}}</view>
+  </view>
+</view>
