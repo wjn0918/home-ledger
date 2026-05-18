@@ -4,13 +4,17 @@
     <view>切换家庭</view>
   </picker>
 
-  <picker mode="selector" range="{{dimensionOptions}}" value="{{dimensionIndex}}" bindchange="onDimensionChange">
-    <view>统计维度：{{dimensionOptions[dimensionIndex]}}</view>
-  </picker>
+  <view>
+    <block wx:for="{{dimensionOptions}}" wx:key="*this">
+      <text data-index="{{index}}" bindtap="onDimensionTabTap" style="margin-right: 12px; {{dimensionIndex === index ? 'font-weight:bold;color:#1677ff;' : 'color:#666;'}}">{{item}}</text>
+    </block>
+  </view>
 
-  <picker mode="selector" range="{{periodOptions}}" range-key="label" value="{{periodIndex}}" bindchange="onPeriodChange">
-    <view>统计周期：{{periodOptions[periodIndex].label}}</view>
-  </picker>
+  <view>
+    <block wx:for="{{periodOptions}}" wx:key="key">
+      <text data-index="{{index}}" bindtap="onPeriodTabTap" style="margin-right: 10px; {{periodIndex === index ? 'font-weight:bold;color:#1677ff;' : 'color:#666;'}}">{{item.label}}</text>
+    </block>
+  </view>
 
   <view>总支出：¥{{totalExpense}}</view>
 

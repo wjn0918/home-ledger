@@ -132,13 +132,13 @@ Page({
     this.setData({ totalExpense: total.toFixed(2), trendPoints, ranking })
   },
 
-  onDimensionChange(e) {
-    this.setData({ dimensionIndex: Number(e.detail.value), periodIndex: 4 })
+  onDimensionTabTap(e) {
+    this.setData({ dimensionIndex: Number(e.currentTarget.dataset.index), periodIndex: 4 })
     this.buildPeriodsAndStats()
   },
 
-  onPeriodChange(e) {
-    this.setData({ periodIndex: Number(e.detail.value) })
+  onPeriodTabTap(e) {
+    this.setData({ periodIndex: Number(e.currentTarget.dataset.index) })
     this.calcStats()
   },
 
