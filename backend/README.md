@@ -14,3 +14,13 @@ uvicorn app.main:app --reload --port 8000
 - 微信登录（code -> openid）并签发 JWT。
 - 家庭账本：创建家庭、添加成员、成员权限校验。
 - 账单 CRUD（示例提供创建+查询）与分类图表汇总。
+
+
+## 一键启停脚本
+在项目根目录执行：
+```bash
+./scripts/start_backend.sh
+./scripts/stop_backend.sh
+```
+- 启动日志：`backend/backend.log`
+- PID 文件：`backend/.uvicorn.pid`
