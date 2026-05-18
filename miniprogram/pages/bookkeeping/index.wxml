@@ -1,0 +1,22 @@
+<view class="container">
+  <view>当前家庭：{{currentFamilyName || '未选择'}}</view>
+  <picker mode="selector" range="{{families}}" range-key="name" value="{{familyIndex}}" bindchange="onFamilyChange">
+    <view>切换家庭</view>
+  </picker>
+
+  <input placeholder="金额" type="digit" bindinput="bindAmount" />
+
+  <picker mode="selector" range="{{categoryOptions}}" value="{{categoryIndex}}" bindchange="onCategoryChange">
+    <view>账单类别：{{category}}</view>
+  </picker>
+
+  <picker mode="date" value="{{billDate}}" bindchange="onDateChange">
+    <view>记账日期：{{billDate}}</view>
+  </picker>
+
+  <input placeholder="新增类别（如：零食）" value="{{newCategory}}" bindinput="bindNewCategory" />
+  <button bindtap="addCustomCategory">添加账单类别</button>
+
+  <input placeholder="备注" bindinput="bindNote" />
+  <button bindtap="onSubmit">提交记账</button>
+</view>

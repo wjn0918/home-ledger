@@ -1,0 +1,10 @@
+<view class="container">
+  <button bindtap="onLogin">微信登录/注册</button>
+  <text wx:if="{{loggedIn}}">状态：已登录</text>
+  <text wx:else>状态：未登录，请先登录/注册</text>
+
+  <input placeholder="输入家庭名称" bindinput="bindName" />
+  <button bindtap="onCreateFamily">创建家庭</button>
+
+  <text>当前家庭ID：{{familyId}}</text>
+</view>

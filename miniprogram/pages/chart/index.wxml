@@ -1,0 +1,30 @@
+<view>
+  <view>当前家庭：{{currentFamilyName || '未选择'}}</view>
+  <picker mode="selector" range="{{families}}" range-key="name" value="{{familyIndex}}" bindchange="onFamilyChange">
+    <view>切换家庭</view>
+  </picker>
+
+  <view>
+    <block wx:for="{{dimensionOptions}}" wx:key="*this">
+      <text data-index="{{index}}" bindtap="onDimensionTabTap" style="margin-right: 12px; {{dimensionIndex === index ? 'font-weight:bold;color:#1677ff;' : 'color:#666;'}}">{{item}}</text>
+    </block>
+  </view>
+
+  <view>
+    <block wx:for="{{periodOptions}}" wx:key="key">
+      <text data-index="{{index}}" bindtap="onPeriodTabTap" style="margin-right: 10px; {{periodIndex === index ? 'font-weight:bold;color:#1677ff;' : 'color:#666;'}}">{{item.label}}</text>
+    </block>
+  </view>
+
+  <view>总支出：¥{{totalExpense}}</view>
+
+  <view>支出折线图（文本版）</view>
+  <block wx:for="{{trendPoints}}" wx:key="*this">
+    <view>{{item}}</view>
+  </block>
+
+  <view>支出排行榜</view>
+  <block wx:for="{{ranking}}" wx:key="category">
+    <view>{{index + 1}}. {{item.category}} ¥{{item.amount}}</view>
+  </block>
+</view>
