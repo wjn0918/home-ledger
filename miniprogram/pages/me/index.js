@@ -1,27 +1,34 @@
 const { request } = require('../../utils/request')
+const { syncFamilies } = require('../../utils/family')
 const app = getApp()
 
 Page({
   data: {
     familyName: '',
     familyId: null,
+    joinFamilyId: '',
     loggedIn: false,
     userId: null
   },
 
-  onShow() {
+  async onShow() {
     const token = app.globalData.token || wx.getStorageSync('token')
     const familyId = app.globalData.familyId || wx.getStorageSync('familyId') || null
-    this.setData({
-      loggedIn: !!token,
-      familyId
-    })
+    this.setData({ loggedIn: !!token, familyId })
     if (!token) {
       wx.showModal({
         title: '请先登录',
         content: '未登录无法进入系统，请先完成微信登录/注册。',
         showCancel: false
       })
+      return
+    }
+
+    try {
+      const data = await syncFamilies(app)
+      this.setData({ familyId: data.selectedFamilyId })
+    } catch (e) {
+      // ignore refresh failure
     }
   },
 
@@ -32,10 +39,7 @@ Page({
           const res = await request('/auth/wechat', 'POST', { code })
           app.globalData.token = res.token
           wx.setStorageSync('token', res.token)
-          this.setData({
-            loggedIn: true,
-            userId: res.user_id
-          })
+          this.setData({ loggedIn: true, userId: res.user_id })
           wx.showModal({
             title: '登录/注册成功',
             content: '已完成微信身份校验，首次登录会自动注册账号。',
@@ -45,21 +49,13 @@ Page({
           wx.showToast({ title: '登录失败', icon: 'none' })
         }
       },
-      fail: () => {
-        wx.showToast({ title: '微信登录失败', icon: 'none' })
-      }
+      fail: () => wx.showToast({ title: '微信登录失败', icon: 'none' })
     })
   },
 
   async onCreateFamily() {
-    if (!this.data.loggedIn) {
-      wx.showToast({ title: '请先登录/注册', icon: 'none' })
-      return
-    }
-    if (!this.data.familyName) {
-      wx.showToast({ title: '请输入家庭名称', icon: 'none' })
-      return
-    }
+    if (!this.data.loggedIn) return wx.showToast({ title: '请先登录/注册', icon: 'none' })
+    if (!this.data.familyName) return wx.showToast({ title: '请输入家庭名称', icon: 'none' })
 
     try {
       const res = await request('/families', 'POST', { name: this.data.familyName })
@@ -68,15 +64,28 @@ Page({
       this.setData({ familyId: res.id })
       wx.showToast({ title: '家庭已创建' })
     } catch (error) {
-      if (error.statusCode === 401) {
-        wx.showToast({ title: '登录已失效，请重新登录', icon: 'none' })
-        return
-      }
       wx.showToast({ title: '创建失败，请重试', icon: 'none' })
     }
   },
 
-  bindName(e) {
-    this.setData({ familyName: e.detail.value })
-  }
+  async onJoinFamily() {
+    if (!this.data.loggedIn) return wx.showToast({ title: '请先登录/注册', icon: 'none' })
+    if (!this.data.joinFamilyId) return wx.showToast({ title: '请输入家庭ID', icon: 'none' })
+
+    try {
+      const res = await request(`/families/join?family_id=${Number(this.data.joinFamilyId)}`, 'POST')
+      const data = await syncFamilies(app)
+      this.setData({ familyId: data.selectedFamilyId, joinFamilyId: '' })
+      wx.showToast({ title: res.message || '加入成功', icon: 'none' })
+    } catch (error) {
+      if (error.statusCode === 404) {
+        wx.showToast({ title: '家庭不存在', icon: 'none' })
+        return
+      }
+      wx.showToast({ title: '加入失败，请重试', icon: 'none' })
+    }
+  },
+
+  bindName(e) { this.setData({ familyName: e.detail.value }) },
+  bindJoinFamilyId(e) { this.setData({ joinFamilyId: e.detail.value }) }
 })

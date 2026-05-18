@@ -40,6 +40,25 @@ def my_families(db: Session = Depends(get_db), user: User = Depends(get_current_
     )
     return [{"id": item.id, "name": item.name} for item in rows]
 
+
+
+@router.post("/families/join")
+def join_family(family_id: int, db: Session = Depends(get_db), user: User = Depends(get_current_user)):
+    family = db.query(Family).filter(Family.id == family_id).first()
+    if not family:
+        raise HTTPException(status_code=404, detail="家庭不存在")
+
+    exists = db.query(FamilyMember).filter(
+        FamilyMember.family_id == family_id,
+        FamilyMember.user_id == user.id
+    ).first()
+    if exists:
+        return {"ok": True, "message": "已加入该家庭"}
+
+    db.add(FamilyMember(family_id=family_id, user_id=user.id, role="member"))
+    db.commit()
+    return {"ok": True, "message": "加入家庭成功"}
+
 @router.post("/families/{family_id}/members")
 def add_member(family_id: int, payload: FamilyMemberIn, db: Session = Depends(get_db), user: User = Depends(get_current_user)):
     family = db.query(Family).filter(Family.id == family_id).first()
@@ -48,9 +67,16 @@ def add_member(family_id: int, payload: FamilyMemberIn, db: Session = Depends(ge
     if family.owner_user_id != user.id:
         raise HTTPException(status_code=403, detail="只有家庭拥有者可添加成员")
 
+    exists = db.query(FamilyMember).filter(
+        FamilyMember.family_id == family_id,
+        FamilyMember.user_id == payload.user_id
+    ).first()
+    if exists:
+        return {"ok": True, "message": "用户已在该家庭"}
+
     db.add(FamilyMember(family_id=family_id, user_id=payload.user_id, role="member"))
     db.commit()
-    return {"ok": True}
+    return {"ok": True, "message": "添加成员成功"}
 
 
 @router.post("/bills", response_model=BillOut)

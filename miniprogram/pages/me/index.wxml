@@ -9,6 +9,11 @@
     <view class="lin-title">家庭管理</view>
     <input class="lin-input" placeholder="输入家庭名称" bindinput="bindName" />
     <button class="lin-btn" bindtap="onCreateFamily">创建家庭</button>
+
+    <input class="lin-input" placeholder="输入家庭ID加入家庭" value="{{joinFamilyId}}" bindinput="bindJoinFamilyId" />
+    <button class="lin-btn" bindtap="onJoinFamily">加入家庭</button>
+
     <view class="lin-subtitle">当前家庭ID：{{familyId}}</view>
+    <view class="lin-subtitle">同一家庭成员可共同查看家庭账单</view>
   </view>
 </view>
