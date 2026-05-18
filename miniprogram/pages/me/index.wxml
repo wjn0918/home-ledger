@@ -2,7 +2,7 @@
   <view class="lin-card">
     <view class="lin-title">我的</view>
     <view class="lin-subtitle">状态：{{loggedIn ? '已登录' : '未登录，请先登录/注册'}}</view>
-    <button class="lin-btn" bindtap="onLogin">微信登录/注册</button>
+    <button wx:if="{{!loggedIn}}" class="lin-btn" bindtap="onLogin">微信登录/注册</button>
   </view>
 
   <view class="lin-card">

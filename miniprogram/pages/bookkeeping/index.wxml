@@ -8,9 +8,12 @@
     </picker>
 
     <input class="lin-input" placeholder="金额" type="digit" bindinput="bindAmount" />
-    <picker mode="selector" range="{{categoryOptions}}" value="{{categoryIndex}}" bindchange="onCategoryChange">
-      <view class="lin-input">账单类别：{{category}}</view>
-    </picker>
+    <view class="lin-input">账单类别：{{category}}</view>
+    <view class="lin-tabs">
+      <block wx:for="{{categoryOptions}}" wx:key="*this">
+        <text class="lin-tab {{category === item ? 'active' : ''}}" data-category="{{item}}" bindtap="onCategoryTap">{{item}}</text>
+      </block>
+    </view>
     <picker mode="date" value="{{billDate}}" bindchange="onDateChange">
       <view class="lin-input">记账日期：{{billDate}}</view>
     </picker>

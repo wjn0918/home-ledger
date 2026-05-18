@@ -15,7 +15,6 @@ Page({
     familyIndex: 0,
     currentFamilyName: '',
     categoryOptions: DEFAULT_CATEGORIES,
-    categoryIndex: 0,
     newCategory: ''
   },
 
@@ -47,11 +46,10 @@ Page({
   loadCategories() {
     const custom = wx.getStorageSync('customCategories') || []
     const categoryOptions = [...DEFAULT_CATEGORIES, ...custom]
-    const categoryIndex = Math.max(categoryOptions.indexOf(this.data.category), 0)
+    const selected = categoryOptions.includes(this.data.category) ? this.data.category : categoryOptions[0]
     this.setData({
       categoryOptions,
-      categoryIndex,
-      category: categoryOptions[categoryIndex]
+      category: selected
     })
   },
 
@@ -84,12 +82,9 @@ Page({
     this.setData({ familyIndex: index, currentFamilyName: target.name })
   },
 
-  onCategoryChange(e) {
-    const categoryIndex = Number(e.detail.value)
-    this.setData({
-      categoryIndex,
-      category: this.data.categoryOptions[categoryIndex]
-    })
+  onCategoryTap(e) {
+    const category = e.currentTarget.dataset.category
+    this.setData({ category })
   },
 
   onDateChange(e) {
@@ -117,8 +112,7 @@ Page({
     wx.setStorageSync('customCategories', custom)
     this.setData({ newCategory: '' })
     this.loadCategories()
-    const categoryIndex = this.data.categoryOptions.indexOf(value)
-    this.setData({ categoryIndex, category: value })
+    this.setData({ category: value })
     wx.showToast({ title: '类别已添加' })
   }
 })
