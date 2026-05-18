@@ -1,0 +1,6 @@
+<view class="container">
+  <button bindtap="onLogin">微信登录</button>
+  <input placeholder="输入家庭名称" bindinput="bindName" />
+  <button bindtap="onCreateFamily">创建家庭</button>
+  <text>当前家庭ID：{{familyId}}</text>
+</view>
