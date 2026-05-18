@@ -1,0 +1,6 @@
+<view class="container">
+  <input placeholder="金额" type="digit" bindinput="bindAmount" />
+  <input placeholder="分类" bindinput="bindCategory" />
+  <input placeholder="备注" bindinput="bindNote" />
+  <button bindtap="onSubmit">提交记账</button>
+</view>
