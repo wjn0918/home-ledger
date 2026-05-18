@@ -1,0 +1,10 @@
+<view class="container">
+  <view>当前家庭：{{currentFamilyName || '未选择'}}</view>
+  <picker mode="selector" range="{{families}}" range-key="name" value="{{familyIndex}}" bindchange="onFamilyChange">
+    <view>切换家庭</view>
+  </picker>
+  <input placeholder="金额" type="digit" bindinput="bindAmount" />
+  <input placeholder="分类" bindinput="bindCategory" />
+  <input placeholder="备注" bindinput="bindNote" />
+  <button bindtap="onSubmit">提交记账</button>
+</view>
