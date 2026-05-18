@@ -3,7 +3,11 @@ const app = getApp()
 
 Page({
   data: { amount: '', category: '餐饮', type: 'expense', note: '' },
+  onShow() {
+    app.requireLogin()
+  },
   async onSubmit() {
+    if (!app.requireLogin()) return
     await request('/bills', 'POST', {
       family_id: app.globalData.familyId,
       amount: Number(this.data.amount),

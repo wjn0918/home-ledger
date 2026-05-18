@@ -16,6 +16,13 @@ Page({
       loggedIn: !!token,
       familyId
     })
+    if (!token) {
+      wx.showModal({
+        title: '请先登录',
+        content: '未登录无法进入系统，请先完成微信登录/注册。',
+        showCancel: false
+      })
+    }
   },
 
   onLogin() {
