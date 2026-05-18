@@ -1,0 +1,48 @@
+from datetime import datetime
+
+from sqlalchemy import String, DateTime, ForeignKey, Integer, DECIMAL
+from sqlalchemy.orm import Mapped, mapped_column
+
+from app.db.session import Base
+
+
+class User(Base):
+    __tablename__ = "users"
+
+    id: Mapped[int] = mapped_column(primary_key=True, index=True)
+    openid: Mapped[str] = mapped_column(String(64), unique=True, index=True)
+    nickname: Mapped[str] = mapped_column(String(50), default="微信用户")
+    avatar_url: Mapped[str] = mapped_column(String(255), default="")
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+
+class Family(Base):
+    __tablename__ = "families"
+
+    id: Mapped[int] = mapped_column(primary_key=True, index=True)
+    name: Mapped[str] = mapped_column(String(100))
+    owner_user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+
+class FamilyMember(Base):
+    __tablename__ = "family_members"
+
+    id: Mapped[int] = mapped_column(primary_key=True, index=True)
+    family_id: Mapped[int] = mapped_column(ForeignKey("families.id"), index=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), index=True)
+    role: Mapped[str] = mapped_column(String(20), default="member")
+
+
+class Bill(Base):
+    __tablename__ = "bills"
+
+    id: Mapped[int] = mapped_column(primary_key=True, index=True)
+    family_id: Mapped[int] = mapped_column(ForeignKey("families.id"), index=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), index=True)
+    type: Mapped[str] = mapped_column(String(20))
+    category: Mapped[str] = mapped_column(String(50))
+    amount: Mapped[float] = mapped_column(DECIMAL(10, 2))
+    note: Mapped[str] = mapped_column(String(255), default="")
+    bill_date: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
