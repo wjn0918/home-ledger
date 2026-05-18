@@ -1,0 +1,26 @@
+<view>
+  <view>当前家庭：{{currentFamilyName || '未选择'}}</view>
+  <picker mode="selector" range="{{families}}" range-key="name" value="{{familyIndex}}" bindchange="onFamilyChange">
+    <view>切换家庭</view>
+  </picker>
+
+  <picker mode="selector" range="{{dimensionOptions}}" value="{{dimensionIndex}}" bindchange="onDimensionChange">
+    <view>统计维度：{{dimensionOptions[dimensionIndex]}}</view>
+  </picker>
+
+  <picker mode="selector" range="{{periodOptions}}" range-key="label" value="{{periodIndex}}" bindchange="onPeriodChange">
+    <view>统计周期：{{periodOptions[periodIndex].label}}</view>
+  </picker>
+
+  <view>总支出：¥{{totalExpense}}</view>
+
+  <view>支出折线图（文本版）</view>
+  <block wx:for="{{trendPoints}}" wx:key="*this">
+    <view>{{item}}</view>
+  </block>
+
+  <view>支出排行榜</view>
+  <block wx:for="{{ranking}}" wx:key="category">
+    <view>{{index + 1}}. {{item.category}} ¥{{item.amount}}</view>
+  </block>
+</view>
