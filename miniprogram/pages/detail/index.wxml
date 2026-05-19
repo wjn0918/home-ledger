@@ -12,7 +12,7 @@
         <view>¥{{item.total}}</view>
       </view>
       <block wx:for="{{item.items}}" wx:key="id">
-        <view class="lin-row" style="margin-top:10rpx;">
+        <view class="lin-row {{item.creatorClass}}" style="margin-top:10rpx; padding: 10rpx; border-radius: 10rpx;">
           <view><text data-id="{{item.id}}" bindtap="onDateTap">{{item.bill_date.slice(0,10)}}</text> <text data-id="{{item.id}}" bindtap="onCategoryTap">{{item.category}} {{item.note}}<text wx:if="{{item.user_id !== userId}}">（创建人：{{item.creator_nickname}}）</text></text></view>
           <switch data-id="{{item.id}}" checked="{{item.is_shared}}" bindchange="onShareSwitchChange" />
           <view data-id="{{item.id}}" bindtap="onAmountTap">¥{{item.amount}}</view>

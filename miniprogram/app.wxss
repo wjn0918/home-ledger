@@ -67,3 +67,10 @@ page {
   justify-content: space-between;
   align-items: center;
 }
+
+
+.bill-self { background: #edf7ff; }
+.bill-member-0 { background: #fff5f5; }
+.bill-member-1 { background: #f5fff7; }
+.bill-member-2 { background: #fffaf0; }
+.bill-member-3 { background: #f7f5ff; }
