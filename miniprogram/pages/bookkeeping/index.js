@@ -15,7 +15,7 @@ Page({
     familyIndex: 0,
     currentFamilyName: '',
     categoryOptions: DEFAULT_CATEGORIES,
-    newCategory: ''
+    isShared: true
   },
 
   async onShow() {
@@ -70,7 +70,8 @@ Page({
       category: this.data.category,
       type: this.data.type,
       note: this.data.note,
-      bill_date: new Date(`${this.data.billDate}T00:00:00`).toISOString()
+      bill_date: new Date(`${this.data.billDate}T00:00:00`).toISOString(),
+      is_shared: this.data.isShared
     })
     wx.showToast({ title: '记账成功' })
   },
@@ -93,26 +94,32 @@ Page({
 
   bindAmount(e) { this.setData({ amount: e.detail.value }) },
   bindNote(e) { this.setData({ note: e.detail.value }) },
-  bindNewCategory(e) { this.setData({ newCategory: e.detail.value.trim() }) },
+  onShareChange(e) { this.setData({ isShared: !!e.detail.value }) },
 
-  addCustomCategory() {
-    const value = this.data.newCategory
-    if (!value) {
-      wx.showToast({ title: '请输入类别名称', icon: 'none' })
-      return
-    }
-
-    if (this.data.categoryOptions.includes(value)) {
-      wx.showToast({ title: '类别已存在', icon: 'none' })
-      return
-    }
-
-    const custom = wx.getStorageSync('customCategories') || []
-    custom.push(value)
-    wx.setStorageSync('customCategories', custom)
-    this.setData({ newCategory: '' })
-    this.loadCategories()
-    this.setData({ category: value })
-    wx.showToast({ title: '类别已添加' })
+  onAddCategoryTap() {
+    wx.showModal({
+      title: '新增账单类别',
+      editable: true,
+      placeholderText: '例如：零食',
+      success: (res) => {
+        if (!res.confirm) return
+        const value = (res.content || '').trim()
+        if (!value) {
+          wx.showToast({ title: '请输入类别名称', icon: 'none' })
+          return
+        }
+        if (this.data.categoryOptions.includes(value)) {
+          wx.showToast({ title: '类别已存在', icon: 'none' })
+          this.setData({ category: value })
+          return
+        }
+        const custom = wx.getStorageSync('customCategories') || []
+        custom.push(value)
+        wx.setStorageSync('customCategories', custom)
+        this.loadCategories()
+        this.setData({ category: value })
+        wx.showToast({ title: '类别已添加', icon: 'none' })
+      }
+    })
   }
 })
