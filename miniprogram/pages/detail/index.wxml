@@ -1,8 +1,7 @@
 <view class="lin-container">
   <view class="lin-card">
     <view class="lin-row">
-      <view class="lin-title">明细</view>
-      <view class="lin-subtitle">当前家庭：{{currentFamilyName || '未选择'}}</view>
+            <view class="lin-subtitle">当前家庭：{{currentFamilyName || '未选择'}}</view>
     </view>
     <picker mode="selector" range="{{families}}" range-key="name" value="{{familyIndex}}" bindchange="onFamilyChange">
       <view class="lin-tab">切换家庭</view>
@@ -17,8 +16,9 @@
       </view>
       <block wx:for="{{item.items}}" wx:key="id">
         <view class="lin-row" style="margin-top:10rpx;">
-          <view>{{item.category}} {{item.note}}</view>
-          <view>¥{{item.amount}}</view>
+          <view><text data-id="{{item.id}}" bindtap="onDateTap">{{item.bill_date.slice(0,10)}}</text> <text data-id="{{item.id}}" bindtap="onCategoryTap">{{item.category}} {{item.note}}</text></view>
+          <switch data-id="{{item.id}}" checked="{{item.is_shared}}" bindchange="onShareSwitchChange" />
+          <view data-id="{{item.id}}" bindtap="onAmountTap">¥{{item.amount}}</view>
         </view>
       </block>
     </view>
