@@ -29,6 +29,12 @@ class BillCreateIn(BaseModel):
     bill_date: datetime
 
 
+class BillUpdateIn(BaseModel):
+    amount: Decimal
+    category: str
+    bill_date: datetime
+
+
 class BillOut(BaseModel):
     id: int
     family_id: int
@@ -41,3 +47,17 @@ class BillOut(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+class JoinRequestOut(BaseModel):
+    id: int
+    family_id: int
+    family_name: str
+    applicant_user_id: int
+    applicant_nickname: str
+    status: str
+    created_at: datetime
+
+
+class JoinRequestReviewIn(BaseModel):
+    approve: bool
