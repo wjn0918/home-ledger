@@ -1,13 +1,16 @@
 <view class="lin-container">
   <view class="lin-card">
-    <view class="lin-title">我的</view>
-    <view class="lin-subtitle">状态：{{loggedIn ? '已登录' : '未登录，请先登录/注册'}}</view>
-    <button wx:if="{{!loggedIn}}" class="lin-btn" bindtap="onLogin">微信登录/注册</button>
+        <view class="lin-subtitle">状态：{{loggedIn ? '已登录' : '未登录，请先登录/注册'}}</view>
+    <button wx:if="{{!loggedIn}}" class="lin-btn" bindtap="onLogin">微信登录</button>
+    <input wx:if="{{!loggedIn}}" class="lin-input" placeholder="账号" bindinput="bindAccount" />
+    <input wx:if="{{!loggedIn}}" class="lin-input" password placeholder="密码" bindinput="bindPassword" />
+    <input wx:if="{{!loggedIn}}" class="lin-input" placeholder="昵称（注册可选）" bindinput="bindNickname" />
+    <button wx:if="{{!loggedIn}}" class="lin-btn" bindtap="onAccountLogin">账号密码登录</button>
+    <button wx:if="{{!loggedIn}}" class="lin-btn" bindtap="onRegister">注册账户</button>
   </view>
 
   <view class="lin-card">
-    <view class="lin-title">家庭管理</view>
-    <input class="lin-input" placeholder="输入家庭名称" bindinput="bindName" />
+        <input class="lin-input" placeholder="输入家庭名称" bindinput="bindName" />
     <button class="lin-btn" bindtap="onCreateFamily">创建家庭</button>
 
     <input class="lin-input" placeholder="输入家庭ID加入家庭" value="{{joinFamilyId}}" bindinput="bindJoinFamilyId" />
@@ -16,4 +19,15 @@
     <view class="lin-subtitle">当前家庭ID：{{familyId}}</view>
     <view class="lin-subtitle">同一家庭成员可共同查看家庭账单</view>
   </view>
+
+  <view class="lin-card">
+        <view wx:if="{{!joinRequests.length}}" class="lin-subtitle">暂无待处理申请</view>
+    <view wx:for="{{joinRequests}}" wx:key="id" class="lin-subtitle">
+      <view>申请人：{{item.applicant_nickname}}（ID:{{item.applicant_user_id}}）</view>
+      <view>申请加入：{{item.family_name}}（ID:{{item.family_id}}）</view>
+      <button class="lin-btn" data-id="{{item.id}}" data-approve="{{true}}" bindtap="onReviewRequest">同意</button>
+      <button class="lin-btn" data-id="{{item.id}}" data-approve="{{false}}" bindtap="onReviewRequest">拒绝</button>
+    </view>
+  </view>
+
 </view>
