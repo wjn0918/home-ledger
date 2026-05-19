@@ -41,3 +41,17 @@ class BillOut(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+class JoinRequestOut(BaseModel):
+    id: int
+    family_id: int
+    family_name: str
+    applicant_user_id: int
+    applicant_nickname: str
+    status: str
+    created_at: datetime
+
+
+class JoinRequestReviewIn(BaseModel):
+    approve: bool
