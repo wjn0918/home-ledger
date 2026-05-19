@@ -10,6 +10,7 @@ from app.core.config import settings
 from app.models.entities import User
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+BCRYPT_PASSWORD_MAX_BYTES = 72
 
 
 def create_token(user_id: int):
@@ -49,15 +50,31 @@ async def get_or_create_user_by_wechat_code(code: str, db: Session):
     return user
 
 
+def normalize_password(password: str) -> str:
+    password = (password or "").strip()
+    if not password:
+        raise HTTPException(status_code=400, detail="密码不能为空")
+    if len(password.encode("utf-8")) > BCRYPT_PASSWORD_MAX_BYTES:
+        raise HTTPException(status_code=400, detail="密码过长，请控制在72字节以内")
+    return password
+
+
 def hash_password(password: str) -> str:
-    return pwd_context.hash(password)
+    return pwd_context.hash(normalize_password(password))
 
 
 def verify_password(password: str, password_hash: str) -> bool:
-    return pwd_context.verify(password, password_hash)
+    try:
+        normalized = normalize_password(password)
+    except HTTPException:
+        return False
+    return pwd_context.verify(normalized, password_hash)
 
 
 def register_by_account(account: str, password: str, nickname: str, db: Session):
+    account = (account or "").strip()
+    if not account:
+        raise HTTPException(status_code=400, detail="账号不能为空")
     exists = db.query(User).filter(User.account == account).first()
     if exists:
         raise HTTPException(status_code=400, detail="账号已存在")
