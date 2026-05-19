@@ -27,6 +27,15 @@ class BillCreateIn(BaseModel):
     amount: Decimal
     note: str = ""
     bill_date: datetime
+    is_shared: bool = True
+
+
+class BillUpdateIn(BaseModel):
+    amount: Decimal
+    category: str
+    bill_date: datetime
+    is_shared: bool
+    is_shared: bool = True
 
 
 class BillOut(BaseModel):
@@ -38,6 +47,22 @@ class BillOut(BaseModel):
     amount: Decimal
     note: str
     bill_date: datetime
+    is_shared: bool
+    is_shared: bool = True
 
     class Config:
         from_attributes = True
+
+
+class JoinRequestOut(BaseModel):
+    id: int
+    family_id: int
+    family_name: str
+    applicant_user_id: int
+    applicant_nickname: str
+    status: str
+    created_at: datetime
+
+
+class JoinRequestReviewIn(BaseModel):
+    approve: bool
