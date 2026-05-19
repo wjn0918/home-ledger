@@ -3,6 +3,14 @@ const { syncFamilies } = require('../../utils/family')
 const app = getApp()
 
 Page({
+  handleUnauthorized() {
+    app.globalData.token = ""
+    app.globalData.familyId = null
+    wx.removeStorageSync("token")
+    wx.removeStorageSync("familyId")
+    this.setData({ loggedIn: false, familyId: null, joinRequests: [] })
+    wx.showToast({ title: "登录已失效，请重新登录", icon: "none" })
+  },
   data: {
     familyName: '',
     familyId: null,
@@ -30,7 +38,9 @@ Page({
       this.setData({ familyId: data.selectedFamilyId })
       await this.loadJoinRequests()
     } catch (e) {
-      // ignore refresh failure
+      if (e.statusCode === 401) {
+        this.handleUnauthorized()
+      }
     }
   },
 
@@ -66,6 +76,7 @@ Page({
       this.setData({ familyId: res.id })
       wx.showToast({ title: '家庭已创建' })
     } catch (error) {
+      if (error.statusCode === 401) return this.handleUnauthorized()
       wx.showToast({ title: '创建失败，请重试', icon: 'none' })
     }
   },
@@ -80,6 +91,7 @@ Page({
       this.setData({ familyId: data.selectedFamilyId, joinFamilyId: '' })
       wx.showToast({ title: res.message || '申请已提交', icon: 'none' })
     } catch (error) {
+      if (error.statusCode === 401) return this.handleUnauthorized()
       if (error.statusCode === 404) {
         wx.showToast({ title: '家庭不存在', icon: 'none' })
         return
@@ -94,6 +106,7 @@ Page({
       const requests = await request('/families/join-requests')
       this.setData({ joinRequests: requests || [] })
     } catch (e) {
+      if (e.statusCode === 401) return this.handleUnauthorized()
       this.setData({ joinRequests: [] })
     }
   },
@@ -105,6 +118,7 @@ Page({
       wx.showToast({ title: res.message || '操作成功', icon: 'none' })
       await this.loadJoinRequests()
     } catch (err) {
+      if (err.statusCode === 401) return this.handleUnauthorized()
       wx.showToast({ title: '操作失败，请重试', icon: 'none' })
     }
   },

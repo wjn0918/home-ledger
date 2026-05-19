@@ -38,12 +38,6 @@ class BillUpdateIn(BaseModel):
     is_shared: bool = True
 
 
-class BillUpdateIn(BaseModel):
-    amount: Decimal
-    category: str
-    bill_date: datetime
-
-
 class BillOut(BaseModel):
     id: int
     family_id: int
