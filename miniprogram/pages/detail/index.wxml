@@ -1,8 +1,7 @@
 <view class="lin-container">
   <view class="lin-card">
     <view class="lin-row">
-      <view class="lin-title">明细</view>
-      <view class="lin-subtitle">当前家庭：{{currentFamilyName || '未选择'}}</view>
+            <view class="lin-subtitle">当前家庭：{{currentFamilyName || '未选择'}}</view>
     </view>
     <picker mode="selector" range="{{families}}" range-key="name" value="{{familyIndex}}" bindchange="onFamilyChange">
       <view class="lin-tab">切换家庭</view>

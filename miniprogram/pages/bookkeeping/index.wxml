@@ -1,6 +1,5 @@
 <view class="lin-container">
   <view class="lin-card">
-    <view class="lin-title">记一笔</view>
     <view class="lin-subtitle">当前家庭：{{currentFamilyName || '未选择'}}</view>
 
     <picker mode="selector" range="{{families}}" range-key="name" value="{{familyIndex}}" bindchange="onFamilyChange">
@@ -8,17 +7,15 @@
     </picker>
 
     <input class="lin-input" placeholder="金额" type="digit" bindinput="bindAmount" />
-    <view class="lin-input">账单类别：{{category}}</view>
     <view class="lin-tabs">
       <block wx:for="{{categoryOptions}}" wx:key="*this">
         <text class="lin-tab {{category === item ? 'active' : ''}}" data-category="{{item}}" bindtap="onCategoryTap">{{item}}</text>
       </block>
+      <text class="lin-tab" bindtap="onAddCategoryTap">+</text>
     </view>
     <picker mode="date" value="{{billDate}}" bindchange="onDateChange">
       <view class="lin-input">记账日期：{{billDate}}</view>
     </picker>
-    <input class="lin-input" placeholder="新增类别（如：零食）" value="{{newCategory}}" bindinput="bindNewCategory" />
-    <button class="lin-btn" bindtap="addCustomCategory">添加账单类别</button>
     <input class="lin-input" placeholder="备注" bindinput="bindNote" />
     <button class="lin-btn" bindtap="onSubmit">提交记账</button>
   </view>
