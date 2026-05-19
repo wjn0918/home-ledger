@@ -27,6 +27,15 @@ class BillCreateIn(BaseModel):
     amount: Decimal
     note: str = ""
     bill_date: datetime
+    is_shared: bool = True
+
+
+class BillUpdateIn(BaseModel):
+    amount: Decimal
+    category: str
+    bill_date: datetime
+    is_shared: bool
+    is_shared: bool = True
 
 
 class BillUpdateIn(BaseModel):
@@ -44,6 +53,8 @@ class BillOut(BaseModel):
     amount: Decimal
     note: str
     bill_date: datetime
+    is_shared: bool
+    is_shared: bool = True
 
     class Config:
         from_attributes = True

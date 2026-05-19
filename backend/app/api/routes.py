@@ -1,5 +1,5 @@
 import random
-from sqlalchemy import func
+from sqlalchemy import func, or_
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
@@ -180,6 +180,7 @@ def update_bill(bill_id: int, payload: BillUpdateIn, db: Session = Depends(get_d
     bill.amount = payload.amount
     bill.category = payload.category
     bill.bill_date = payload.bill_date
+    bill.is_shared = payload.is_shared
     db.commit()
     db.refresh(bill)
     return bill
@@ -193,7 +194,10 @@ def list_bills(family_id: int, db: Session = Depends(get_db), user: User = Depen
     ).first()
     if not membership:
         raise HTTPException(status_code=403, detail="你不是该家庭成员")
-    return db.query(Bill).filter(Bill.family_id == family_id).order_by(Bill.bill_date.desc()).all()
+    return db.query(Bill).filter(
+        Bill.family_id == family_id,
+        or_(Bill.is_shared == True, Bill.user_id == user.id)
+    ).order_by(Bill.bill_date.desc()).all()
 
 
 @router.get("/charts/summary")

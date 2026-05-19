@@ -16,6 +16,7 @@
     <picker mode="date" value="{{billDate}}" bindchange="onDateChange">
       <view class="lin-input">记账日期：{{billDate}}</view>
     </picker>
+    <view class="lin-row"><view>共享到家庭账单</view><switch checked="{{isShared}}" bindchange="onShareChange" /></view>
     <input class="lin-input" placeholder="备注" bindinput="bindNote" />
     <button class="lin-btn" bindtap="onSubmit">提交记账</button>
   </view>

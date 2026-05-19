@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import String, DateTime, ForeignKey, Integer, DECIMAL, UniqueConstraint
+from sqlalchemy import String, DateTime, ForeignKey, Integer, DECIMAL, UniqueConstraint, Boolean
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db.session import Base
@@ -57,5 +57,6 @@ class Bill(Base):
     category: Mapped[str] = mapped_column(String(50))
     amount: Mapped[float] = mapped_column(DECIMAL(10, 2))
     note: Mapped[str] = mapped_column(String(255), default="")
+    is_shared: Mapped[bool] = mapped_column(Boolean, default=True)
     bill_date: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)

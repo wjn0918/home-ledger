@@ -60,84 +60,76 @@ Page({
     this.setData({ bills: list, groupedBills: groupBillsByDay(list) })
   },
 
-  async onEditBill(e) {
-    const billId = e.currentTarget.dataset.id
-    const bill = this.data.bills.find((item) => item.id === billId)
+  async onAmountTap(e) {
+    const bill = this.findBillByDatasetId(e)
     if (!bill) return
-
-    wx.showActionSheet({
-      itemList: ['修改金额', '修改类别', '修改日期'],
-      success: async ({ tapIndex }) => {
-        if (tapIndex === 0) {
-          await this.editAmount(bill)
-        } else if (tapIndex === 1) {
-          await this.editCategory(bill)
-        } else if (tapIndex === 2) {
-          await this.editDate(bill)
-        }
+    wx.showModal({
+      title: '修改金额',
+      editable: true,
+      placeholderText: `${bill.amount}`,
+      success: async (res) => {
+        if (!res.confirm) return
+        const amount = Number((res.content || '').trim())
+        if (!amount) return wx.showToast({ title: '金额无效', icon: 'none' })
+        await this.submitBillEdit(bill, { amount })
       }
     })
+  },
+
+  async onCategoryTap(e) {
+    const bill = this.findBillByDatasetId(e)
+    if (!bill) return
+    wx.showModal({
+      title: '修改类别',
+      editable: true,
+      placeholderText: bill.category,
+      success: async (res) => {
+        if (!res.confirm) return
+        const category = (res.content || '').trim()
+        if (!category) return wx.showToast({ title: '类别不能为空', icon: 'none' })
+        await this.submitBillEdit(bill, { category })
+      }
+    })
+  },
+
+  async onDateTap(e) {
+    const bill = this.findBillByDatasetId(e)
+    if (!bill) return
+    wx.showModal({
+      title: '修改日期',
+      editable: true,
+      placeholderText: toDay(bill.bill_date),
+      success: async (res) => {
+        if (!res.confirm) return
+        const dateStr = (res.content || '').trim()
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return wx.showToast({ title: '日期格式应为YYYY-MM-DD', icon: 'none' })
+        await this.submitBillEdit(bill, { bill_date: new Date(`${dateStr}T00:00:00`).toISOString() })
+      }
+    })
+  },
+
+  async onShareSwitchChange(e) {
+    const bill = this.findBillByDatasetId(e)
+    if (!bill) return
+    await this.submitBillEdit(bill, { is_shared: !!e.detail.value })
+  },
+
+  findBillByDatasetId(e) {
+    const billId = Number(e.currentTarget.dataset.id)
+    return this.data.bills.find((item) => item.id === billId)
   },
 
   async submitBillEdit(bill, patch) {
     const payload = {
       amount: patch.amount ?? Number(bill.amount),
       category: patch.category ?? bill.category,
-      bill_date: patch.bill_date ?? bill.bill_date
+      bill_date: patch.bill_date ?? bill.bill_date,
+      is_shared: patch.is_shared ?? bill.is_shared
     }
     await request(`/bills/${bill.id}`, 'PUT', payload)
     await this.loadFamiliesAndBills()
     wx.showToast({ title: '修改成功', icon: 'none' })
   },
 
-  editAmount(bill) {
-    return new Promise((resolve) => {
-      wx.showModal({
-        title: '修改金额',
-        editable: true,
-        placeholderText: `${bill.amount}`,
-        success: async (res) => {
-          if (!res.confirm) return resolve()
-          const amount = Number((res.content || '').trim())
-          if (!amount) { wx.showToast({ title: '金额无效', icon: 'none' }); return resolve() }
-          await this.submitBillEdit(bill, { amount })
-          resolve()
-        }
-      })
-    })
-  },
 
-  editCategory(bill) {
-    return new Promise((resolve) => {
-      wx.showModal({
-        title: '修改类别',
-        editable: true,
-        placeholderText: bill.category,
-        success: async (res) => {
-          if (!res.confirm) return resolve()
-          const category = (res.content || '').trim()
-          if (!category) { wx.showToast({ title: '类别不能为空', icon: 'none' }); return resolve() }
-          await this.submitBillEdit(bill, { category })
-          resolve()
-        }
-      })
-    })
-  },
-
-  editDate(bill) {
-    return new Promise((resolve) => {
-      wx.showModal({
-        title: '修改日期',
-        editable: true,
-        placeholderText: toDay(bill.bill_date),
-        success: async (res) => {
-          if (!res.confirm) return resolve()
-          const dateStr = (res.content || '').trim()
-          if (!/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) { wx.showToast({ title: '日期格式应为YYYY-MM-DD', icon: 'none' }); return resolve() }
-          await this.submitBillEdit(bill, { bill_date: new Date(`${dateStr}T00:00:00`).toISOString() })
-          resolve()
-        }
-      })
-    })
-  }
 })

@@ -14,7 +14,8 @@ Page({
     families: [],
     familyIndex: 0,
     currentFamilyName: '',
-    categoryOptions: DEFAULT_CATEGORIES
+    categoryOptions: DEFAULT_CATEGORIES,
+    isShared: true
   },
 
   async onShow() {
@@ -69,7 +70,8 @@ Page({
       category: this.data.category,
       type: this.data.type,
       note: this.data.note,
-      bill_date: new Date(`${this.data.billDate}T00:00:00`).toISOString()
+      bill_date: new Date(`${this.data.billDate}T00:00:00`).toISOString(),
+      is_shared: this.data.isShared
     })
     wx.showToast({ title: '记账成功' })
   },
@@ -92,6 +94,7 @@ Page({
 
   bindAmount(e) { this.setData({ amount: e.detail.value }) },
   bindNote(e) { this.setData({ note: e.detail.value }) },
+  onShareChange(e) { this.setData({ isShared: !!e.detail.value }) },
 
   onAddCategoryTap() {
     wx.showModal({
