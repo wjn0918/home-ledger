@@ -17,6 +17,7 @@
       <block wx:for="{{item.items}}" wx:key="id">
         <view class="lin-row" style="margin-top:10rpx;">
           <view>{{item.category}} {{item.note}}</view>
+          <text class="lin-tab" data-id="{{item.id}}" bindtap="onEditBill">编辑</text>
           <view>¥{{item.amount}}</view>
         </view>
       </block>

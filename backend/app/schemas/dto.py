@@ -29,6 +29,12 @@ class BillCreateIn(BaseModel):
     bill_date: datetime
 
 
+class BillUpdateIn(BaseModel):
+    amount: Decimal
+    category: str
+    bill_date: datetime
+
+
 class BillOut(BaseModel):
     id: int
     family_id: int

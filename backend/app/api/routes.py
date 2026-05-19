@@ -1,3 +1,4 @@
+import random
 from sqlalchemy import func
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
@@ -5,7 +6,7 @@ from sqlalchemy.orm import Session
 from app.api.deps import get_current_user
 from app.db.session import get_db
 from app.models.entities import User, Family, FamilyMember, FamilyJoinRequest, Bill
-from app.schemas.dto import LoginByCodeIn, LoginOut, FamilyCreateIn, FamilyMemberIn, BillCreateIn, BillOut, JoinRequestOut, JoinRequestReviewIn
+from app.schemas.dto import LoginByCodeIn, LoginOut, FamilyCreateIn, FamilyMemberIn, BillCreateIn, BillUpdateIn, BillOut, JoinRequestOut, JoinRequestReviewIn
 from app.services.auth import get_or_create_user_by_wechat_code, create_token
 
 router = APIRouter()
@@ -19,7 +20,11 @@ async def auth_wechat(payload: LoginByCodeIn, db: Session = Depends(get_db)):
 
 @router.post("/families")
 def create_family(payload: FamilyCreateIn, db: Session = Depends(get_db), user: User = Depends(get_current_user)):
-    family = Family(name=payload.name, owner_user_id=user.id)
+    family_id = random.randint(100000, 999999)
+    while db.query(Family).filter(Family.id == family_id).first():
+        family_id = random.randint(100000, 999999)
+
+    family = Family(id=family_id, name=payload.name, owner_user_id=user.id)
     db.add(family)
     db.flush()
     db.add(FamilyMember(family_id=family.id, user_id=user.id, role="owner"))
@@ -154,6 +159,27 @@ def create_bill(payload: BillCreateIn, db: Session = Depends(get_db), user: User
 
     bill = Bill(**payload.model_dump(), user_id=user.id)
     db.add(bill)
+    db.commit()
+    db.refresh(bill)
+    return bill
+
+
+@router.put("/bills/{bill_id}", response_model=BillOut)
+def update_bill(bill_id: int, payload: BillUpdateIn, db: Session = Depends(get_db), user: User = Depends(get_current_user)):
+    bill = db.query(Bill).filter(Bill.id == bill_id).first()
+    if not bill:
+        raise HTTPException(status_code=404, detail="账单不存在")
+
+    membership = db.query(FamilyMember).filter(
+        FamilyMember.family_id == bill.family_id,
+        FamilyMember.user_id == user.id
+    ).first()
+    if not membership:
+        raise HTTPException(status_code=403, detail="你不是该家庭成员")
+
+    bill.amount = payload.amount
+    bill.category = payload.category
+    bill.bill_date = payload.bill_date
     db.commit()
     db.refresh(bill)
     return bill
