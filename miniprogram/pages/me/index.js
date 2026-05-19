@@ -3,6 +3,14 @@ const { syncFamilies, switchFamily } = require('../../utils/family')
 const app = getApp()
 
 Page({
+  handleUnauthorized() {
+    app.globalData.token = ""
+    app.globalData.familyId = null
+    wx.removeStorageSync("token")
+    wx.removeStorageSync("familyId")
+    this.setData({ loggedIn: false, familyId: null, joinRequests: [] })
+    wx.showToast({ title: "登录已失效，请重新登录", icon: "none" })
+  },
   data: {
     familyName: '',
     familyId: null,
