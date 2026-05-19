@@ -9,7 +9,7 @@ from sqlalchemy.orm import Session
 from app.core.config import settings
 from app.models.entities import User
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+pwd_context = CryptContext(schemes=["pbkdf2_sha256", "bcrypt"], deprecated="auto")
 BCRYPT_PASSWORD_MAX_BYTES = 72
 
 
@@ -60,7 +60,10 @@ def normalize_password(password: str) -> str:
 
 
 def hash_password(password: str) -> str:
-    return pwd_context.hash(normalize_password(password))
+    normalized = normalize_password(password)
+    # Use pbkdf2_sha256 as default scheme to avoid bcrypt 72-byte hard-limit runtime issues.
+    # Keep bcrypt in context for backward compatibility when verifying historical hashes.
+    return pwd_context.hash(normalized, scheme="pbkdf2_sha256")
 
 
 def verify_password(password: str, password_hash: str) -> bool:
