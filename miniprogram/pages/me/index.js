@@ -8,7 +8,8 @@ Page({
     familyId: null,
     joinFamilyId: '',
     loggedIn: false,
-    userId: null
+    userId: null,
+    joinRequests: []
   },
 
   async onShow() {
@@ -27,6 +28,7 @@ Page({
     try {
       const data = await syncFamilies(app)
       this.setData({ familyId: data.selectedFamilyId })
+      await this.loadJoinRequests()
     } catch (e) {
       // ignore refresh failure
     }
@@ -76,13 +78,34 @@ Page({
       const res = await request(`/families/join?family_id=${Number(this.data.joinFamilyId)}`, 'POST')
       const data = await syncFamilies(app)
       this.setData({ familyId: data.selectedFamilyId, joinFamilyId: '' })
-      wx.showToast({ title: res.message || '加入成功', icon: 'none' })
+      wx.showToast({ title: res.message || '申请已提交', icon: 'none' })
     } catch (error) {
       if (error.statusCode === 404) {
         wx.showToast({ title: '家庭不存在', icon: 'none' })
         return
       }
       wx.showToast({ title: '加入失败，请重试', icon: 'none' })
+    }
+  },
+
+  async loadJoinRequests() {
+    if (!this.data.loggedIn) return
+    try {
+      const requests = await request('/families/join-requests')
+      this.setData({ joinRequests: requests || [] })
+    } catch (e) {
+      this.setData({ joinRequests: [] })
+    }
+  },
+
+  async onReviewRequest(e) {
+    const { id, approve } = e.currentTarget.dataset
+    try {
+      const res = await request(`/families/join-requests/${id}/review`, 'POST', { approve })
+      wx.showToast({ title: res.message || '操作成功', icon: 'none' })
+      await this.loadJoinRequests()
+    } catch (err) {
+      wx.showToast({ title: '操作失败，请重试', icon: 'none' })
     }
   },
 

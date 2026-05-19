@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import String, DateTime, ForeignKey, Integer, DECIMAL
+from sqlalchemy import String, DateTime, ForeignKey, Integer, DECIMAL, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db.session import Base
@@ -32,6 +32,19 @@ class FamilyMember(Base):
     family_id: Mapped[int] = mapped_column(ForeignKey("families.id"), index=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), index=True)
     role: Mapped[str] = mapped_column(String(20), default="member")
+
+
+class FamilyJoinRequest(Base):
+    __tablename__ = "family_join_requests"
+    __table_args__ = (
+        UniqueConstraint("family_id", "applicant_user_id", "status", name="uq_family_applicant_status"),
+    )
+
+    id: Mapped[int] = mapped_column(primary_key=True, index=True)
+    family_id: Mapped[int] = mapped_column(ForeignKey("families.id"), index=True)
+    applicant_user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), index=True)
+    status: Mapped[str] = mapped_column(String(20), default="pending")
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
 
 class Bill(Base):
