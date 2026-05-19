@@ -17,7 +17,10 @@ Page({
     joinFamilyId: '',
     loggedIn: false,
     userId: null,
-    joinRequests: []
+    joinRequests: [],
+    account: '',
+    password: '',
+    nickname: ''
   },
 
   async onShow() {
@@ -123,6 +126,36 @@ Page({
     }
   },
 
+
+
+  async onAccountLogin() {
+    if (!this.data.account || !this.data.password) return wx.showToast({ title: '请输入账号和密码', icon: 'none' })
+    try {
+      const res = await request('/auth/login', 'POST', { account: this.data.account, password: this.data.password })
+      app.globalData.token = res.token
+      wx.setStorageSync('token', res.token)
+      this.setData({ loggedIn: true, userId: res.user_id })
+      wx.showToast({ title: '登录成功', icon: 'none' })
+    } catch (error) {
+      wx.showToast({ title: '账号或密码错误', icon: 'none' })
+    }
+  },
+
+  async onRegister() {
+    if (!this.data.account || !this.data.password) return wx.showToast({ title: '请输入账号和密码', icon: 'none' })
+    try {
+      const res = await request('/auth/register', 'POST', { account: this.data.account, password: this.data.password, nickname: this.data.nickname || '普通用户' })
+      app.globalData.token = res.token
+      wx.setStorageSync('token', res.token)
+      this.setData({ loggedIn: true, userId: res.user_id })
+      wx.showToast({ title: '注册并登录成功', icon: 'none' })
+    } catch (error) {
+      wx.showToast({ title: '注册失败，账号可能已存在', icon: 'none' })
+    }
+  },
   bindName(e) { this.setData({ familyName: e.detail.value }) },
-  bindJoinFamilyId(e) { this.setData({ joinFamilyId: e.detail.value }) }
+  bindJoinFamilyId(e) { this.setData({ joinFamilyId: e.detail.value }) },
+  bindAccount(e) { this.setData({ account: e.detail.value.trim() }) },
+  bindPassword(e) { this.setData({ password: e.detail.value.trim() }) },
+  bindNickname(e) { this.setData({ nickname: e.detail.value.trim() }) }
 })

@@ -2,11 +2,14 @@ from datetime import datetime, timedelta
 
 import httpx
 from fastapi import HTTPException
+from passlib.context import CryptContext
 from jose import jwt
 from sqlalchemy.orm import Session
 
 from app.core.config import settings
 from app.models.entities import User
+
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
 def create_token(user_id: int):
@@ -43,4 +46,30 @@ async def get_or_create_user_by_wechat_code(code: str, db: Session):
         db.add(user)
         db.commit()
         db.refresh(user)
+    return user
+
+
+def hash_password(password: str) -> str:
+    return pwd_context.hash(password)
+
+
+def verify_password(password: str, password_hash: str) -> bool:
+    return pwd_context.verify(password, password_hash)
+
+
+def register_by_account(account: str, password: str, nickname: str, db: Session):
+    exists = db.query(User).filter(User.account == account).first()
+    if exists:
+        raise HTTPException(status_code=400, detail="账号已存在")
+    user = User(account=account, password_hash=hash_password(password), nickname=nickname)
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+    return user
+
+
+def login_by_account(account: str, password: str, db: Session):
+    user = db.query(User).filter(User.account == account).first()
+    if not user or not user.password_hash or not verify_password(password, user.password_hash):
+        raise HTTPException(status_code=400, detail="账号或密码错误")
     return user

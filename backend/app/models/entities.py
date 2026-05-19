@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Optional
 
 from sqlalchemy import String, DateTime, ForeignKey, Integer, DECIMAL, UniqueConstraint, Boolean
 from sqlalchemy.orm import Mapped, mapped_column
@@ -10,9 +11,11 @@ class User(Base):
     __tablename__ = "users"
 
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
-    openid: Mapped[str] = mapped_column(String(64), unique=True, index=True)
+    openid: Mapped[Optional[str]] = mapped_column(String(64), unique=True, index=True, nullable=True)
     nickname: Mapped[str] = mapped_column(String(50), default="微信用户")
     avatar_url: Mapped[str] = mapped_column(String(255), default="")
+    account: Mapped[Optional[str]] = mapped_column(String(50), unique=True, index=True, nullable=True)
+    password_hash: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
 

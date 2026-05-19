@@ -12,6 +12,17 @@ class LoginOut(BaseModel):
     user_id: int
 
 
+class AccountRegisterIn(BaseModel):
+    account: str
+    password: str
+    nickname: str = "普通用户"
+
+
+class AccountLoginIn(BaseModel):
+    account: str
+    password: str
+
+
 class FamilyCreateIn(BaseModel):
     name: str
 
@@ -34,7 +45,6 @@ class BillUpdateIn(BaseModel):
     amount: Decimal
     category: str
     bill_date: datetime
-    is_shared: bool
     is_shared: bool = True
 
 
@@ -48,7 +58,6 @@ class BillOut(BaseModel):
     note: str
     bill_date: datetime
     is_shared: bool
-    is_shared: bool = True
 
     class Config:
         from_attributes = True

@@ -6,10 +6,22 @@ from sqlalchemy.orm import Session
 from app.api.deps import get_current_user
 from app.db.session import get_db
 from app.models.entities import User, Family, FamilyMember, FamilyJoinRequest, Bill
-from app.schemas.dto import LoginByCodeIn, LoginOut, FamilyCreateIn, FamilyMemberIn, BillCreateIn, BillUpdateIn, BillOut, JoinRequestOut, JoinRequestReviewIn
-from app.services.auth import get_or_create_user_by_wechat_code, create_token
+from app.schemas.dto import LoginByCodeIn, LoginOut, AccountRegisterIn, AccountLoginIn, FamilyCreateIn, FamilyMemberIn, BillCreateIn, BillUpdateIn, BillOut, JoinRequestOut, JoinRequestReviewIn
+from app.services.auth import get_or_create_user_by_wechat_code, register_by_account, login_by_account, create_token
 
 router = APIRouter()
+
+
+@router.post("/auth/register", response_model=LoginOut)
+def auth_register(payload: AccountRegisterIn, db: Session = Depends(get_db)):
+    user = register_by_account(payload.account, payload.password, payload.nickname, db)
+    return LoginOut(token=create_token(user.id), user_id=user.id)
+
+
+@router.post("/auth/login", response_model=LoginOut)
+def auth_login(payload: AccountLoginIn, db: Session = Depends(get_db)):
+    user = login_by_account(payload.account, payload.password, db)
+    return LoginOut(token=create_token(user.id), user_id=user.id)
 
 
 @router.post("/auth/wechat", response_model=LoginOut)

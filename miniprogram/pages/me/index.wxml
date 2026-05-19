@@ -1,7 +1,12 @@
 <view class="lin-container">
   <view class="lin-card">
         <view class="lin-subtitle">状态：{{loggedIn ? '已登录' : '未登录，请先登录/注册'}}</view>
-    <button wx:if="{{!loggedIn}}" class="lin-btn" bindtap="onLogin">微信登录/注册</button>
+    <button wx:if="{{!loggedIn}}" class="lin-btn" bindtap="onLogin">微信登录</button>
+    <input wx:if="{{!loggedIn}}" class="lin-input" placeholder="账号" bindinput="bindAccount" />
+    <input wx:if="{{!loggedIn}}" class="lin-input" password placeholder="密码" bindinput="bindPassword" />
+    <input wx:if="{{!loggedIn}}" class="lin-input" placeholder="昵称（注册可选）" bindinput="bindNickname" />
+    <button wx:if="{{!loggedIn}}" class="lin-btn" bindtap="onAccountLogin">账号密码登录</button>
+    <button wx:if="{{!loggedIn}}" class="lin-btn" bindtap="onRegister">注册账户</button>
   </view>
 
   <view class="lin-card">
