@@ -16,6 +16,12 @@ function request(url, method = 'GET', data = {}) {
           resolve(res.data)
           return
         }
+        if (res.statusCode === 401) {
+          app.globalData.token = ""
+          wx.removeStorageSync("token")
+          wx.removeStorageSync("familyId")
+          app.globalData.familyId = null
+        }
         reject({
           statusCode: res.statusCode,
           data: res.data

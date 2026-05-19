@@ -1,5 +1,5 @@
 const { request } = require('../../utils/request')
-const { syncFamilies, switchFamily } = require('../../utils/family')
+const { syncFamilies } = require('../../utils/family')
 const app = getApp()
 
 function toDate(d) {
@@ -61,7 +61,9 @@ function filterBillsByPeriod(bills, period) {
 
 Page({
   data: {
-    families: [], familyIndex: 0, currentFamilyName: '',
+    currentFamilyName: '',
+    statScope: 'family',
+    scopeOptions: ['家庭', '本人'],
     bills: [],
     dimensionOptions: ['周', '月', '年'],
     dimensionIndex: 0,
@@ -80,12 +82,7 @@ Page({
   async loadFamiliesAndChart() {
     try {
       const data = await syncFamilies(app)
-      const familyIndex = data.families.findIndex((f) => f.id === data.selectedFamilyId)
-      this.setData({
-        families: data.families,
-        familyIndex: familyIndex >= 0 ? familyIndex : 0,
-        currentFamilyName: data.selectedFamilyName
-      })
+      this.setData({ currentFamilyName: data.selectedFamilyName })
       if (!data.selectedFamilyId) return
       await this.reloadBillsAndMetrics(data.selectedFamilyId)
     } catch (e) {
@@ -94,7 +91,7 @@ Page({
   },
 
   async reloadBillsAndMetrics(familyId) {
-    const bills = await request(`/bills?family_id=${familyId}`)
+    const bills = await request(`/bills?family_id=${familyId}&scope=${this.data.statScope}`)
     this.setData({ bills })
     this.buildPeriodsAndStats()
   },
@@ -142,11 +139,9 @@ Page({
     this.calcStats()
   },
 
-  async onFamilyChange(e) {
-    const index = Number(e.detail.value)
-    const target = switchFamily(app, this.data.families, index)
-    if (!target) return
-    this.setData({ familyIndex: index, currentFamilyName: target.name })
-    await this.reloadBillsAndMetrics(target.id)
+  async onScopeTabTap(e) {
+    const index = Number(e.currentTarget.dataset.index)
+    this.setData({ statScope: index === 1 ? "self" : "family" })
+    if (app.globalData.familyId) await this.reloadBillsAndMetrics(app.globalData.familyId)
   }
 })
