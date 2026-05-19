@@ -58,6 +58,7 @@ class BillOut(BaseModel):
     note: str
     bill_date: datetime
     is_shared: bool
+    creator_nickname: str | None = None
 
     class Config:
         from_attributes = True

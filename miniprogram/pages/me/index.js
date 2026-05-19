@@ -1,5 +1,5 @@
 const { request } = require('../../utils/request')
-const { syncFamilies } = require('../../utils/family')
+const { syncFamilies, switchFamily } = require('../../utils/family')
 const app = getApp()
 
 Page({
@@ -20,7 +20,9 @@ Page({
     joinRequests: [],
     account: '',
     password: '',
-    nickname: ''
+    nickname: '',
+    families: [],
+    familyIndex: 0
   },
 
   async onShow() {
@@ -38,7 +40,8 @@ Page({
 
     try {
       const data = await syncFamilies(app)
-      this.setData({ familyId: data.selectedFamilyId })
+      const familyIndex = data.families.findIndex((f) => f.id === data.selectedFamilyId)
+      this.setData({ familyId: data.selectedFamilyId, families: data.families, familyIndex: familyIndex >= 0 ? familyIndex : 0 })
       await this.loadJoinRequests()
     } catch (e) {
       if (e.statusCode === 401) {
@@ -54,7 +57,13 @@ Page({
           const res = await request('/auth/wechat', 'POST', { code })
           app.globalData.token = res.token
           wx.setStorageSync('token', res.token)
-          this.setData({ loggedIn: true, userId: res.user_id })
+          app.globalData.userId = res.user_id
+          wx.setStorageSync('userId', res.user_id)
+          app.globalData.userId = res.user_id
+      wx.setStorageSync('userId', res.user_id)
+      app.globalData.userId = res.user_id
+      wx.setStorageSync('userId', res.user_id)
+      this.setData({ loggedIn: true, userId: res.user_id })
           wx.showModal({
             title: '登录/注册成功',
             content: '已完成微信身份校验，首次登录会自动注册账号。',
@@ -157,5 +166,11 @@ Page({
   bindJoinFamilyId(e) { this.setData({ joinFamilyId: e.detail.value }) },
   bindAccount(e) { this.setData({ account: e.detail.value.trim() }) },
   bindPassword(e) { this.setData({ password: e.detail.value.trim() }) },
-  bindNickname(e) { this.setData({ nickname: e.detail.value.trim() }) }
+  bindNickname(e) { this.setData({ nickname: e.detail.value.trim() }) },
+  onFamilySwitch(e) {
+    const index = Number(e.detail.value)
+    const target = switchFamily(app, this.data.families, index)
+    if (!target) return
+    this.setData({ familyIndex: index, familyId: target.id })
+  }
 })

@@ -188,6 +188,8 @@ def update_bill(bill_id: int, payload: BillUpdateIn, db: Session = Depends(get_d
     ).first()
     if not membership:
         raise HTTPException(status_code=403, detail="你不是该家庭成员")
+    if bill.user_id != user.id:
+        raise HTTPException(status_code=403, detail="只能修改自己创建的账单")
 
     bill.amount = payload.amount
     bill.category = payload.category
@@ -199,17 +201,26 @@ def update_bill(bill_id: int, payload: BillUpdateIn, db: Session = Depends(get_d
 
 
 @router.get("/bills", response_model=list[BillOut])
-def list_bills(family_id: int, db: Session = Depends(get_db), user: User = Depends(get_current_user)):
+def list_bills(family_id: int, scope: str = "family", db: Session = Depends(get_db), user: User = Depends(get_current_user)):
     membership = db.query(FamilyMember).filter(
         FamilyMember.family_id == family_id,
         FamilyMember.user_id == user.id
     ).first()
     if not membership:
         raise HTTPException(status_code=403, detail="你不是该家庭成员")
-    return db.query(Bill).filter(
-        Bill.family_id == family_id,
-        or_(Bill.is_shared == True, Bill.user_id == user.id)
-    ).order_by(Bill.bill_date.desc()).all()
+    query = db.query(Bill, User.nickname).join(User, User.id == Bill.user_id).filter(Bill.family_id == family_id)
+    if scope == "self":
+        query = query.filter(Bill.user_id == user.id)
+    else:
+        query = query.filter(or_(Bill.is_shared == True, Bill.user_id == user.id))
+
+    rows = query.order_by(Bill.bill_date.desc()).all()
+    result = []
+    for bill, nickname in rows:
+        item = BillOut.model_validate(bill).model_dump()
+        item["creator_nickname"] = nickname
+        result.append(item)
+    return result
 
 
 @router.get("/charts/summary")

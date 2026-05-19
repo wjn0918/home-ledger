@@ -1,5 +1,5 @@
 const { request } = require('../../utils/request')
-const { syncFamilies, switchFamily } = require('../../utils/family')
+const { syncFamilies } = require('../../utils/family')
 const app = getApp()
 
 function toDay(dateStr) {
@@ -27,7 +27,7 @@ function groupBillsByDay(bills) {
 }
 
 Page({
-  data: { bills: [], groupedBills: [], families: [], familyIndex: 0, currentFamilyName: '' },
+  data: { bills: [], groupedBills: [], currentFamilyName: '', userId: null },
 
   async onShow() {
     if (!app.requireLogin()) return
@@ -37,12 +37,7 @@ Page({
   async loadFamiliesAndBills() {
     try {
       const data = await syncFamilies(app)
-      const familyIndex = data.families.findIndex((f) => f.id === data.selectedFamilyId)
-      this.setData({
-        families: data.families,
-        familyIndex: familyIndex >= 0 ? familyIndex : 0,
-        currentFamilyName: data.selectedFamilyName
-      })
+      this.setData({ currentFamilyName: data.selectedFamilyName, userId: app.globalData.userId || wx.getStorageSync("userId") || null })
       if (!data.selectedFamilyId) return
       const list = await request(`/bills?family_id=${data.selectedFamilyId}`)
       this.setData({ bills: list, groupedBills: groupBillsByDay(list) })
@@ -51,18 +46,11 @@ Page({
     }
   },
 
-  async onFamilyChange(e) {
-    const index = Number(e.detail.value)
-    const target = switchFamily(app, this.data.families, index)
-    if (!target) return
-    this.setData({ familyIndex: index, currentFamilyName: target.name })
-    const list = await request(`/bills?family_id=${target.id}`)
-    this.setData({ bills: list, groupedBills: groupBillsByDay(list) })
-  },
 
   async onAmountTap(e) {
     const bill = this.findBillByDatasetId(e)
     if (!bill) return
+    if (bill.user_id !== this.data.userId) return wx.showToast({ title: "仅可修改自己账单", icon: "none" })
     wx.showModal({
       title: '修改金额',
       editable: true,
@@ -79,6 +67,7 @@ Page({
   async onCategoryTap(e) {
     const bill = this.findBillByDatasetId(e)
     if (!bill) return
+    if (bill.user_id !== this.data.userId) return wx.showToast({ title: "仅可修改自己账单", icon: "none" })
     wx.showModal({
       title: '修改类别',
       editable: true,
@@ -95,6 +84,7 @@ Page({
   async onDateTap(e) {
     const bill = this.findBillByDatasetId(e)
     if (!bill) return
+    if (bill.user_id !== this.data.userId) return wx.showToast({ title: "仅可修改自己账单", icon: "none" })
     wx.showModal({
       title: '修改日期',
       editable: true,
@@ -111,6 +101,7 @@ Page({
   async onShareSwitchChange(e) {
     const bill = this.findBillByDatasetId(e)
     if (!bill) return
+    if (bill.user_id !== this.data.userId) return wx.showToast({ title: "仅可修改自己账单", icon: "none" })
     await this.submitBillEdit(bill, { is_shared: !!e.detail.value })
   },
 

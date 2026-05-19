@@ -1,6 +1,6 @@
 <view class="lin-container">
   <view class="lin-card">
-        <view class="lin-subtitle">状态：{{loggedIn ? '已登录' : '未登录，请先登录/注册'}}</view>
+        <view class="lin-row"><view class="lin-subtitle">状态：{{loggedIn ? '已登录' : '未登录，请先登录/注册'}}</view><picker wx:if="{{loggedIn}}" mode="selector" range="{{families}}" range-key="name" value="{{familyIndex}}" bindchange="onFamilySwitch"><view class="lin-tab">切换家庭</view></picker></view>
     <button wx:if="{{!loggedIn}}" class="lin-btn" bindtap="onLogin">微信登录</button>
     <input wx:if="{{!loggedIn}}" class="lin-input" placeholder="账号" bindinput="bindAccount" />
     <input wx:if="{{!loggedIn}}" class="lin-input" password placeholder="密码" bindinput="bindPassword" />

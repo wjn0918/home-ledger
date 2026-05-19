@@ -3,9 +3,12 @@
     <view class="lin-row">
             <view class="lin-subtitle">当前家庭：{{currentFamilyName || '未选择'}}</view>
     </view>
-    <picker mode="selector" range="{{families}}" range-key="name" value="{{familyIndex}}" bindchange="onFamilyChange">
-      <view class="lin-tab">切换家庭</view>
-    </picker>
+
+    <view class="lin-tabs">
+      <block wx:for="{{scopeOptions}}" wx:key="*this">
+        <text class="lin-tab {{(statScope==='family'&&index===0)||(statScope==='self'&&index===1)?'active':''}}" data-index="{{index}}" bindtap="onScopeTabTap">{{item}}</text>
+      </block>
+    </view>
 
     <view class="lin-tabs">
       <block wx:for="{{dimensionOptions}}" wx:key="*this">
