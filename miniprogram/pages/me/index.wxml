@@ -16,4 +16,16 @@
     <view class="lin-subtitle">当前家庭ID：{{familyId}}</view>
     <view class="lin-subtitle">同一家庭成员可共同查看家庭账单</view>
   </view>
+
+  <view class="lin-card">
+    <view class="lin-title">加入申请审批</view>
+    <view wx:if="{{!joinRequests.length}}" class="lin-subtitle">暂无待处理申请</view>
+    <view wx:for="{{joinRequests}}" wx:key="id" class="lin-subtitle">
+      <view>申请人：{{item.applicant_nickname}}（ID:{{item.applicant_user_id}}）</view>
+      <view>申请加入：{{item.family_name}}（ID:{{item.family_id}}）</view>
+      <button class="lin-btn" data-id="{{item.id}}" data-approve="{{true}}" bindtap="onReviewRequest">同意</button>
+      <button class="lin-btn" data-id="{{item.id}}" data-approve="{{false}}" bindtap="onReviewRequest">拒绝</button>
+    </view>
+  </view>
+
 </view>

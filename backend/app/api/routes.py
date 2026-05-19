@@ -4,8 +4,8 @@ from sqlalchemy.orm import Session
 
 from app.api.deps import get_current_user
 from app.db.session import get_db
-from app.models.entities import User, Family, FamilyMember, Bill
-from app.schemas.dto import LoginByCodeIn, LoginOut, FamilyCreateIn, FamilyMemberIn, BillCreateIn, BillOut
+from app.models.entities import User, Family, FamilyMember, FamilyJoinRequest, Bill
+from app.schemas.dto import LoginByCodeIn, LoginOut, FamilyCreateIn, FamilyMemberIn, BillCreateIn, BillOut, JoinRequestOut, JoinRequestReviewIn
 from app.services.auth import get_or_create_user_by_wechat_code, create_token
 
 router = APIRouter()
@@ -55,9 +55,73 @@ def join_family(family_id: int, db: Session = Depends(get_db), user: User = Depe
     if exists:
         return {"ok": True, "message": "已加入该家庭"}
 
-    db.add(FamilyMember(family_id=family_id, user_id=user.id, role="member"))
+    pending = db.query(FamilyJoinRequest).filter(
+        FamilyJoinRequest.family_id == family_id,
+        FamilyJoinRequest.applicant_user_id == user.id,
+        FamilyJoinRequest.status == "pending"
+    ).first()
+    if pending:
+        return {"ok": True, "message": "申请已提交，等待家庭创建人处理"}
+
+    db.add(FamilyJoinRequest(family_id=family_id, applicant_user_id=user.id, status="pending"))
     db.commit()
-    return {"ok": True, "message": "加入家庭成功"}
+    return {"ok": True, "message": "申请已提交，等待家庭创建人同意"}
+
+
+@router.get("/families/join-requests", response_model=list[JoinRequestOut])
+def list_join_requests(db: Session = Depends(get_db), user: User = Depends(get_current_user)):
+    rows = (
+        db.query(FamilyJoinRequest, Family.name, User.nickname)
+        .join(Family, Family.id == FamilyJoinRequest.family_id)
+        .join(User, User.id == FamilyJoinRequest.applicant_user_id)
+        .filter(Family.owner_user_id == user.id, FamilyJoinRequest.status == "pending")
+        .order_by(FamilyJoinRequest.created_at.desc())
+        .all()
+    )
+
+    return [
+        JoinRequestOut(
+            id=req.id,
+            family_id=req.family_id,
+            family_name=family_name,
+            applicant_user_id=req.applicant_user_id,
+            applicant_nickname=applicant_nickname,
+            status=req.status,
+            created_at=req.created_at
+        )
+        for req, family_name, applicant_nickname in rows
+    ]
+
+
+@router.post("/families/join-requests/{request_id}/review")
+def review_join_request(request_id: int, payload: JoinRequestReviewIn, db: Session = Depends(get_db), user: User = Depends(get_current_user)):
+    req = (
+        db.query(FamilyJoinRequest)
+        .join(Family, Family.id == FamilyJoinRequest.family_id)
+        .filter(FamilyJoinRequest.id == request_id, Family.owner_user_id == user.id)
+        .first()
+    )
+    if not req:
+        raise HTTPException(status_code=404, detail="申请不存在")
+
+    if req.status != "pending":
+        return {"ok": True, "message": "该申请已处理"}
+
+    if payload.approve:
+        exists = db.query(FamilyMember).filter(
+            FamilyMember.family_id == req.family_id,
+            FamilyMember.user_id == req.applicant_user_id
+        ).first()
+        if not exists:
+            db.add(FamilyMember(family_id=req.family_id, user_id=req.applicant_user_id, role="member"))
+        req.status = "approved"
+        message = "已同意加入申请"
+    else:
+        req.status = "rejected"
+        message = "已拒绝加入申请"
+
+    db.commit()
+    return {"ok": True, "message": message}
 
 @router.post("/families/{family_id}/members")
 def add_member(family_id: int, payload: FamilyMemberIn, db: Session = Depends(get_db), user: User = Depends(get_current_user)):
