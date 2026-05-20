@@ -3,14 +3,6 @@ const { syncFamilies, switchFamily } = require('../../utils/family')
 const app = getApp()
 
 Page({
-  handleUnauthorized() {
-    app.globalData.token = ""
-    app.globalData.familyId = null
-    wx.removeStorageSync("token")
-    wx.removeStorageSync("familyId")
-    this.setData({ loggedIn: false, familyId: null, joinRequests: [] })
-    wx.showToast({ title: "登录已失效，请重新登录", icon: "none" })
-  },
   data: {
     familyName: '',
     familyId: null,
@@ -23,7 +15,9 @@ Page({
     nickname: '',
     families: [],
     familyIndex: 0,
-    loginTab: 'wechat'
+    loginTab: 'wechat',
+    userInfo: null, // Add userInfo to store nickname/avatar
+    currentFamilyName: '未选择'
   },
 
   handleUnauthorized() {
@@ -46,11 +40,47 @@ Page({
     try {
       const data = await syncFamilies(app)
       const familyIndex = data.families.findIndex((f) => f.id === data.selectedFamilyId)
-      this.setData({ familyId: data.selectedFamilyId, families: data.families, familyIndex: familyIndex >= 0 ? familyIndex : 0 })
+      const currentFamily = data.families[familyIndex] || null
+      this.setData({ 
+        familyId: data.selectedFamilyId, 
+        families: data.families, 
+        familyIndex: familyIndex >= 0 ? familyIndex : 0,
+        currentFamilyName: currentFamily ? currentFamily.name : '未加入家庭'
+      })
       await this.loadJoinRequests()
     } catch (e) {
       if (e.statusCode === 401) this.handleUnauthorized()
     }
+  },
+
+  showCreateFamilyModal() {
+    if (!this.data.loggedIn) return wx.showToast({ title: '请先登录', icon: 'none' })
+    wx.showModal({
+      title: '创建新家庭',
+      editable: true,
+      placeholderText: '请输入家庭名称',
+      success: async (res) => {
+        if (res.confirm && res.content) {
+          this.setData({ familyName: res.content })
+          await this.onCreateFamily()
+        }
+      }
+    })
+  },
+
+  showJoinFamilyModal() {
+    if (!this.data.loggedIn) return wx.showToast({ title: '请先登录', icon: 'none' })
+    wx.showModal({
+      title: '加入家庭',
+      editable: true,
+      placeholderText: '请输入家庭ID',
+      success: async (res) => {
+        if (res.confirm && res.content) {
+          this.setData({ joinFamilyId: res.content })
+          await this.onJoinFamily()
+        }
+      }
+    })
   },
 
   setLoginState(res) {
@@ -107,8 +137,8 @@ Page({
       const res = await request('/families', 'POST', { name: this.data.familyName })
       app.globalData.familyId = res.id
       wx.setStorageSync('familyId', res.id)
-      this.setData({ familyId: res.id })
       wx.showToast({ title: '家庭已创建' })
+      await this.onShow() // Refresh data
     } catch (error) {
       if (error.statusCode === 401) return this.handleUnauthorized()
       wx.showToast({ title: '创建失败，请重试', icon: 'none' })
@@ -157,7 +187,24 @@ Page({
     const index = Number(e.detail.value)
     const target = switchFamily(app, this.data.families, index)
     if (!target) return
-    this.setData({ familyIndex: index, familyId: target.id })
+    this.setData({ 
+      familyIndex: index, 
+      familyId: target.id,
+      currentFamilyName: target.name 
+    })
+  },
+
+  onLogout() {
+    wx.showModal({
+      title: '退出登录',
+      content: '确定要退出当前账户吗？',
+      success: (res) => {
+        if (res.confirm) {
+          this.handleUnauthorized()
+          wx.showToast({ title: '已退出登录', icon: 'none' })
+        }
+      }
+    })
   },
 
   bindName(e) { this.setData({ familyName: e.detail.value }) },

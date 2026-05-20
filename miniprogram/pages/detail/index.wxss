@@ -1,0 +1,92 @@
+.header {
+  background: linear-gradient(135deg, #3963bc 0%, #5a8dee 100%);
+  padding: 40rpx 30rpx 60rpx;
+  color: #fff;
+}
+
+.family-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30rpx;
+}
+
+.family-name {
+  font-size: 36rpx;
+  font-weight: 600;
+}
+
+.stats-row {
+  display: flex;
+  gap: 40rpx;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.stat-label {
+  font-size: 24rpx;
+  opacity: 0.8;
+  margin-bottom: 8rpx;
+}
+
+.stat-value {
+  font-size: 32rpx;
+  font-weight: 600;
+}
+
+.bill-list {
+  margin-top: -30rpx;
+  padding: 0 30rpx;
+}
+
+.day-group {
+  margin-bottom: 30rpx;
+}
+
+.day-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20rpx 10rpx;
+}
+
+.day-label {
+  font-size: 28rpx;
+  color: #909399;
+  font-weight: 500;
+}
+
+.day-total {
+  font-size: 26rpx;
+  color: #303133;
+  font-weight: 600;
+}
+
+.modern-card {
+  padding: 0 30rpx;
+}
+
+.bill-item {
+  padding: 30rpx 0;
+}
+
+.bill-item:last-child {
+  border-bottom: none;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding-top: 200rpx;
+  color: #c0c4cc;
+}
+
+.empty-icon {
+  font-size: 100rpx;
+  margin-bottom: 20rpx;
+}

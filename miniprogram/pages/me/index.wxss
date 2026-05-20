@@ -1,0 +1,258 @@
+.me-container {
+  min-height: 100vh;
+  background-color: #f8f9fa;
+  padding-bottom: 40rpx;
+}
+
+/* 用户头部 */
+.user-header {
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+  padding: 60rpx 40rpx 100rpx;
+  display: flex;
+  align-items: center;
+  color: #fff;
+}
+
+.avatar-container {
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: 60rpx;
+  background: rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 30rpx;
+  border: 4rpx solid rgba(255, 255, 255, 0.3);
+  overflow: hidden;
+  font-size: 48rpx;
+}
+
+.avatar-img {
+  width: 100%;
+  height: 100%;
+}
+
+.user-info {
+  flex: 1;
+}
+
+.nickname {
+  font-size: 36rpx;
+  font-weight: 600;
+  margin-bottom: 8rpx;
+  display: block;
+}
+
+.user-id {
+  font-size: 24rpx;
+  opacity: 0.8;
+}
+
+.login-btn-header {
+  font-size: 32rpx;
+  font-weight: 500;
+}
+
+/* 统计/家庭信息卡片 */
+.info-cards {
+  margin-top: -40rpx;
+  padding: 0 30rpx;
+}
+
+.family-card {
+  background: var(--bg-card);
+  border-radius: 20rpx;
+  padding: 30rpx;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.05);
+}
+
+.family-main {
+  display: flex;
+  flex-direction: column;
+}
+
+.family-label {
+  font-size: 24rpx;
+  color: var(--text-sub);
+  margin-bottom: 4rpx;
+}
+
+.family-name {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.switch-btn {
+  font-size: 24rpx;
+  color: var(--primary-color);
+  background: #f0f4ff;
+  padding: 10rpx 24rpx;
+  border-radius: 30rpx;
+  font-weight: 500;
+}
+
+/* 功能列表 */
+.menu-list {
+  margin: 30rpx;
+  background: var(--bg-card);
+  border-radius: 20rpx;
+  overflow: hidden;
+  box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.02);
+}
+
+.menu-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 34rpx 30rpx;
+  border-bottom: 1rpx solid var(--border-color);
+  transition: background 0.2s;
+}
+
+.menu-item:active {
+  background-color: #f9f9f9;
+}
+
+.menu-item:last-child {
+  border-bottom: none;
+}
+
+.menu-left {
+  display: flex;
+  align-items: center;
+}
+
+.menu-icon {
+  margin-right: 20rpx;
+  font-size: 36rpx;
+}
+
+.menu-text {
+  font-size: 30rpx;
+  color: var(--text-main);
+}
+
+.menu-arrow {
+  color: #c0c4cc;
+  font-size: 24rpx;
+}
+
+/* 待处理申请 */
+.section-title {
+  padding: 30rpx 30rpx 10rpx;
+  font-size: 28rpx;
+  color: var(--text-sub);
+  font-weight: 500;
+}
+
+.request-item {
+  background: var(--bg-card);
+  margin: 0 30rpx 20rpx;
+  padding: 30rpx;
+  border-radius: 20rpx;
+  box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.02);
+}
+
+.request-info {
+  margin-bottom: 20rpx;
+}
+
+.request-user {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: var(--text-main);
+  margin-bottom: 10rpx;
+  display: block;
+}
+
+.request-detail {
+  font-size: 24rpx;
+  color: #606266;
+  display: block;
+}
+
+.request-actions {
+  display: flex;
+  gap: 20rpx;
+}
+
+.action-btn {
+  flex: 1;
+  font-size: 26rpx;
+  padding: 16rpx 0;
+  border-radius: 12rpx;
+  text-align: center;
+  font-weight: 500;
+}
+
+.btn-approve {
+  background-color: var(--primary-color);
+  color: #fff;
+}
+
+.btn-reject {
+  background-color: #f5f7fa;
+  color: var(--text-sub);
+}
+
+/* 登录弹窗/区域 */
+.login-section {
+  padding: 40rpx;
+  background: var(--bg-card);
+  margin: 30rpx;
+  border-radius: 24rpx;
+  box-shadow: 0 8rpx 30rpx rgba(0, 0, 0, 0.05);
+}
+
+.login-tabs {
+  display: flex;
+  margin-bottom: 40rpx;
+  border-bottom: 2rpx solid var(--border-color);
+}
+
+.login-tab {
+  flex: 1;
+  text-align: center;
+  padding: 20rpx 0;
+  font-size: 28rpx;
+  color: var(--text-sub);
+  position: relative;
+}
+
+.login-tab.active {
+  color: var(--primary-color);
+  font-weight: 600;
+}
+
+.login-tab.active::after {
+  content: '';
+  position: absolute;
+  bottom: -2rpx;
+  left: 20%;
+  right: 20%;
+  height: 4rpx;
+  background: var(--primary-color);
+  border-radius: 2rpx;
+}
+
+.form-item {
+  margin-bottom: 24rpx;
+}
+
+.secondary-btn {
+  background: transparent;
+  color: var(--primary-color);
+  border: 2rpx solid var(--primary-color);
+  margin-top: 20rpx;
+}
+
+.empty-tip {
+  text-align: center;
+  padding: 60rpx 0;
+  color: #c0c4cc;
+  font-size: 26rpx;
+}

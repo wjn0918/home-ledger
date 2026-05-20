@@ -1,43 +1,103 @@
-<view class="lin-container">
-  <view class="lin-card">
-    <view class="lin-row"><view class="lin-subtitle">状态：{{loggedIn ? '已登录' : '未登录，请先登录/注册'}}</view><picker wx:if="{{loggedIn}}" mode="selector" range="{{families}}" range-key="name" value="{{familyIndex}}" bindchange="onFamilySwitch"><view class="lin-tab">切换家庭</view></picker></view>
-
-    <view wx:if="{{!loggedIn}}" class="lin-tabs">
-      <text class="lin-tab {{loginTab==='wechat' ? 'active' : ''}}" data-tab="wechat" bindtap="onLoginTabTap">微信登录</text>
-      <text class="lin-tab {{loginTab==='account' ? 'active' : ''}}" data-tab="account" bindtap="onLoginTabTap">账号登录</text>
+<view class="me-container">
+  <!-- 用户头部 -->
+  <view class="user-header">
+    <view class="avatar-container">
+      <image class="avatar-img" src="{{userInfo.avatarUrl || '/images/default-avatar.png'}}" mode="aspectFill" wx:if="{{loggedIn}}"></image>
+      <text wx:else>?</text>
     </view>
-
-    <view wx:if="{{!loggedIn && loginTab==='wechat'}}">
-      <button class="lin-btn" bindtap="onLogin">微信一键登录</button>
+    <view class="user-info" wx:if="{{loggedIn}}">
+      <text class="nickname">{{nickname || '用户' + userId}}</text>
+      <text class="user-id">ID: {{userId}}</text>
     </view>
-
-    <view wx:if="{{!loggedIn && loginTab==='account'}}">
-      <input class="lin-input" placeholder="账号" bindinput="bindAccount" />
-      <input class="lin-input" password placeholder="密码" bindinput="bindPassword" />
-      <input class="lin-input" placeholder="昵称（注册可选）" bindinput="bindNickname" />
-      <button class="lin-btn" bindtap="onAccountLogin">账号密码登录</button>
-      <button class="lin-btn" bindtap="onRegister">注册账户</button>
+    <view class="user-info" wx:else bindtap="onLoginTabTap" data-tab="wechat">
+      <text class="login-btn-header">点击登录/注册</text>
     </view>
   </view>
 
-  <view class="lin-card">
-    <input class="lin-input" placeholder="输入家庭名称" bindinput="bindName" />
-    <button class="lin-btn" bindtap="onCreateFamily">创建家庭</button>
-
-    <input class="lin-input" placeholder="输入家庭ID加入家庭" value="{{joinFamilyId}}" bindinput="bindJoinFamilyId" />
-    <button class="lin-btn" bindtap="onJoinFamily">加入家庭</button>
-
-    <view class="lin-subtitle">当前家庭ID：{{familyId}}</view>
-    <view class="lin-subtitle">同一家庭成员可共同查看家庭账单</view>
+  <!-- 家庭信息卡片 -->
+  <view class="info-cards" wx:if="{{loggedIn}}">
+    <view class="family-card">
+      <view class="family-main">
+        <text class="family-label">当前家庭</text>
+        <text class="family-name">{{currentFamilyName}}</text>
+      </view>
+      <picker mode="selector" range="{{families}}" range-key="name" value="{{familyIndex}}" bindchange="onFamilySwitch">
+        <view class="switch-btn">切换家庭</view>
+      </picker>
+    </view>
   </view>
 
-  <view class="lin-card">
-    <view wx:if="{{!joinRequests.length}}" class="lin-subtitle">暂无待处理申请</view>
-    <view wx:for="{{joinRequests}}" wx:key="id" class="lin-subtitle">
-      <view>申请人：{{item.applicant_nickname}}（ID:{{item.applicant_user_id}}）</view>
-      <view>申请加入：{{item.family_name}}（ID:{{item.family_id}}）</view>
-      <button class="lin-btn" data-id="{{item.id}}" data-approve="{{true}}" bindtap="onReviewRequest">同意</button>
-      <button class="lin-btn" data-id="{{item.id}}" data-approve="{{false}}" bindtap="onReviewRequest">拒绝</button>
+  <!-- 登录区域 (未登录时显示) -->
+  <view wx:if="{{!loggedIn}}" class="login-section">
+    <view class="login-tabs">
+      <view class="login-tab {{loginTab==='wechat' ? 'active' : ''}}" data-tab="wechat" bindtap="onLoginTabTap">微信登录</view>
+      <view class="login-tab {{loginTab==='account' ? 'active' : ''}}" data-tab="account" bindtap="onLoginTabTap">账号登录</view>
+    </view>
+
+    <view wx:if="{{loginTab==='wechat'}}">
+      <view class="modern-btn" bindtap="onLogin">微信一键登录</view>
+    </view>
+
+    <view wx:if="{{loginTab==='account'}}">
+      <view class="form-item">
+        <input class="modern-input" placeholder="请输入账号" bindinput="bindAccount" />
+      </view>
+      <view class="form-item">
+        <input class="modern-input" password placeholder="请输入密码" bindinput="bindPassword" />
+      </view>
+      <view class="form-item">
+        <input class="modern-input" placeholder="昵称（注册可选）" bindinput="bindNickname" />
+      </view>
+      <view class="modern-btn" bindtap="onAccountLogin">立即登录</view>
+      <view class="modern-btn secondary-btn" bindtap="onRegister">注册新账户</view>
+    </view>
+  </view>
+
+  <!-- 功能菜单 -->
+  <view class="menu-list" wx:if="{{loggedIn}}">
+    <view class="menu-item" bindtap="showCreateFamilyModal">
+      <view class="menu-left">
+        <text class="menu-icon">🏠</text>
+        <text class="menu-text">创建新家庭</text>
+      </view>
+      <text class="menu-arrow">></text>
+    </view>
+    <view class="menu-item" bindtap="showJoinFamilyModal">
+      <view class="menu-left">
+        <text class="menu-icon">🔗</text>
+        <text class="menu-text">加入已有家庭</text>
+      </view>
+      <text class="menu-arrow">></text>
+    </view>
+    <view class="menu-item" bindtap="onShow" style="margin-top: 10rpx;">
+      <view class="menu-left">
+        <text class="menu-icon">🔄</text>
+        <text class="menu-text">刷新数据</text>
+      </view>
+      <text class="menu-arrow">></text>
+    </view>
+    <view class="menu-item" bindtap="onLogout">
+      <view class="menu-left">
+        <text class="menu-icon">🚪</text>
+        <text class="menu-text">退出登录</text>
+      </view>
+      <text class="menu-arrow">></text>
+    </view>
+  </view>
+
+  <!-- 待处理申请 -->
+  <view wx:if="{{loggedIn}}">
+    <view class="section-title">待处理申请</view>
+    <view wx:if="{{!joinRequests.length}}" class="empty-tip">暂无新的申请</view>
+    <view wx:for="{{joinRequests}}" wx:key="id" class="request-item">
+      <view class="request-info">
+        <text class="request-user">{{item.applicant_nickname}} 申请加入</text>
+        <text class="request-detail">家庭：{{item.family_name}} (ID:{{item.family_id}})</text>
+      </view>
+      <view class="request-actions">
+        <view class="action-btn btn-reject" data-id="{{item.id}}" data-approve="{{false}}" bindtap="onReviewRequest">拒绝</view>
+        <view class="action-btn btn-approve" data-id="{{item.id}}" data-approve="{{true}}" bindtap="onReviewRequest">同意</view>
+      </view>
     </view>
   </view>
 

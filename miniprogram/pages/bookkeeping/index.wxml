@@ -1,23 +1,80 @@
-<view class="lin-container">
-  <view class="lin-card">
-    <view class="lin-subtitle">当前家庭：{{currentFamilyName || '未选择'}}</view>
+<view class="container">
+  <!-- 顶部标题 -->
+  <view class="header">
+    <view class="modern-subtitle" style="color: rgba(255,255,255,0.8); margin-bottom: 10rpx;">正在记账</view>
+    <view class="modern-title" style="color: #fff; margin-bottom: 0;">{{currentFamilyName || '未选择家庭'}}</view>
+  </view>
 
-    <picker mode="selector" range="{{families}}" range-key="name" value="{{familyIndex}}" bindchange="onFamilyChange">
-      <view class="lin-tab">切换家庭</view>
-    </picker>
-
-    <input class="lin-input" placeholder="金额" type="digit" bindinput="bindAmount" />
-    <view class="lin-tabs">
-      <block wx:for="{{categoryOptions}}" wx:key="*this">
-        <text class="lin-tab {{category === item ? 'active' : ''}}" data-category="{{item}}" bindtap="onCategoryTap">{{item}}</text>
-      </block>
-      <text class="lin-tab" bindtap="onAddCategoryTap">+</text>
+  <!-- 金额输入卡片 -->
+  <view class="amount-card">
+    <view class="amount-box">
+      <text class="amount-label">支出金额</text>
+      <view class="amount-input-wrapper">
+        <text class="currency-symbol">¥</text>
+        <input class="amount-input" type="digit" placeholder="0.00" value="{{amount}}" bindinput="bindAmount" focus />
+      </view>
     </view>
-    <picker mode="date" value="{{billDate}}" bindchange="onDateChange">
-      <view class="lin-input">记账日期：{{billDate}}</view>
-    </picker>
-    <view class="lin-row"><view>共享到家庭账单</view><switch checked="{{isShared}}" bindchange="onShareChange" /></view>
-    <input class="lin-input" placeholder="备注" bindinput="bindNote" />
-    <button class="lin-btn" bindtap="onSubmit">提交记账</button>
+  </view>
+
+  <view class="form-section">
+    <!-- 分类选择 -->
+    <text class="modern-label" style="margin-left: 10rpx; margin-bottom: 20rpx;">选择分类</text>
+    <view class="category-grid">
+      <block wx:for="{{categoryOptions}}" wx:key="*this">
+        <view class="category-item {{category === item ? 'active' : ''}}" data-category="{{item}}" bindtap="onCategoryTap">
+          <text class="category-icon">
+            <text wx:if="{{item === '餐饮' || item === '蔬菜' || item === '水果'}}">🍔</text>
+            <text wx:elif="{{item === '交通'}}">🚗</text>
+            <text wx:elif="{{item === '住房'}}">🏠</text>
+            <text wx:elif="{{item === '购物'}}">🛍️</text>
+            <text wx:elif="{{item === '娱乐'}}">🎮</text>
+            <text wx:else>📝</text>
+          </text>
+          <text class="category-name">{{item}}</text>
+        </view>
+      </block>
+      <view class="category-item add-category" bindtap="onAddCategoryTap">
+        <text class="category-icon">+</text>
+        <text class="category-name">新增</text>
+      </view>
+    </view>
+
+    <!-- 其他表单项 -->
+    <view class="modern-form">
+      <picker mode="selector" range="{{families}}" range-key="name" value="{{familyIndex}}" bindchange="onFamilyChange">
+        <view class="form-item">
+          <text class="item-label">记账家庭</text>
+          <view class="item-value">
+            <text>{{currentFamilyName}}</text>
+            <text class="menu-arrow" style="margin-left: 10rpx;">></text>
+          </view>
+        </view>
+      </picker>
+
+      <picker mode="date" value="{{billDate}}" bindchange="onDateChange">
+        <view class="form-item">
+          <text class="item-label">记账日期</text>
+          <view class="item-value">
+            <text>{{billDate}}</text>
+            <text class="menu-arrow" style="margin-left: 10rpx;">></text>
+          </view>
+        </view>
+      </picker>
+
+      <view class="form-item">
+        <text class="item-label">共享到家庭</text>
+        <switch checked="{{isShared}}" bindchange="onShareChange" color="#3963bc" style="transform: scale(0.8);" />
+      </view>
+
+      <view class="form-item">
+        <text class="item-label">备注</text>
+        <input class="note-input" placeholder="点击输入备注..." value="{{note}}" bindinput="bindNote" />
+      </view>
+    </view>
+
+    <!-- 提交按钮 -->
+    <view class="submit-section">
+      <view class="submit-btn" bindtap="onSubmit">保存账单</view>
+    </view>
   </view>
 </view>

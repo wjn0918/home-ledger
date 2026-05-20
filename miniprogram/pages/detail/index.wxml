@@ -1,23 +1,62 @@
-<view class="lin-container">
-  <view class="lin-card">
-    <view class="lin-row">
-            <view class="lin-subtitle">当前家庭：{{currentFamilyName || '未选择'}}</view>
+<view class="container">
+  <!-- 顶部概览 -->
+  <view class="header">
+    <view class="family-info">
+      <text class="family-name">{{currentFamilyName || '未选择家庭'}}</text>
+    </view>
+    <view class="stats-row">
+      <view class="stat-item">
+        <text class="stat-label">总明细笔数</text>
+        <text class="stat-value">{{bills.length}} 笔</text>
+      </view>
     </view>
   </view>
 
-  <block wx:for="{{groupedBills}}" wx:key="day">
-    <view class="lin-card">
-      <view class="lin-row">
-        <view>{{item.day}}</view>
-        <view>¥{{item.total}}</view>
-      </view>
-      <block wx:for="{{item.items}}" wx:key="id">
-        <view class="lin-row {{item.creatorClass}}" style="margin-top:10rpx; padding: 10rpx; border-radius: 10rpx;">
-          <view><text data-id="{{item.id}}" bindtap="onDateTap">{{item.bill_date.slice(0,10)}}</text> <text data-id="{{item.id}}" bindtap="onCategoryTap">{{item.category}} {{item.note}}<text wx:if="{{item.user_id !== userId}}">（创建人：{{item.creator_nickname}}）</text></text></view>
-          <switch data-id="{{item.id}}" checked="{{item.is_shared}}" bindchange="onShareSwitchChange" />
-          <view data-id="{{item.id}}" bindtap="onAmountTap">¥{{item.amount}}</view>
-        </view>
-      </block>
+  <!-- 账单列表 -->
+  <view class="bill-list">
+    <view wx:if="{{!groupedBills.length}}" class="empty-state">
+      <text class="empty-icon">📅</text>
+      <text>暂无账单数据</text>
     </view>
-  </block>
+
+    <block wx:for="{{groupedBills}}" wx:key="day">
+      <view class="day-group">
+        <view class="day-header">
+          <text class="day-label">{{item.day}}</text>
+          <text class="day-total">支出：¥{{item.total}}</text>
+        </view>
+        
+        <view class="modern-card">
+          <block wx:for="{{item.items}}" wx:key="id">
+            <view class="bill-item">
+              <view class="bill-left">
+                <view class="bill-icon">
+                  <text wx:if="{{item.category === '餐饮' || item.category === '蔬菜' || item.category === '水果'}}">🍔</text>
+                  <text wx:elif="{{item.category === '交通'}}">🚗</text>
+                  <text wx:elif="{{item.category === '住房'}}">🏠</text>
+                  <text wx:elif="{{item.category === '购物'}}">🛍️</text>
+                  <text wx:elif="{{item.category === '娱乐'}}">🎮</text>
+                  <text wx:else>📝</text>
+                </view>
+                <view class="bill-info">
+                  <view class="bill-category">
+                    {{item.category}}
+                    <text class="bill-creator {{item.creatorClass}}">{{item.creator_nickname}}</text>
+                  </view>
+                  <text class="bill-note" data-id="{{item.id}}" bindtap="onCategoryTap">{{item.note || '无备注'}}</text>
+                </view>
+              </view>
+              <view class="bill-right">
+                <view class="bill-amount expense" data-id="{{item.id}}" bindtap="onAmountTap">¥{{item.amount}}</view>
+                <view class="modern-subtitle" style="display: flex; align-items: center; justify-content: flex-end;">
+                  <text style="margin-right: 10rpx;">共享</text>
+                  <switch data-id="{{item.id}}" checked="{{item.is_shared}}" bindchange="onShareSwitchChange" style="transform: scale(0.6);" />
+                </view>
+              </view>
+            </view>
+          </block>
+        </view>
+      </view>
+    </block>
+  </view>
 </view>

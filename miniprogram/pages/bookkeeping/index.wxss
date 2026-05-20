@@ -1,0 +1,141 @@
+.header {
+  background: linear-gradient(135deg, #3963bc 0%, #5a8dee 100%);
+  padding: 40rpx 30rpx 100rpx;
+  color: #fff;
+}
+
+.amount-card {
+  margin-top: -60rpx;
+  padding: 0 30rpx;
+}
+
+.amount-box {
+  background: #fff;
+  border-radius: 24rpx;
+  padding: 40rpx;
+  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.05);
+}
+
+.amount-label {
+  font-size: 26rpx;
+  color: #909399;
+  margin-bottom: 20rpx;
+  display: block;
+}
+
+.amount-input-wrapper {
+  display: flex;
+  align-items: baseline;
+  border-bottom: 2rpx solid #f2f3f5;
+  padding-bottom: 20rpx;
+}
+
+.currency-symbol {
+  font-size: 48rpx;
+  font-weight: 600;
+  color: #303133;
+  margin-right: 10rpx;
+}
+
+.amount-input {
+  font-size: 72rpx;
+  font-weight: 700;
+  color: #303133;
+  height: 90rpx;
+  flex: 1;
+}
+
+.form-section {
+  padding: 30rpx;
+}
+
+.category-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20rpx;
+  margin-bottom: 40rpx;
+}
+
+.category-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20rpx 0;
+  background: #fff;
+  border-radius: 20rpx;
+  border: 2rpx solid transparent;
+  transition: all 0.2s;
+}
+
+.category-item.active {
+  background: #f0f4ff;
+  border-color: #3963bc;
+  color: #3963bc;
+}
+
+.category-icon {
+  font-size: 44rpx;
+  margin-bottom: 12rpx;
+}
+
+.category-name {
+  font-size: 24rpx;
+  font-weight: 500;
+}
+
+.add-category {
+  color: #909399;
+  border: 2rpx dashed #dcdfe6;
+}
+
+.modern-form {
+  background: #fff;
+  border-radius: 24rpx;
+  padding: 10rpx 30rpx;
+  box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.02);
+}
+
+.form-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 30rpx 0;
+  border-bottom: 1rpx solid #f2f3f5;
+}
+
+.form-item:last-child {
+  border-bottom: none;
+}
+
+.item-label {
+  font-size: 28rpx;
+  color: #303133;
+  font-weight: 500;
+}
+
+.item-value {
+  font-size: 28rpx;
+  color: #606266;
+  display: flex;
+  align-items: center;
+}
+
+.note-input {
+  text-align: right;
+  width: 400rpx;
+}
+
+.submit-section {
+  padding: 60rpx 30rpx;
+}
+
+.submit-btn {
+  background: linear-gradient(135deg, #3963bc, #5a8dee);
+  color: #fff;
+  border-radius: 50rpx;
+  padding: 26rpx;
+  font-size: 32rpx;
+  font-weight: 600;
+  text-align: center;
+  box-shadow: 0 8rpx 20rpx rgba(57, 99, 188, 0.3);
+}

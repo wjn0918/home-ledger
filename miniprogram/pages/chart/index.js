@@ -125,6 +125,11 @@ Page({
     const ranking = Object.keys(byCategory)
       .map((c) => ({ category: c, amount: byCategory[c].toFixed(2) }))
       .sort((a, b) => Number(b.amount) - Number(a.amount))
+    
+    const maxAmount = ranking.length > 0 ? Number(ranking[0].amount) : 1
+    ranking.forEach(item => {
+      item.percentage = (Number(item.amount) / maxAmount * 100).toFixed(0)
+    })
 
     this.setData({ totalExpense: total.toFixed(2), trendPoints, ranking })
   },

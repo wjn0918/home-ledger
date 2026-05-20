@@ -1,44 +1,70 @@
-<view class="lin-container">
-  <view class="lin-card">
-    <view class="lin-row">
-            <view class="lin-subtitle">当前家庭：{{currentFamilyName || '未选择'}}</view>
-    </view>
+<view class="container">
+  <!-- 顶部渐变背景 -->
+  <view class="header">
+    <view class="modern-subtitle" style="color: rgba(255,255,255,0.8); margin-bottom: 10rpx;">当前家庭：{{currentFamilyName || '未选择'}}</view>
+    <view class="modern-title" style="color: #fff; margin-bottom: 0;">收支统计</view>
+  </view>
 
-    <view class="lin-tabs">
+  <!-- 总支出卡片 -->
+  <view class="summary-card">
+    <view class="total-box">
+      <text class="total-label">总支出 (元)</text>
+      <text class="total-amount">¥{{totalExpense}}</text>
+    </view>
+  </view>
+
+  <view class="filter-section">
+    <!-- 范围切换 -->
+    <view class="modern-tabs">
       <block wx:for="{{scopeOptions}}" wx:key="*this">
-        <text class="lin-tab {{(statScope==='family'&&index===0)||(statScope==='self'&&index===1)?'active':''}}" data-index="{{index}}" bindtap="onScopeTabTap">{{item}}</text>
+        <view class="modern-tab {{(statScope==='family'&&index===0)||(statScope==='self'&&index===1)?'active':''}}" data-index="{{index}}" bindtap="onScopeTabTap">{{item}}</view>
       </block>
     </view>
 
-    <view class="lin-tabs">
+    <!-- 维度切换 -->
+    <view class="modern-tabs">
       <block wx:for="{{dimensionOptions}}" wx:key="*this">
-        <text class="lin-tab {{dimensionIndex === index ? 'active' : ''}}" data-index="{{index}}" bindtap="onDimensionTabTap">{{item}}</text>
+        <view class="modern-tab {{dimensionIndex === index ? 'active' : ''}}" data-index="{{index}}" bindtap="onDimensionTabTap">{{item}}</view>
       </block>
     </view>
 
-    <view class="lin-tabs">
+    <!-- 周期切换 -->
+    <scroll-view scroll-x class="modern-tabs" style="white-space: nowrap; display: block;">
       <block wx:for="{{periodOptions}}" wx:key="key">
-        <text class="lin-tab {{periodIndex === index ? 'active' : ''}}" data-index="{{index}}" bindtap="onPeriodTabTap">{{item.label}}</text>
+        <view class="modern-tab {{periodIndex === index ? 'active' : ''}}" data-index="{{index}}" bindtap="onPeriodTabTap" style="display: inline-block; width: 120rpx; margin-right: 10rpx;">{{item.label}}</view>
       </block>
+    </scroll-view>
+
+    <!-- 支出排行榜 -->
+    <view class="trend-section">
+      <view class="section-title">支出分类排行</view>
+      <view class="ranking-list" wx:if="{{ranking.length}}">
+        <block wx:for="{{ranking}}" wx:key="category">
+          <view class="ranking-item">
+            <view class="ranking-info">
+              <text class="ranking-name">{{item.category}}</text>
+              <text class="ranking-value">¥{{item.amount}}</text>
+            </view>
+            <view class="progress-bar">
+              <view class="progress-inner" style="width: {{item.percentage}}%"></view>
+            </view>
+          </view>
+        </block>
+      </view>
+      <view wx:else class="modern-card" style="text-align: center; color: #999; padding: 60rpx 0;">暂无支出数据</view>
     </view>
 
-    <view class="lin-subtitle">总支出：¥{{totalExpense}}</view>
-  </view>
-
-  <view class="lin-card">
-    <view class="lin-subtitle">支出折线图（文本版）</view>
-    <block wx:for="{{trendPoints}}" wx:key="*this">
-      <view>{{item}}</view>
-    </block>
-  </view>
-
-  <view class="lin-card">
-    <view class="lin-subtitle">支出排行榜</view>
-    <block wx:for="{{ranking}}" wx:key="category">
-      <view class="lin-row" style="margin-top:10rpx;">
-        <view>{{index + 1}}. {{item.category}}</view>
-        <view>¥{{item.amount}}</view>
+    <!-- 每日趋势 -->
+    <view class="trend-section">
+      <view class="section-title">每日支出明细</view>
+      <view class="modern-card">
+        <block wx:for="{{trendPoints}}" wx:key="*this">
+          <view class="trend-item">
+            <text>{{item}}</text>
+          </view>
+        </block>
+        <view wx:if="{{!trendPoints.length}}" style="text-align: center; color: #999; padding: 20rpx 0;">暂无数据</view>
       </view>
-    </block>
+    </view>
   </view>
 </view>

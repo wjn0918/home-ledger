@@ -2,11 +2,28 @@ App({
   globalData: {
     token: wx.getStorageSync('token') || '',
     familyId: wx.getStorageSync('familyId') || null,
-    apiBase: 'http://127.0.0.1:8000/api'
+    apiBase: '' // 动态设置
   },
 
   onLaunch() {
+    this.initEnv()
     this.requireLogin('欢迎使用家庭记账，请先登录后再使用系统功能。')
+  },
+
+  initEnv() {
+    // 获取当前小程序运行环境
+    const accountInfo = wx.getAccountInfoSync();
+    const env = accountInfo.miniProgram.envVersion;
+
+    // 根据环境设置 apiBase
+    const baseUrls = {
+      develop: 'http://127.0.0.1:8000/api', // 开发版
+      trial: 'https://hapi.catpd.cn/api',    // 体验版
+      release: 'https://hapi.catpd.cn/api'   // 正式版
+    };
+
+    this.globalData.apiBase = baseUrls[env] || baseUrls.release;
+    console.log('Current API Base:', this.globalData.apiBase);
   },
 
   isLoggedIn() {
