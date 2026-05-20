@@ -144,8 +144,7 @@ Page({
               this.setLoginState(res)
               await this.updateWechatProfile({
                 nickname: wechatNickname,
-                avatarUrl: wechatAvatarUrl,
-                fallbackNickname: res.nickname
+                avatarUrl: wechatAvatarUrl
               })
               wx.showToast({ title: '微信登录成功', icon: 'none' })
             } catch (error) {
@@ -204,9 +203,9 @@ Page({
     }
   },
 
-  async updateWechatProfile({ nickname, avatarUrl, fallbackNickname }) {
+  async updateWechatProfile({ nickname, avatarUrl }) {
     const safeNickname = (nickname || '').trim()
-    const shouldUpdateNickname = safeNickname && (!fallbackNickname || fallbackNickname === '微信用户')
+    const shouldUpdateNickname = !!safeNickname
     const shouldUpdateAvatar = !!avatarUrl
     if (!shouldUpdateNickname && !shouldUpdateAvatar) return
 
@@ -216,12 +215,8 @@ Page({
       if (shouldUpdateAvatar) query.push(`avatar_url=${encodeURIComponent(avatarUrl)}`)
       await request(`/users/me?${query.join('&')}`, 'PUT')
 
-      if (shouldUpdateNickname) {
-        wx.setStorageSync('nickname', safeNickname)
-      }
-      if (shouldUpdateAvatar) {
-        wx.setStorageSync('avatarUrl', avatarUrl)
-      }
+      if (shouldUpdateNickname) wx.setStorageSync('nickname', safeNickname)
+      if (shouldUpdateAvatar) wx.setStorageSync('avatarUrl', avatarUrl)
       this.setData({
         nickname: shouldUpdateNickname ? safeNickname : this.data.nickname,
         userInfo: { avatarUrl: shouldUpdateAvatar ? avatarUrl : (this.data.userInfo?.avatarUrl || '') }
