@@ -51,32 +51,16 @@
     <view class="trend-section">
       <view class="section-title">支出趋势图</view>
       <view class="modern-card line-chart-container">
-        <view class="line-chart">
-          <view wx:for="{{linePoints}}" wx:key="index" class="line-column">
-            <view class="line-bar" style="height: {{item.height}}%"></view>
-            <text class="line-label">{{item.label}}</text>
-          </view>
-          <view wx:if="{{!linePoints.length}}" class="empty-chart">暂无趋势数据</view>
-        </view>
+        <ec-canvas id="trend-line-chart" canvas-id="trend-line-chart" ec="{{ ecLine }}"></ec-canvas>
+        <view wx:if="{{!linePoints.length}}" class="empty-chart">暂无趋势数据</view>
       </view>
     </view>
 
     <!-- 家庭成员统计 (仅家庭范围且有数据时显示) -->
     <view class="trend-section" wx:if="{{statScope === 'family' && memberStats.length}}">
       <view class="section-title">成员支出占比</view>
-      <view class="modern-card member-stats-card">
-        <view class="pie-container">
-          <view wx:for="{{memberStats}}" wx:key="nickname" class="member-stat-row">
-            <view class="member-stat-info">
-              <text class="member-name">{{item.nickname}}</text>
-              <text class="member-amount">¥{{item.amount}}</text>
-            </view>
-            <view class="member-progress">
-              <view class="member-progress-inner" style="width: {{item.percentage}}%; background: {{memberColors[index % 5]}}"></view>
-            </view>
-            <text class="member-percent">{{item.percentage}}%</text>
-          </view>
-        </view>
+      <view class="modern-card member-pie-container">
+        <ec-canvas id="member-pie-chart" canvas-id="member-pie-chart" ec="{{ ecPie }}"></ec-canvas>
       </view>
     </view>
 

@@ -1,6 +1,10 @@
+import * as echarts from '../../ec-canvas/echarts'
 const { request } = require('../../utils/request')
 const { syncFamilies } = require('../../utils/family')
 const app = getApp()
+
+let lineChart = null
+let pieChart = null
 
 function toDate(d) {
   return new Date(d.getFullYear(), d.getMonth(), d.getDate())
@@ -73,14 +77,40 @@ Page({
     linePoints: [],
     ranking: [],
     memberStats: [],
-    memberColors: ['#3963bc', '#5a8dee', '#ff9800', '#4caf50', '#9c27b0'],
     startDate: '',
-    endDate: ''
+    endDate: '',
+    ecLine: {
+      onInit: function (canvas, width, height, dpr) {
+        lineChart = echarts.init(canvas, null, {
+          width: width,
+          height: height,
+          devicePixelRatio: dpr
+        })
+        canvas.setChart(lineChart)
+        return lineChart
+      }
+    },
+    ecPie: {
+      onInit: function (canvas, width, height, dpr) {
+        pieChart = echarts.init(canvas, null, {
+          width: width,
+          height: height,
+          devicePixelRatio: dpr
+        })
+        canvas.setChart(pieChart)
+        return pieChart
+      }
+    }
   },
 
   async onShow() {
     if (!app.requireLogin()) return
     await this.loadFamiliesAndChart()
+  },
+
+  onUnload() {
+    lineChart = null
+    pieChart = null
   },
 
   async loadFamiliesAndChart() {
@@ -120,7 +150,7 @@ Page({
     const list = filterBillsByPeriod(this.data.bills, period).filter((b) => b.type === 'expense')
     const total = list.reduce((sum, b) => sum + Number(b.amount || 0), 0)
 
-    // 1. 每日支出趋势 (用于折线图)
+    // 1. 每日支出趋势
     const byDay = {}
     list.forEach((b) => {
       const day = formatDay(new Date(b.bill_date))
@@ -128,12 +158,10 @@ Page({
     })
     
     const sortedDays = Object.keys(byDay).sort()
-    const maxDayAmount = sortedDays.length > 0 ? Math.max(...Object.values(byDay)) : 1
-    const linePoints = sortedDays.map(day => ({
-      label: day.slice(5), // 只显示月-日
-      height: (byDay[day] / maxDayAmount * 100).toFixed(0),
-      amount: byDay[day].toFixed(2)
-    })).slice(-10) // 最多显示最近10个点以免太挤
+    const lineLabels = sortedDays.map(day => day.slice(5)).slice(-15)
+    const lineData = sortedDays.map(day => byDay[day].toFixed(2)).slice(-15)
+
+    this.updateLineChart(lineLabels, lineData)
 
     // 2. 分类排行
     const byCategory = {}
@@ -149,7 +177,7 @@ Page({
       item.percentage = (Number(item.amount) / maxCatAmount * 100).toFixed(0)
     })
 
-    // 3. 家庭成员统计 (仅家庭维度)
+    // 3. 家庭成员统计
     let memberStats = []
     if (this.data.statScope === 'family') {
       const byMember = {}
@@ -159,19 +187,83 @@ Page({
       })
       memberStats = Object.keys(byMember)
         .map(name => ({
-          nickname: name,
-          amount: byMember[name].toFixed(2),
-          percentage: total > 0 ? (byMember[name] / total * 100).toFixed(1) : 0
+          name: name,
+          value: Number(byMember[name].toFixed(2))
         }))
-        .sort((a, b) => Number(b.amount) - Number(a.amount))
+        .sort((a, b) => b.value - a.value)
+      
+      this.updatePieChart(memberStats)
     }
 
     this.setData({ 
       totalExpense: total.toFixed(2), 
-      linePoints, 
+      linePoints: sortedDays, // 用于判断是否有数据显示 empty-chart
       ranking,
       memberStats 
     })
+  },
+
+  updateLineChart(labels, data) {
+    if (!lineChart) {
+      setTimeout(() => this.updateLineChart(labels, data), 500)
+      return
+    }
+    const option = {
+      grid: { left: '10%', right: '10%', bottom: '15%', top: '15%', containLabel: true },
+      tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+      xAxis: {
+        type: 'category',
+        data: labels,
+        axisLine: { lineStyle: { color: '#999' } },
+        axisLabel: { color: '#666', fontSize: 10 }
+      },
+      yAxis: {
+        type: 'value',
+        axisLine: { show: false },
+        axisTick: { show: false },
+        splitLine: { lineStyle: { type: 'dashed', color: '#eee' } },
+        axisLabel: { color: '#666', fontSize: 10 }
+      },
+      series: [{
+        data: data,
+        type: 'line',
+        smooth: true,
+        symbol: 'circle',
+        symbolSize: 6,
+        itemStyle: { color: '#3963bc' },
+        areaStyle: {
+          color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+            { offset: 0, color: 'rgba(57, 99, 188, 0.3)' },
+            { offset: 1, color: 'rgba(57, 99, 188, 0)' }
+          ])
+        }
+      }]
+    }
+    lineChart.setOption(option)
+  },
+
+  updatePieChart(data) {
+    if (!pieChart) {
+      setTimeout(() => this.updatePieChart(data), 500)
+      return
+    }
+    const option = {
+      tooltip: { trigger: 'item', formatter: '{b}: {c} ({d}%)' },
+      legend: { bottom: '0', left: 'center', itemWidth: 10, itemHeight: 10, textStyle: { fontSize: 10 } },
+      series: [{
+        name: '支出占比',
+        type: 'pie',
+        radius: ['40%', '70%'],
+        center: ['50%', '45%'],
+        avoidLabelOverlap: false,
+        itemStyle: { borderRadius: 10, borderColor: '#fff', borderWidth: 2 },
+        label: { show: false, position: 'center' },
+        emphasis: { label: { show: true, fontSize: 14, fontWeight: 'bold' } },
+        labelLine: { show: false },
+        data: data
+      }]
+    }
+    pieChart.setOption(option)
   },
 
   onDimensionTabTap(e) {
