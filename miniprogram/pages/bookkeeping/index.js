@@ -15,7 +15,11 @@ Page({
     familyIndex: 0,
     currentFamilyName: '',
     categoryOptions: DEFAULT_CATEGORIES,
-    isShared: true
+    isShared: true,
+    showCategoryModal: false,
+    showDetailModal: false,
+    calcExpr: '',
+    lastOp: ''
   },
 
   async onShow() {
@@ -35,6 +39,125 @@ Page({
     }
   },
 
+  openCategoryModal() {
+    this.setData({ showCategoryModal: true, showDetailModal: false })
+  },
+
+  onCategorySelect(e) {
+    const category = e.currentTarget.dataset.category
+    this.setData({ 
+      category, 
+      showCategoryModal: false, 
+      showDetailModal: true,
+      amount: '',
+      calcExpr: '',
+      note: ''
+    })
+  },
+
+  closeModals() {
+    this.setData({ showCategoryModal: false, showDetailModal: false })
+  },
+
+  stopBubble() {},
+
+  onCalcInput(e) {
+    const val = e.currentTarget.dataset.val
+    let { calcExpr, amount } = this.data
+
+    if (val === 'back') {
+      calcExpr = calcExpr.slice(0, -1)
+    } else if (val === '=') {
+      amount = this.evaluateExpr(calcExpr)
+      calcExpr = amount
+    } else if (['+', '-'].includes(val)) {
+      if (!calcExpr) return
+      const lastChar = calcExpr.slice(-1)
+      if (['+', '-'].includes(lastChar)) {
+        calcExpr = calcExpr.slice(0, -1) + val
+      } else {
+        // 先计算之前的结果显示在 amount
+        amount = this.evaluateExpr(calcExpr)
+        calcExpr += val
+      }
+    } else {
+      // 数字或点
+      calcExpr += val
+      // 实时计算当前能算出的结果显示在 amount
+      amount = this.evaluateExpr(calcExpr)
+    }
+
+    this.setData({ calcExpr, amount })
+  },
+
+  evaluateExpr(expr) {
+    if (!expr) return '0.00'
+    // 移除末尾的操作符再计算
+    let cleanExpr = expr
+    if (['+', '-'].includes(expr.slice(-1))) {
+      cleanExpr = expr.slice(0, -1)
+    }
+    try {
+      // 简单的加减计算逻辑，避免使用 eval
+      const parts = cleanExpr.split(/([+-])/)
+      let res = parseFloat(parts[0] || 0)
+      for (let i = 1; i < parts.length; i += 2) {
+        const op = parts[i]
+        const val = parseFloat(parts[i + 1] || 0)
+        if (op === '+') res += val
+        else if (op === '-') res -= val
+      }
+      return res.toFixed(2)
+    } catch (e) {
+      return '0.00'
+    }
+  },
+
+  async onSubmit() {
+    if (!app.requireLogin()) return
+    
+    // 提交前先结算表达式
+    const finalAmount = this.evaluateExpr(this.data.calcExpr)
+    if (Number(finalAmount) <= 0) {
+      wx.showToast({ title: '金额必须大于0', icon: 'none' })
+      return
+    }
+
+    if (!app.globalData.familyId) {
+      wx.showToast({ title: '请先选择家庭', icon: 'none' })
+      return
+    }
+
+    try {
+      await request('/bills', 'POST', {
+        family_id: app.globalData.familyId,
+        amount: Number(finalAmount),
+        category: this.data.category,
+        type: this.data.type,
+        note: this.data.note,
+        bill_date: new Date(`${this.data.billDate}T00:00:00`).toISOString(),
+        is_shared: this.data.isShared
+      })
+      wx.showToast({ title: '记账成功', icon: 'success' })
+      this.closeModals()
+      // 重置数据
+      this.setData({ amount: '', note: '', calcExpr: '' })
+    } catch (err) {
+      wx.showToast({ title: '提交失败', icon: 'none' })
+    }
+  },
+
+  onFamilyChange(e) {
+    const index = Number(e.detail.value)
+    const target = switchFamily(app, this.data.families, index)
+    if (!target) return
+    this.setData({ familyIndex: index, currentFamilyName: target.name })
+  },
+
+  onCategoryTap(e) {
+    // 废弃，改用 onCategorySelect
+  },
+
   initTodayDate() {
     if (this.data.billDate) return
     const now = new Date()
@@ -51,41 +174,6 @@ Page({
       categoryOptions,
       category: selected
     })
-  },
-
-  async onSubmit() {
-    if (!app.requireLogin()) return
-    if (!this.data.amount) {
-      wx.showToast({ title: '请输入金额', icon: 'none' })
-      return
-    }
-    if (!app.globalData.familyId) {
-      wx.showToast({ title: '请先选择家庭', icon: 'none' })
-      return
-    }
-
-    await request('/bills', 'POST', {
-      family_id: app.globalData.familyId,
-      amount: Number(this.data.amount),
-      category: this.data.category,
-      type: this.data.type,
-      note: this.data.note,
-      bill_date: new Date(`${this.data.billDate}T00:00:00`).toISOString(),
-      is_shared: this.data.isShared
-    })
-    wx.showToast({ title: '记账成功' })
-  },
-
-  onFamilyChange(e) {
-    const index = Number(e.detail.value)
-    const target = switchFamily(app, this.data.families, index)
-    if (!target) return
-    this.setData({ familyIndex: index, currentFamilyName: target.name })
-  },
-
-  onCategoryTap(e) {
-    const category = e.currentTarget.dataset.category
-    this.setData({ category })
   },
 
   onDateChange(e) {

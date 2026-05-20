@@ -4,56 +4,109 @@
   color: #fff;
 }
 
-.amount-card {
-  margin-top: -60rpx;
-  padding: 0 30rpx;
-}
-
-.amount-box {
-  background: #fff;
-  border-radius: 24rpx;
-  padding: 40rpx;
-  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.05);
-}
-
-.amount-label {
-  font-size: 26rpx;
-  color: #909399;
-  margin-bottom: 20rpx;
-  display: block;
-}
-
-.amount-input-wrapper {
+/* 开始记账视图 */
+.start-view {
+  height: 100vh;
   display: flex;
-  align-items: baseline;
-  border-bottom: 2rpx solid #f2f3f5;
-  padding-bottom: 20rpx;
+  flex-direction: column;
 }
 
-.currency-symbol {
-  font-size: 48rpx;
+.start-btn-container {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-bottom: 200rpx;
+}
+
+.start-circle-btn {
+  width: 240rpx;
+  height: 240rpx;
+  background: linear-gradient(135deg, #3963bc, #5a8dee);
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  box-shadow: 0 20rpx 40rpx rgba(57, 99, 188, 0.2);
+  transition: all 0.2s;
+}
+
+.start-circle-btn:active {
+  transform: scale(0.95);
+  box-shadow: 0 10rpx 20rpx rgba(57, 99, 188, 0.2);
+}
+
+.plus-icon {
+  font-size: 80rpx;
+  font-weight: 300;
+  line-height: 1;
+  margin-bottom: 10rpx;
+}
+
+.btn-text {
+  font-size: 28rpx;
+  font-weight: 500;
+}
+
+/* 弹窗基础样式 */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 1000;
+  display: flex;
+  align-items: flex-end;
+}
+
+.modal-content {
+  width: 100%;
+  background: #fff;
+  border-radius: 40rpx 40rpx 0 0;
+  padding-bottom: env(safe-area-inset-bottom);
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+.modal-header {
+  padding: 30rpx 40rpx;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1rpx solid #f2f3f5;
+}
+
+.modal-title {
+  font-size: 32rpx;
   font-weight: 600;
   color: #303133;
-  margin-right: 10rpx;
 }
 
-.amount-input {
-  font-size: 72rpx;
-  font-weight: 700;
-  color: #303133;
-  height: 90rpx;
-  flex: 1;
+.close-icon {
+  font-size: 48rpx;
+  color: #909399;
+  padding: 10rpx;
 }
 
-.form-section {
-  padding: 30rpx;
+/* 分类弹窗 */
+.category-modal {
+  max-height: 80vh;
+  overflow-y: auto;
 }
 
 .category-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 20rpx;
-  margin-bottom: 40rpx;
+  padding: 40rpx;
 }
 
 .category-item {
@@ -61,41 +114,63 @@
   flex-direction: column;
   align-items: center;
   padding: 20rpx 0;
-  background: #fff;
+  background: #f8f9fa;
   border-radius: 20rpx;
-  border: 2rpx solid transparent;
-  transition: all 0.2s;
 }
 
 .category-item.active {
   background: #f0f4ff;
-  border-color: #3963bc;
   color: #3963bc;
 }
 
-.category-icon {
-  font-size: 44rpx;
-  margin-bottom: 12rpx;
+/* 详情弹窗 */
+.selected-category {
+  display: flex;
+  align-items: center;
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #3963bc;
 }
 
-.category-name {
-  font-size: 24rpx;
-  font-weight: 500;
+.cat-icon {
+  margin-right: 12rpx;
 }
 
-.add-category {
+.amount-display-area {
+  padding: 40rpx;
+  background: #f8f9fa;
+  text-align: right;
+}
+
+.calc-expr {
+  font-size: 28rpx;
   color: #909399;
-  border: 2rpx dashed #dcdfe6;
+  height: 40rpx;
+  margin-bottom: 10rpx;
 }
 
-.modern-form {
-  background: #fff;
-  border-radius: 24rpx;
-  padding: 10rpx 30rpx;
-  box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.02);
+.amount-val {
+  display: flex;
+  justify-content: flex-end;
+  align-items: baseline;
 }
 
-.form-item {
+.amount-val .symbol {
+  font-size: 40rpx;
+  font-weight: 600;
+  margin-right: 8rpx;
+}
+
+.amount-val .value {
+  font-size: 64rpx;
+  font-weight: 700;
+}
+
+.input-rows {
+  padding: 0 40rpx;
+}
+
+.input-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -103,39 +178,63 @@
   border-bottom: 1rpx solid #f2f3f5;
 }
 
-.form-item:last-child {
-  border-bottom: none;
-}
-
-.item-label {
-  font-size: 28rpx;
-  color: #303133;
-  font-weight: 500;
-}
-
-.item-value {
+.row-label {
   font-size: 28rpx;
   color: #606266;
+}
+
+.row-input {
+  text-align: right;
+  flex: 1;
+  margin-left: 40rpx;
+  font-size: 28rpx;
+}
+
+.row-value {
+  font-size: 28rpx;
+  color: #303133;
+}
+
+/* 计算器 */
+.calculator {
+  background: #f2f3f5;
+  padding: 20rpx;
+}
+
+.calc-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12rpx;
+}
+
+.calc-btn {
+  height: 100rpx;
+  background: #fff;
+  border-radius: 12rpx;
   display: flex;
   align-items: center;
+  justify-content: center;
+  font-size: 36rpx;
+  font-weight: 500;
+  box-shadow: 0 2rpx 4rpx rgba(0,0,0,0.05);
 }
 
-.note-input {
-  text-align: right;
-  width: 400rpx;
+.calc-btn:active {
+  background: #f0f2f5;
 }
 
-.submit-section {
-  padding: 60rpx 30rpx;
+.calc-btn.op {
+  background: #eef1f5;
+  color: #3963bc;
 }
 
-.submit-btn {
-  background: linear-gradient(135deg, #3963bc, #5a8dee);
+.calc-btn.submit {
+  background: #3963bc;
   color: #fff;
-  border-radius: 50rpx;
-  padding: 26rpx;
-  font-size: 32rpx;
-  font-weight: 600;
-  text-align: center;
-  box-shadow: 0 8rpx 20rpx rgba(57, 99, 188, 0.3);
+  grid-row: span 1;
 }
+
+.calc-btn.submit:active {
+  opacity: 0.9;
+}
+

@@ -1,80 +1,105 @@
 <view class="container">
-  <!-- 顶部标题 -->
-  <view class="header">
-    <view class="modern-subtitle" style="color: rgba(255,255,255,0.8); margin-bottom: 10rpx;">正在记账</view>
-    <view class="modern-title" style="color: #fff; margin-bottom: 0;">{{currentFamilyName || '未选择家庭'}}</view>
-  </view>
-
-  <!-- 金额输入卡片 -->
-  <view class="amount-card">
-    <view class="amount-box">
-      <text class="amount-label">支出金额</text>
-      <view class="amount-input-wrapper">
-        <text class="currency-symbol">¥</text>
-        <input class="amount-input" type="digit" placeholder="0.00" value="{{amount}}" bindinput="bindAmount" focus />
+  <!-- 初始状态：点击开始记账 -->
+  <view class="start-view" wx:if="{{!showCategoryModal && !showDetailModal}}">
+    <view class="header">
+      <view class="modern-subtitle" style="color: rgba(255,255,255,0.8); margin-bottom: 10rpx;">每一笔支出都值得被记录</view>
+      <view class="modern-title" style="color: #fff; margin-bottom: 0;">{{currentFamilyName || '未选择家庭'}}</view>
+    </view>
+    <view class="start-btn-container">
+      <view class="start-circle-btn" bindtap="openCategoryModal">
+        <text class="plus-icon">+</text>
+        <text class="btn-text">开始记账</text>
       </view>
     </view>
   </view>
 
-  <view class="form-section">
-    <!-- 分类选择 -->
-    <text class="modern-label" style="margin-left: 10rpx; margin-bottom: 20rpx;">选择分类</text>
-    <view class="category-grid">
-      <block wx:for="{{categoryOptions}}" wx:key="*this">
-        <view class="category-item {{category === item ? 'active' : ''}}" data-category="{{item}}" bindtap="onCategoryTap">
-          <text class="category-icon">
-            <text wx:if="{{item === '餐饮' || item === '蔬菜' || item === '水果'}}">🍔</text>
-            <text wx:elif="{{item === '交通'}}">🚗</text>
-            <text wx:elif="{{item === '住房'}}">🏠</text>
-            <text wx:elif="{{item === '购物'}}">🛍️</text>
-            <text wx:elif="{{item === '娱乐'}}">🎮</text>
-            <text wx:else>📝</text>
-          </text>
-          <text class="category-name">{{item}}</text>
+  <!-- 弹窗1：选择分类 -->
+  <view class="modal-overlay" wx:if="{{showCategoryModal}}" bindtap="closeModals">
+    <view class="modal-content category-modal" catchtap="stopBubble">
+      <view class="modal-header">
+        <text class="modal-title">选择分类</text>
+        <text class="close-icon" bindtap="closeModals">×</text>
+      </view>
+      <view class="category-grid">
+        <block wx:for="{{categoryOptions}}" wx:key="*this">
+          <view class="category-item {{category === item ? 'active' : ''}}" data-category="{{item}}" bindtap="onCategorySelect">
+            <text class="category-icon">
+              <text wx:if="{{item === '餐饮' || item === '蔬菜' || item === '水果'}}">🍔</text>
+              <text wx:elif="{{item === '交通'}}">🚗</text>
+              <text wx:elif="{{item === '住房'}}">🏠</text>
+              <text wx:elif="{{item === '购物'}}">🛍️</text>
+              <text wx:elif="{{item === '娱乐'}}">🎮</text>
+              <text wx:else>📝</text>
+            </text>
+            <text class="category-name">{{item}}</text>
+          </view>
+        </block>
+        <view class="category-item add-category" bindtap="onAddCategoryTap">
+          <text class="category-icon">+</text>
+          <text class="category-name">新增</text>
         </view>
-      </block>
-      <view class="category-item add-category" bindtap="onAddCategoryTap">
-        <text class="category-icon">+</text>
-        <text class="category-name">新增</text>
       </view>
     </view>
+  </view>
 
-    <!-- 其他表单项 -->
-    <view class="modern-form">
-      <picker mode="selector" range="{{families}}" range-key="name" value="{{familyIndex}}" bindchange="onFamilyChange">
-        <view class="form-item">
-          <text class="item-label">记账家庭</text>
-          <view class="item-value">
-            <text>{{currentFamilyName}}</text>
-            <text class="menu-arrow" style="margin-left: 10rpx;">></text>
-          </view>
+  <!-- 弹窗2：输入金额、备注、时间 -->
+  <view class="modal-overlay" wx:if="{{showDetailModal}}" bindtap="closeModals">
+    <view class="modal-content detail-modal" catchtap="stopBubble">
+      <view class="modal-header">
+        <view class="selected-category">
+          <text class="cat-icon">📝</text>
+          <text>{{category}}</text>
         </view>
-      </picker>
-
-      <picker mode="date" value="{{billDate}}" bindchange="onDateChange">
-        <view class="form-item">
-          <text class="item-label">记账日期</text>
-          <view class="item-value">
-            <text>{{billDate}}</text>
-            <text class="menu-arrow" style="margin-left: 10rpx;">></text>
-          </view>
-        </view>
-      </picker>
-
-      <view class="form-item">
-        <text class="item-label">共享到家庭</text>
-        <switch checked="{{isShared}}" bindchange="onShareChange" color="#3963bc" style="transform: scale(0.8);" />
+        <text class="close-icon" bindtap="closeModals">×</text>
       </view>
 
-      <view class="form-item">
-        <text class="item-label">备注</text>
-        <input class="note-input" placeholder="点击输入备注..." value="{{note}}" bindinput="bindNote" />
+      <!-- 金额显示与计算过程 -->
+      <view class="amount-display-area">
+        <view class="calc-expr">{{calcExpr || ' '}}</view>
+        <view class="amount-val">
+          <text class="symbol">¥</text>
+          <text class="value">{{amount || '0.00'}}</text>
+        </view>
       </view>
-    </view>
 
-    <!-- 提交按钮 -->
-    <view class="submit-section">
-      <view class="submit-btn" bindtap="onSubmit">保存账单</view>
+      <!-- 备注与日期 -->
+      <view class="input-rows">
+        <view class="input-row">
+          <text class="row-label">备注</text>
+          <input class="row-input" placeholder="点击输入备注..." value="{{note}}" bindinput="bindNote" />
+        </view>
+        <picker mode="date" value="{{billDate}}" bindchange="onDateChange">
+          <view class="input-row">
+            <text class="row-label">日期</text>
+            <view class="row-value">{{billDate}}</view>
+          </view>
+        </picker>
+      </view>
+
+      <!-- 数字键盘/计算器 -->
+      <view class="calculator">
+        <view class="calc-grid">
+          <view class="calc-btn" bindtap="onCalcInput" data-val="7">7</view>
+          <view class="calc-btn" bindtap="onCalcInput" data-val="8">8</view>
+          <view class="calc-btn" bindtap="onCalcInput" data-val="9">9</view>
+          <view class="calc-btn op" bindtap="onCalcInput" data-val="back">退格</view>
+          
+          <view class="calc-btn" bindtap="onCalcInput" data-val="4">4</view>
+          <view class="calc-btn" bindtap="onCalcInput" data-val="5">5</view>
+          <view class="calc-btn" bindtap="onCalcInput" data-val="6">6</view>
+          <view class="calc-btn op" bindtap="onCalcInput" data-val="+">+</view>
+          
+          <view class="calc-btn" bindtap="onCalcInput" data-val="1">1</view>
+          <view class="calc-btn" bindtap="onCalcInput" data-val="2">2</view>
+          <view class="calc-btn" bindtap="onCalcInput" data-val="3">3</view>
+          <view class="calc-btn op" bindtap="onCalcInput" data-val="-">-</view>
+          
+          <view class="calc-btn" bindtap="onCalcInput" data-val=".">.</view>
+          <view class="calc-btn" bindtap="onCalcInput" data-val="0">0</view>
+          <view class="calc-btn op" bindtap="onCalcInput" data-val="=">=</view>
+          <view class="calc-btn submit" bindtap="onSubmit">完成</view>
+        </view>
+      </view>
     </view>
   </view>
 </view>
