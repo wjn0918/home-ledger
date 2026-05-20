@@ -115,6 +115,13 @@
       </view>
       <text class="menu-arrow">></text>
     </view>
+    <view class="menu-item" bindtap="onDeregister" style="margin-top: 10rpx;">
+      <view class="menu-left">
+        <text class="menu-icon">⚠️</text>
+        <text class="menu-text" style="color: #ff4d4f;">注销账号</text>
+      </view>
+      <text class="menu-arrow">></text>
+    </view>
   </view>
 
   <!-- 待处理申请 -->

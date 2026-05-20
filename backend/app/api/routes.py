@@ -37,6 +37,34 @@ def update_my_profile(nickname: str, db: Session = Depends(get_db), user: User =
     return {"ok": True, "nickname": user.nickname}
 
 
+@router.delete("/users/me")
+def deregister_user(db: Session = Depends(get_db), user: User = Depends(get_current_user)):
+    # 1. 处理用户拥有的家庭
+    owned_families = db.query(Family).filter(Family.owner_user_id == user.id).all()
+    for family in owned_families:
+        # 删除该家庭的所有账单
+        db.query(Bill).filter(Bill.family_id == family.id).delete()
+        # 删除该家庭的所有申请
+        db.query(FamilyJoinRequest).filter(FamilyJoinRequest.family_id == family.id).delete()
+        # 删除该家庭的所有成员记录
+        db.query(FamilyMember).filter(FamilyMember.family_id == family.id).delete()
+        # 删除家庭本身
+        db.delete(family)
+
+    # 2. 处理用户作为普通成员的相关数据
+    # 删除用户创建的所有账单（可能在别人的家庭里）
+    db.query(Bill).filter(Bill.user_id == user.id).delete()
+    # 删除用户发起的所有申请
+    db.query(FamilyJoinRequest).filter(FamilyJoinRequest.applicant_user_id == user.id).delete()
+    # 删除用户的所有家庭成员记录
+    db.query(FamilyMember).filter(FamilyMember.user_id == user.id).delete()
+
+    # 3. 最后删除用户记录
+    db.delete(user)
+    db.commit()
+    return {"ok": True, "message": "注销成功"}
+
+
 @router.post("/families")
 def create_family(payload: FamilyCreateIn, db: Session = Depends(get_db), user: User = Depends(get_current_user)):
     family_id = random.randint(100000, 999999)

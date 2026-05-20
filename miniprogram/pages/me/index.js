@@ -309,6 +309,37 @@ Page({
     })
   },
 
+  onDeregister() {
+    wx.showModal({
+      title: '注销账号',
+      content: '注销后将永久删除您的所有账单、家庭及相关数据，且无法找回。确定要注销吗？',
+      confirmColor: '#ff4d4f',
+      success: async (res) => {
+        if (res.confirm) {
+          try {
+            await request('/users/me', 'DELETE')
+            wx.showToast({ title: '账号已注销', icon: 'success' })
+            // 清除本地状态
+            app.globalData.token = null
+            app.globalData.userId = null
+            app.globalData.familyId = null
+            wx.clearStorageSync()
+            this.setData({ 
+              loggedIn: false, 
+              userId: null, 
+              nickname: '',
+              families: [], 
+              familyMembers: [], 
+              joinRequests: [] 
+            })
+          } catch (err) {
+            wx.showToast({ title: '注销失败，请稍后重试', icon: 'none' })
+          }
+        }
+      }
+    })
+  },
+
   bindName(e) { this.setData({ familyName: e.detail.value }) },
   bindJoinFamilyId(e) { this.setData({ joinFamilyId: e.detail.value }) },
   bindAccount(e) { this.setData({ account: e.detail.value.trim() }) },

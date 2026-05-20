@@ -17,7 +17,7 @@ App({
 
     // 根据环境设置 apiBase
     const baseUrls = {
-      develop: 'http://127.0.0.1:8000/api', // 开发版
+      develop: 'http://192.168.3.51:8000/api', // 开发版
       trial: 'https://hapi.catpd.cn/api',    // 体验版
       release: 'https://hapi.catpd.cn/api'   // 正式版
     };
