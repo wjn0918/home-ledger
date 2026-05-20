@@ -31,9 +31,9 @@
     <!-- 周期切换 -->
     <scroll-view scroll-x class="modern-tabs" style="white-space: nowrap; display: block;">
       <block wx:for="{{periodOptions}}" wx:key="key">
-        <view class="modern-tab {{periodIndex === index ? 'active' : ''}}" data-index="{{index}}" bindtap="onPeriodTabTap" style="display: inline-block; width: 120rpx; margin-right: 10rpx;">{{item.label}}</view>
+        <view class="modern-tab {{periodIndex === index ? 'active' : ''}}" data-index="{{index}}" bindtap="onPeriodTabTap" style="display: inline-block; width: 100rpx; margin-right: 6rpx;">{{item.label}}</view>
       </block>
-      <view class="modern-tab {{periodIndex === -1 ? 'active' : ''}}" bindtap="onCustomPeriodTap" style="display: inline-block; width: 160rpx;">自定义</view>
+      <view class="modern-tab {{periodIndex === -1 ? 'active' : ''}}" bindtap="onCustomPeriodTap" style="display: inline-block; width: 130rpx;">自定义</view>
     </scroll-view>
 
     <!-- 自定义时间范围选择 -->
@@ -80,7 +80,7 @@
           </view>
         </block>
       </view>
-      <view wx:else class="modern-card" style="text-align: center; color: #999; padding: 60rpx 0;">暂无支出数据</view>
+      <view wx:else class="modern-card" style="text-align: center; color: #999; padding: 36rpx 0;">暂无支出数据</view>
     </view>
   </view>
 </view>

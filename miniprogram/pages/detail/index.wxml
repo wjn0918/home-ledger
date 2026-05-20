@@ -36,12 +36,12 @@
           <block wx:for="{{item.items}}" wx:key="id">
             <view class="bill-wrapper">
               <view class="checkbox-area" wx:if="{{isBatchMode}}" bindtap="onSelectBill" data-id="{{item.id}}">
-                <view class="checkbox {{selectedIds.includes(item.id) ? 'checked' : ''}}"></view>
+                <view class="checkbox {{item.selected ? 'checked' : ''}}"></view>
               </view>
               
               <movable-area class="swipe-area {{isBatchMode ? 'batch-mode' : ''}}">
                 <movable-view class="swipe-view" direction="horizontal" x="{{item.x}}" out-of-bounds="true" damping="50" friction="1" bindchange="onSwipeChange" data-id="{{item.id}}" disabled="{{isBatchMode}}">
-                  <view class="bill-item {{selectedIds.includes(item.id) ? 'item-selected' : ''}}" bindtap="{{isBatchMode ? 'onSelectBill' : ''}}" data-id="{{item.id}}">
+                  <view class="bill-item {{item.selected ? 'item-selected' : ''}}" bindtap="{{isBatchMode ? 'onSelectBill' : ''}}" data-id="{{item.id}}">
                     <view class="bill-left">
                       <view class="bill-icon">
                         <text wx:if="{{item.category === '餐饮' || item.category === '蔬菜' || item.category === '水果'}}">🍔</text>

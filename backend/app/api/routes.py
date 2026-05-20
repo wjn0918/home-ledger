@@ -15,26 +15,40 @@ router = APIRouter()
 @router.post("/auth/register", response_model=LoginOut)
 def auth_register(payload: AccountRegisterIn, db: Session = Depends(get_db)):
     user = register_by_account(payload.account, payload.password, payload.nickname, db)
-    return LoginOut(token=create_token(user.id), user_id=user.id)
+    return LoginOut(token=create_token(user.id), user_id=user.id, nickname=user.nickname, avatar_url=user.avatar_url)
 
 
 @router.post("/auth/login", response_model=LoginOut)
 def auth_login(payload: AccountLoginIn, db: Session = Depends(get_db)):
     user = login_by_account(payload.account, payload.password, db)
-    return LoginOut(token=create_token(user.id), user_id=user.id)
+    return LoginOut(token=create_token(user.id), user_id=user.id, nickname=user.nickname, avatar_url=user.avatar_url)
 
 
 @router.post("/auth/wechat", response_model=LoginOut)
 async def auth_wechat(payload: LoginByCodeIn, db: Session = Depends(get_db)):
     user = await get_or_create_user_by_wechat_code(payload.code, db)
-    return LoginOut(token=create_token(user.id), user_id=user.id, nickname=user.nickname)
+    return LoginOut(token=create_token(user.id), user_id=user.id, nickname=user.nickname, avatar_url=user.avatar_url)
+
+
+@router.post("/auth/logout")
+def auth_logout(user: User = Depends(get_current_user)):
+    # JWT 为无状态令牌，服务端无需持久化会话；该接口用于前端统一触发退出流程
+    return {"ok": True, "message": "退出成功"}
 
 
 @router.put("/users/me")
-def update_my_profile(nickname: str, db: Session = Depends(get_db), user: User = Depends(get_current_user)):
-    user.nickname = nickname
+def update_my_profile(
+    nickname: str | None = None,
+    avatar_url: str | None = None,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+):
+    if nickname is not None:
+        user.nickname = nickname
+    if avatar_url is not None:
+        user.avatar_url = avatar_url
     db.commit()
-    return {"ok": True, "nickname": user.nickname}
+    return {"ok": True, "nickname": user.nickname, "avatar_url": user.avatar_url}
 
 
 @router.delete("/users/me")

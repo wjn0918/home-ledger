@@ -3,20 +3,25 @@ const { syncFamilies } = require('../../utils/family')
 const app = getApp()
 
 function toDay(dateStr) {
-  return new Date(dateStr).toISOString().slice(0, 10)
+  const d = new Date(dateStr)
+  const y = d.getFullYear()
+  const m = `${d.getMonth() + 1}`.padStart(2, '0')
+  const day = `${d.getDate()}`.padStart(2, '0')
+  return `${y}-${m}-${day}`
 }
 
 function toAmount(value) {
   return Number(value || 0)
 }
 
-function groupBillsByDay(bills, currentUserId) {
+function groupBillsByDay(bills, currentUserId, selectedIds = []) {
   const groups = {}
   bills.forEach((bill) => {
     const ownerId = Number(bill.user_id)
     const selfId = Number(currentUserId)
     bill.creatorClass = ownerId === selfId ? "bill-self" : `bill-member-${ownerId % 4}`
     bill.x = 0 // 初始化滑动位置
+    bill.selected = selectedIds.includes(Number(bill.id))
     const day = toDay(bill.bill_date)
     if (!groups[day]) {
       groups[day] = { day, total: 0, items: [] }
@@ -41,7 +46,12 @@ Page({
   },
 
   async onShow() {
-    if (!app.requireLogin()) return
+    const cachedToken = app.globalData.token || wx.getStorageSync('token') || ''
+    if (!cachedToken) {
+      app.requireLogin()
+      return
+    }
+    app.globalData.token = cachedToken
     await this.loadFamiliesAndBills()
   },
 
@@ -51,7 +61,7 @@ Page({
       this.setData({ currentFamilyName: data.selectedFamilyName, userId: app.globalData.userId || wx.getStorageSync("userId") || null })
       if (!data.selectedFamilyId) return
       const list = await request(`/bills?family_id=${data.selectedFamilyId}`)
-      this.setData({ bills: list, groupedBills: groupBillsByDay(list, this.data.userId) })
+      this.setData({ bills: list, groupedBills: groupBillsByDay(list, this.data.userId, this.data.selectedIds) })
     } catch (e) {
       wx.showToast({ title: '加载家庭信息失败', icon: 'none' })
     }
@@ -104,7 +114,7 @@ Page({
         if (!res.confirm) return
         const dateStr = (res.content || '').trim()
         if (!/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return wx.showToast({ title: '日期格式应为YYYY-MM-DD', icon: 'none' })
-        await this.submitBillEdit(bill, { bill_date: new Date(`${dateStr}T00:00:00`).toISOString() })
+        await this.submitBillEdit(bill, { bill_date: `${dateStr}T00:00:00` })
       }
     })
   },
@@ -142,8 +152,8 @@ Page({
       selectedIds.push(id)
     }
     
-    // 更新数据以触发界面渲染
-    this.setData({ selectedIds })
+    const groupedBills = groupBillsByDay(this.data.bills, this.data.userId, selectedIds)
+    this.setData({ selectedIds, groupedBills })
     
     // 同时更新 groupedBills 中的选中状态，确保 wxml 中的 selectedIds.includes(item.id) 能够正确响应
     // 实际上 WXML 里的 selectedIds.includes 是实时计算的，只要 setData({ selectedIds }) 就会刷新。
