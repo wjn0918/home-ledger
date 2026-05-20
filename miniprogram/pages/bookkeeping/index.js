@@ -135,7 +135,7 @@ Page({
         category: this.data.category,
         type: this.data.type,
         note: this.data.note,
-        bill_date: new Date(`${this.data.billDate}T00:00:00`).toISOString(),
+        bill_date: `${this.data.billDate}T00:00:00`,
         is_shared: this.data.isShared
       })
       wx.showToast({ title: '记账成功', icon: 'success' })

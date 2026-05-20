@@ -3,7 +3,11 @@ const { syncFamilies } = require('../../utils/family')
 const app = getApp()
 
 function toDay(dateStr) {
-  return new Date(dateStr).toISOString().slice(0, 10)
+  const d = new Date(dateStr)
+  const y = d.getFullYear()
+  const m = `${d.getMonth() + 1}`.padStart(2, '0')
+  const day = `${d.getDate()}`.padStart(2, '0')
+  return `${y}-${m}-${day}`
 }
 
 function toAmount(value) {
@@ -104,7 +108,7 @@ Page({
         if (!res.confirm) return
         const dateStr = (res.content || '').trim()
         if (!/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return wx.showToast({ title: '日期格式应为YYYY-MM-DD', icon: 'none' })
-        await this.submitBillEdit(bill, { bill_date: new Date(`${dateStr}T00:00:00`).toISOString() })
+        await this.submitBillEdit(bill, { bill_date: `${dateStr}T00:00:00` })
       }
     })
   },
