@@ -27,6 +27,35 @@
     </view>
   </view>
 
+  <!-- 家庭成员 -->
+  <view class="section-container" wx:if="{{loggedIn && familyId}}">
+    <view class="section-header">
+      <text class="section-title">家庭成员</text>
+      <text class="section-subtitle">ID: {{familyId}}</text>
+    </view>
+    <view class="member-list">
+      <view wx:for="{{familyMembers}}" wx:key="id" class="member-item">
+        <view class="member-left">
+          <image class="member-avatar" src="{{item.avatar_url || '/images/default-avatar.png'}}" mode="aspectFill"></image>
+          <view class="member-info">
+            <text class="member-name">{{item.nickname}}</text>
+            <text class="member-role {{item.role}}">{{item.role === 'owner' ? '创建人' : '成员'}}</text>
+          </view>
+        </view>
+        <view class="member-right">
+          <!-- 只有创建人可以移除他人，普通成员可以退出自己 -->
+          <view class="remove-btn" 
+                wx:if="{{(isFamilyOwner && item.role !== 'owner') || (item.id == userId && item.role !== 'owner')}}"
+                bindtap="onRemoveMember" 
+                data-id="{{item.id}}" 
+                data-nickname="{{item.nickname}}">
+            {{item.id == userId ? '退出' : '移除'}}
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
   <!-- 登录区域 (未登录时显示) -->
   <view wx:if="{{!loggedIn}}" class="login-section">
     <view class="login-tabs">

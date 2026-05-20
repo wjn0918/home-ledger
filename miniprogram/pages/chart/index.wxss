@@ -94,6 +94,127 @@
   margin-top: 40rpx;
 }
 
+/* 自定义日期选择器 */
+.custom-range-picker {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 20rpx;
+  background: #fff;
+  padding: 20rpx;
+  border-radius: 16rpx;
+}
+
+.date-btn {
+  background: #f5f7fa;
+  padding: 12rpx 30rpx;
+  border-radius: 30rpx;
+  font-size: 26rpx;
+  color: #3963bc;
+}
+
+.date-sep {
+  margin: 0 20rpx;
+  color: #909399;
+}
+
+/* 简易趋势图 */
+.line-chart-container {
+  padding: 30rpx 20rpx;
+  height: 300rpx;
+}
+
+.line-chart {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-around;
+  height: 240rpx;
+  padding-bottom: 40rpx;
+  position: relative;
+}
+
+.line-column {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+  justify-content: flex-end;
+}
+
+.line-bar {
+  width: 12rpx;
+  background: linear-gradient(180deg, #5a8dee, #3963bc);
+  border-radius: 6rpx 6rpx 0 0;
+  min-height: 4rpx;
+  transition: height 0.3s ease;
+}
+
+.line-label {
+  font-size: 20rpx;
+  color: #909399;
+  margin-top: 10rpx;
+  white-space: nowrap;
+}
+
+.empty-chart {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #c0c4cc;
+  font-size: 26rpx;
+}
+
+/* 成员统计 */
+.member-stats-card {
+  padding: 30rpx;
+}
+
+.member-stat-row {
+  margin-bottom: 24rpx;
+  display: flex;
+  align-items: center;
+}
+
+.member-stat-info {
+  width: 150rpx;
+  display: flex;
+  flex-direction: column;
+}
+
+.member-name {
+  font-size: 26rpx;
+  color: #303133;
+  font-weight: 500;
+}
+
+.member-amount {
+  font-size: 22rpx;
+  color: #909399;
+}
+
+.member-progress {
+  flex: 1;
+  height: 12rpx;
+  background: #f0f2f5;
+  border-radius: 6rpx;
+  margin: 0 20rpx;
+  overflow: hidden;
+}
+
+.member-progress-inner {
+  height: 100%;
+  border-radius: 6rpx;
+}
+
+.member-percent {
+  width: 70rpx;
+  font-size: 24rpx;
+  color: #606266;
+  text-align: right;
+}
+
 .trend-item {
   display: flex;
   justify-content: space-between;

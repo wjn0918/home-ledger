@@ -33,7 +33,52 @@
       <block wx:for="{{periodOptions}}" wx:key="key">
         <view class="modern-tab {{periodIndex === index ? 'active' : ''}}" data-index="{{index}}" bindtap="onPeriodTabTap" style="display: inline-block; width: 120rpx; margin-right: 10rpx;">{{item.label}}</view>
       </block>
+      <view class="modern-tab {{periodIndex === -1 ? 'active' : ''}}" bindtap="onCustomPeriodTap" style="display: inline-block; width: 160rpx;">自定义</view>
     </scroll-view>
+
+    <!-- 自定义时间范围选择 -->
+    <view wx:if="{{periodIndex === -1}}" class="custom-range-picker">
+      <picker mode="date" value="{{startDate}}" bindchange="onStartDateChange">
+        <view class="date-btn">{{startDate || '开始日期'}}</view>
+      </picker>
+      <text class="date-sep">至</text>
+      <picker mode="date" value="{{endDate}}" bindchange="onEndDateChange">
+        <view class="date-btn">{{endDate || '结束日期'}}</view>
+      </picker>
+    </view>
+
+    <!-- 趋势折线图 -->
+    <view class="trend-section">
+      <view class="section-title">支出趋势图</view>
+      <view class="modern-card line-chart-container">
+        <view class="line-chart">
+          <view wx:for="{{linePoints}}" wx:key="index" class="line-column">
+            <view class="line-bar" style="height: {{item.height}}%"></view>
+            <text class="line-label">{{item.label}}</text>
+          </view>
+          <view wx:if="{{!linePoints.length}}" class="empty-chart">暂无趋势数据</view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 家庭成员统计 (仅家庭范围且有数据时显示) -->
+    <view class="trend-section" wx:if="{{statScope === 'family' && memberStats.length}}">
+      <view class="section-title">成员支出占比</view>
+      <view class="modern-card member-stats-card">
+        <view class="pie-container">
+          <view wx:for="{{memberStats}}" wx:key="nickname" class="member-stat-row">
+            <view class="member-stat-info">
+              <text class="member-name">{{item.nickname}}</text>
+              <text class="member-amount">¥{{item.amount}}</text>
+            </view>
+            <view class="member-progress">
+              <view class="member-progress-inner" style="width: {{item.percentage}}%; background: {{memberColors[index % 5]}}"></view>
+            </view>
+            <text class="member-percent">{{item.percentage}}%</text>
+          </view>
+        </view>
+      </view>
+    </view>
 
     <!-- 支出排行榜 -->
     <view class="trend-section">
@@ -52,19 +97,6 @@
         </block>
       </view>
       <view wx:else class="modern-card" style="text-align: center; color: #999; padding: 60rpx 0;">暂无支出数据</view>
-    </view>
-
-    <!-- 每日趋势 -->
-    <view class="trend-section">
-      <view class="section-title">每日支出明细</view>
-      <view class="modern-card">
-        <block wx:for="{{trendPoints}}" wx:key="*this">
-          <view class="trend-item">
-            <text>{{item}}</text>
-          </view>
-        </block>
-        <view wx:if="{{!trendPoints.length}}" style="text-align: center; color: #999; padding: 20rpx 0;">暂无数据</view>
-      </view>
     </view>
   </view>
 </view>

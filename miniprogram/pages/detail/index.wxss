@@ -1,45 +1,127 @@
 .header {
   background: linear-gradient(135deg, #3963bc 0%, #5a8dee 100%);
-  padding: 40rpx 30rpx 60rpx;
+  padding: 30rpx 30rpx 40rpx;
   color: #fff;
+  position: sticky;
+  top: 0;
+  z-index: 100;
 }
 
-.family-info {
+.header-top {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 30rpx;
+  margin-bottom: 20rpx;
 }
 
 .family-name {
-  font-size: 36rpx;
-  font-weight: 600;
-}
-
-.stats-row {
-  display: flex;
-  gap: 40rpx;
-}
-
-.stat-item {
-  display: flex;
-  flex-direction: column;
-}
-
-.stat-label {
-  font-size: 24rpx;
-  opacity: 0.8;
-  margin-bottom: 8rpx;
-}
-
-.stat-value {
   font-size: 32rpx;
   font-weight: 600;
 }
 
+.batch-btn {
+  font-size: 24rpx;
+  background: rgba(255, 255, 255, 0.2);
+  padding: 8rpx 24rpx;
+  border-radius: 30rpx;
+  border: 1rpx solid rgba(255, 255, 255, 0.4);
+}
+
+.header-stats {
+  display: flex;
+  align-items: center;
+  font-size: 24rpx;
+  opacity: 0.9;
+}
+
+.stat-value {
+  font-weight: 600;
+  margin-right: 20rpx;
+}
+
+.stat-sep {
+  margin: 0 20rpx;
+  opacity: 0.5;
+}
+
 .bill-list {
-  margin-top: -30rpx;
+  padding: 20rpx 30rpx;
+  background: #f8f9fa;
+}
+
+.container.has-footer {
+  padding-bottom: 120rpx;
+}
+
+/* 批量操作样式 */
+.bill-wrapper {
+  display: flex;
+  align-items: center;
+}
+
+.checkbox-area {
+  padding: 0 20rpx 0 30rpx;
+}
+
+.checkbox {
+  width: 36rpx;
+  height: 36rpx;
+  border: 2rpx solid #dcdfe6;
+  border-radius: 50%;
+  position: relative;
+  transition: all 0.2s;
+}
+
+.checkbox.checked {
+  background: #3963bc;
+  border-color: #3963bc;
+}
+
+.checkbox.checked::after {
+  content: '';
+  position: absolute;
+  width: 18rpx;
+  height: 10rpx;
+  border-left: 3rpx solid #fff;
+  border-bottom: 3rpx solid #fff;
+  left: 50%;
+  top: 45%;
+  transform: translate(-50%, -50%) rotate(-45deg);
+}
+
+.swipe-area.batch-mode {
+  width: 100%;
+}
+
+.item-selected {
+  background: #f0f7ff !important;
+}
+
+.batch-footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 110rpx;
+  background: #fff;
+  display: flex;
+  align-items: center;
   padding: 0 30rpx;
+  box-shadow: 0 -4rpx 20rpx rgba(0, 0, 0, 0.05);
+  z-index: 1000;
+}
+
+.footer-btn {
+  flex: 1;
+  text-align: center;
+  font-size: 28rpx;
+  color: #3963bc;
+  padding: 20rpx 0;
+  font-weight: 500;
+}
+
+.footer-btn.delete {
+  color: #ff4d4f;
 }
 
 .day-group {

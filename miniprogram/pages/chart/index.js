@@ -70,8 +70,12 @@ Page({
     periodOptions: [],
     periodIndex: 4,
     totalExpense: '0.00',
-    trendPoints: [],
-    ranking: []
+    linePoints: [],
+    ranking: [],
+    memberStats: [],
+    memberColors: ['#3963bc', '#5a8dee', '#ff9800', '#4caf50', '#9c27b0'],
+    startDate: '',
+    endDate: ''
   },
 
   async onShow() {
@@ -106,18 +110,32 @@ Page({
   },
 
   calcStats() {
-    const period = this.data.periodOptions[this.data.periodIndex]
+    let period = this.data.periodOptions[this.data.periodIndex]
+    if (this.data.periodIndex === -1) {
+      if (!this.data.startDate || !this.data.endDate) return
+      period = { start: this.data.startDate, end: this.data.endDate }
+    }
     if (!period) return
+
     const list = filterBillsByPeriod(this.data.bills, period).filter((b) => b.type === 'expense')
     const total = list.reduce((sum, b) => sum + Number(b.amount || 0), 0)
 
+    // 1. 每日支出趋势 (用于折线图)
     const byDay = {}
     list.forEach((b) => {
       const day = formatDay(new Date(b.bill_date))
       byDay[day] = (byDay[day] || 0) + Number(b.amount || 0)
     })
-    const trendPoints = Object.keys(byDay).sort().map((d) => `${d}: ¥${byDay[d].toFixed(2)}`)
+    
+    const sortedDays = Object.keys(byDay).sort()
+    const maxDayAmount = sortedDays.length > 0 ? Math.max(...Object.values(byDay)) : 1
+    const linePoints = sortedDays.map(day => ({
+      label: day.slice(5), // 只显示月-日
+      height: (byDay[day] / maxDayAmount * 100).toFixed(0),
+      amount: byDay[day].toFixed(2)
+    })).slice(-10) // 最多显示最近10个点以免太挤
 
+    // 2. 分类排行
     const byCategory = {}
     list.forEach((b) => {
       byCategory[b.category] = (byCategory[b.category] || 0) + Number(b.amount || 0)
@@ -126,12 +144,34 @@ Page({
       .map((c) => ({ category: c, amount: byCategory[c].toFixed(2) }))
       .sort((a, b) => Number(b.amount) - Number(a.amount))
     
-    const maxAmount = ranking.length > 0 ? Number(ranking[0].amount) : 1
+    const maxCatAmount = ranking.length > 0 ? Number(ranking[0].amount) : 1
     ranking.forEach(item => {
-      item.percentage = (Number(item.amount) / maxAmount * 100).toFixed(0)
+      item.percentage = (Number(item.amount) / maxCatAmount * 100).toFixed(0)
     })
 
-    this.setData({ totalExpense: total.toFixed(2), trendPoints, ranking })
+    // 3. 家庭成员统计 (仅家庭维度)
+    let memberStats = []
+    if (this.data.statScope === 'family') {
+      const byMember = {}
+      list.forEach((b) => {
+        const name = b.creator_nickname || `用户${b.user_id}`
+        byMember[name] = (byMember[name] || 0) + Number(b.amount || 0)
+      })
+      memberStats = Object.keys(byMember)
+        .map(name => ({
+          nickname: name,
+          amount: byMember[name].toFixed(2),
+          percentage: total > 0 ? (byMember[name] / total * 100).toFixed(1) : 0
+        }))
+        .sort((a, b) => Number(b.amount) - Number(a.amount))
+    }
+
+    this.setData({ 
+      totalExpense: total.toFixed(2), 
+      linePoints, 
+      ranking,
+      memberStats 
+    })
   },
 
   onDimensionTabTap(e) {
@@ -142,6 +182,23 @@ Page({
   onPeriodTabTap(e) {
     this.setData({ periodIndex: Number(e.currentTarget.dataset.index) })
     this.calcStats()
+  },
+
+  onCustomPeriodTap() {
+    this.setData({ periodIndex: -1 })
+    if (this.data.startDate && this.data.endDate) {
+      this.calcStats()
+    }
+  },
+
+  onStartDateChange(e) {
+    this.setData({ startDate: e.detail.value })
+    if (this.data.endDate) this.calcStats()
+  },
+
+  onEndDateChange(e) {
+    this.setData({ endDate: e.detail.value })
+    if (this.data.startDate) this.calcStats()
   },
 
   async onScopeTabTap(e) {

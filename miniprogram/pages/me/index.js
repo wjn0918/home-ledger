@@ -15,9 +15,11 @@ Page({
     nickname: '',
     families: [],
     familyIndex: 0,
+    familyMembers: [],
     loginTab: 'wechat',
     userInfo: null, // Add userInfo to store nickname/avatar
-    currentFamilyName: '未选择'
+    currentFamilyName: '未选择',
+    isFamilyOwner: false
   },
 
   handleUnauthorized() {
@@ -48,6 +50,9 @@ Page({
         currentFamilyName: currentFamily ? currentFamily.name : '未加入家庭'
       })
       await this.loadJoinRequests()
+      if (data.selectedFamilyId) {
+        await this.loadFamilyMembers()
+      }
     } catch (e) {
       if (e.statusCode === 401) this.handleUnauthorized()
     }
@@ -183,7 +188,7 @@ Page({
     }
   },
 
-  onFamilySwitch(e) {
+  async onFamilySwitch(e) {
     const index = Number(e.detail.value)
     const target = switchFamily(app, this.data.families, index)
     if (!target) return
@@ -191,6 +196,45 @@ Page({
       familyIndex: index, 
       familyId: target.id,
       currentFamilyName: target.name 
+    })
+    await this.loadFamilyMembers()
+  },
+
+  async loadFamilyMembers() {
+    if (!this.data.familyId) return
+    try {
+      const members = await request(`/families/${this.data.familyId}/members`)
+      const isOwner = members.some(m => m.id === Number(this.data.userId) && m.role === 'owner')
+      this.setData({ familyMembers: members, isFamilyOwner: isOwner })
+    } catch (e) {
+      if (e.statusCode === 401) return this.handleUnauthorized()
+      this.setData({ familyMembers: [] })
+    }
+  },
+
+  onRemoveMember(e) {
+    const { id, nickname } = e.currentTarget.dataset
+    const isSelf = Number(id) === Number(this.data.userId)
+    
+    wx.showModal({
+      title: isSelf ? '退出家庭' : '移除成员',
+      content: isSelf ? '确定要退出当前家庭吗？' : `确定要将成员 "${nickname}" 移出家庭吗？`,
+      success: async (res) => {
+        if (res.confirm) {
+          try {
+            await request(`/families/${this.data.familyId}/members/${id}`, 'DELETE')
+            wx.showToast({ title: '操作成功', icon: 'none' })
+            if (isSelf) {
+              // 如果是退出自己，刷新页面以重新加载家庭列表
+              await this.onShow()
+            } else {
+              await this.loadFamilyMembers()
+            }
+          } catch (err) {
+            wx.showToast({ title: err.data?.detail || '操作失败', icon: 'none' })
+          }
+        }
+      }
     })
   },
 

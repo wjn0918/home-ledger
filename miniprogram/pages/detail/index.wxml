@@ -1,14 +1,20 @@
-<view class="container">
+<view class="container {{isBatchMode ? 'has-footer' : ''}}">
   <!-- 顶部概览 -->
   <view class="header">
-    <view class="family-info">
-      <text class="family-name">{{currentFamilyName || '未选择家庭'}}</text>
-    </view>
-    <view class="stats-row">
-      <view class="stat-item">
-        <text class="stat-label">总明细笔数</text>
-        <text class="stat-value">{{bills.length}} 笔</text>
+    <view class="header-top">
+      <view class="family-info">
+        <text class="family-name">{{currentFamilyName || '未选择家庭'}}</text>
       </view>
+      <view class="batch-btn" bindtap="toggleBatchMode">
+        {{isBatchMode ? '取消' : '批量操作'}}
+      </view>
+    </view>
+    <view class="header-stats">
+      <text class="stat-label">总笔数：</text>
+      <text class="stat-value">{{bills.length}}</text>
+      <text class="stat-sep">|</text>
+      <text class="stat-label">已选：</text>
+      <text class="stat-value">{{selectedIds.length}}</text>
     </view>
   </view>
 
@@ -28,40 +34,53 @@
         
         <view class="modern-card">
           <block wx:for="{{item.items}}" wx:key="id">
-            <movable-area class="swipe-area">
-              <movable-view class="swipe-view" direction="horizontal" x="{{item.x}}" out-of-bounds="true" damping="50" friction="1" bindchange="onSwipeChange" data-id="{{item.id}}">
-                <view class="bill-item">
-                  <view class="bill-left">
-                    <view class="bill-icon">
-                      <text wx:if="{{item.category === '餐饮' || item.category === '蔬菜' || item.category === '水果'}}">🍔</text>
-                      <text wx:elif="{{item.category === '交通'}}">🚗</text>
-                      <text wx:elif="{{item.category === '住房'}}">🏠</text>
-                      <text wx:elif="{{item.category === '购物'}}">🛍️</text>
-                      <text wx:elif="{{item.category === '娱乐'}}">🎮</text>
-                      <text wx:else>📝</text>
-                    </view>
-                    <view class="bill-info">
-                      <view class="bill-category">
-                        {{item.category}}
-                        <text class="bill-creator {{item.creatorClass}}">{{item.creator_nickname}}</text>
+            <view class="bill-wrapper">
+              <view class="checkbox-area" wx:if="{{isBatchMode}}" bindtap="onSelectBill" data-id="{{item.id}}">
+                <view class="checkbox {{selectedIds.includes(item.id) ? 'checked' : ''}}"></view>
+              </view>
+              
+              <movable-area class="swipe-area {{isBatchMode ? 'batch-mode' : ''}}">
+                <movable-view class="swipe-view" direction="horizontal" x="{{item.x}}" out-of-bounds="true" damping="50" friction="1" bindchange="onSwipeChange" data-id="{{item.id}}" disabled="{{isBatchMode}}">
+                  <view class="bill-item {{selectedIds.includes(item.id) ? 'item-selected' : ''}}" bindtap="{{isBatchMode ? 'onSelectBill' : ''}}" data-id="{{item.id}}">
+                    <view class="bill-left">
+                      <view class="bill-icon">
+                        <text wx:if="{{item.category === '餐饮' || item.category === '蔬菜' || item.category === '水果'}}">🍔</text>
+                        <text wx:elif="{{item.category === '交通'}}">🚗</text>
+                        <text wx:elif="{{item.category === '住房'}}">🏠</text>
+                        <text wx:elif="{{item.category === '购物'}}">🛍️</text>
+                        <text wx:elif="{{item.category === '娱乐'}}">🎮</text>
+                        <text wx:else>📝</text>
                       </view>
-                      <text class="bill-note" data-id="{{item.id}}" bindtap="onCategoryTap">{{item.note || '无备注'}}</text>
+                      <view class="bill-info">
+                        <view class="bill-category">
+                          {{item.category}}
+                          <text class="bill-creator {{item.creatorClass}}">{{item.creator_nickname}}</text>
+                        </view>
+                        <text class="bill-note" data-id="{{item.id}}" bindtap="{{isBatchMode ? '' : 'onCategoryTap'}}">{{item.note || '无备注'}}</text>
+                      </view>
+                    </view>
+                    <view class="bill-right">
+                      <view class="bill-amount expense" data-id="{{item.id}}" bindtap="{{isBatchMode ? '' : 'onAmountTap'}}">¥{{item.amount}}</view>
+                      <view class="modern-subtitle" style="display: flex; align-items: center; justify-content: flex-end;" wx:if="{{!isBatchMode}}">
+                        <text style="margin-right: 10rpx;">共享</text>
+                        <switch data-id="{{item.id}}" checked="{{item.is_shared}}" bindchange="onShareSwitchChange" style="transform: scale(0.6);" />
+                      </view>
                     </view>
                   </view>
-                  <view class="bill-right">
-                    <view class="bill-amount expense" data-id="{{item.id}}" bindtap="onAmountTap">¥{{item.amount}}</view>
-                    <view class="modern-subtitle" style="display: flex; align-items: center; justify-content: flex-end;">
-                      <text style="margin-right: 10rpx;">共享</text>
-                      <switch data-id="{{item.id}}" checked="{{item.is_shared}}" bindchange="onShareSwitchChange" style="transform: scale(0.6);" />
-                    </view>
-                  </view>
-                </view>
-                <view class="swipe-delete" bindtap="onDeleteTap" data-id="{{item.id}}">删除</view>
-              </movable-view>
-            </movable-area>
+                  <view class="swipe-delete" bindtap="onDeleteTap" data-id="{{item.id}}" wx:if="{{!isBatchMode}}">删除</view>
+                </movable-view>
+              </movable-area>
+            </view>
           </block>
         </view>
       </view>
     </block>
+  </view>
+
+  <!-- 底部操作栏 -->
+  <view class="batch-footer" wx:if="{{isBatchMode}}">
+    <view class="footer-btn" bindtap="onBatchShare" data-shared="true">批量共享</view>
+    <view class="footer-btn" bindtap="onBatchShare" data-shared="false">取消共享</view>
+    <view class="footer-btn delete" bindtap="onBatchDelete">批量删除</view>
   </view>
 </view>

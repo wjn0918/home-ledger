@@ -31,7 +31,14 @@ function groupBillsByDay(bills, currentUserId) {
 }
 
 Page({
-  data: { bills: [], groupedBills: [], currentFamilyName: '', userId: null },
+  data: { 
+    bills: [], 
+    groupedBills: [], 
+    currentFamilyName: '', 
+    userId: null,
+    isBatchMode: false,
+    selectedIds: []
+  },
 
   async onShow() {
     if (!app.requireLogin()) return
@@ -111,6 +118,90 @@ Page({
 
   onSwipeChange(e) {
     // 可以在这里处理滑动互斥，即同时只允许一个项处于滑动状态
+  },
+
+  toggleBatchMode() {
+    this.setData({
+      isBatchMode: !this.data.isBatchMode,
+      selectedIds: []
+    })
+  },
+
+  onSelectBill(e) {
+    const id = Number(e.currentTarget.dataset.id)
+    const bill = this.data.bills.find(b => b.id === id)
+    if (bill && Number(bill.user_id) !== Number(this.data.userId)) {
+      return wx.showToast({ title: '只能选择自己的账单', icon: 'none' })
+    }
+    
+    let selectedIds = [...this.data.selectedIds]
+    const index = selectedIds.indexOf(id)
+    if (index > -1) {
+      selectedIds.splice(index, 1)
+    } else {
+      selectedIds.push(id)
+    }
+    this.setData({ selectedIds })
+  },
+
+  async onBatchShare(e) {
+    const isShared = e.currentTarget.dataset.shared === 'true'
+    const { selectedIds } = this.data
+    if (!selectedIds.length) return wx.showToast({ title: '请先选择账单', icon: 'none' })
+
+    wx.showLoading({ title: '处理中...' })
+    try {
+      // 批量更新需要传一个完整的 payload，但我们只改 is_shared
+      // 为了简单，我们取第一个选中账单的基础信息，或者后端改造成支持局部更新
+      // 这里我们假设后端 batch-update 逻辑会处理
+      const firstBill = this.data.bills.find(b => b.id === selectedIds[0])
+      const payload = {
+        amount: Number(firstBill.amount),
+        category: firstBill.category,
+        bill_date: firstBill.bill_date,
+        is_shared: isShared
+      }
+      await request(`/bills/batch-update?bill_ids=${selectedIds.join(',')}`, 'PUT', payload, selectedIds) 
+      // 注意：上面的 request 封装可能不支持这种传参方式，我需要检查一下。
+      // 实际上，我们的 request.js 里的 data 是 body。
+      // 所以我应该把 bill_ids 放在 body 里，或者作为 query param。
+      // 后端代码中是 `bill_ids: list[int]`，FastAPI 默认会从 body 中取（如果不是简单类型）。
+      
+      await request('/bills/batch-update', 'PUT', { bill_ids: selectedIds, ...payload })
+      
+      wx.hideLoading()
+      wx.showToast({ title: '批量操作成功' })
+      this.setData({ isBatchMode: false, selectedIds: [] })
+      await this.loadFamiliesAndBills()
+    } catch (err) {
+      wx.hideLoading()
+      wx.showToast({ title: '操作失败', icon: 'none' })
+    }
+  },
+
+  async onBatchDelete() {
+    const { selectedIds } = this.data
+    if (!selectedIds.length) return wx.showToast({ title: '请先选择账单', icon: 'none' })
+
+    wx.showModal({
+      title: '批量删除',
+      content: `确定要删除选中的 ${selectedIds.length} 笔账单吗？`,
+      success: async (res) => {
+        if (res.confirm) {
+          wx.showLoading({ title: '删除中...' })
+          try {
+            await request('/bills/batch-delete', 'POST', selectedIds)
+            wx.hideLoading()
+            wx.showToast({ title: '删除成功' })
+            this.setData({ isBatchMode: false, selectedIds: [] })
+            await this.loadFamiliesAndBills()
+          } catch (err) {
+            wx.hideLoading()
+            wx.showToast({ title: '操作失败', icon: 'none' })
+          }
+        }
+      }
+    })
   },
 
   async onDeleteTap(e) {

@@ -160,6 +160,54 @@ def add_member(family_id: int, payload: FamilyMemberIn, db: Session = Depends(ge
     return {"ok": True, "message": "添加成员成功"}
 
 
+@router.get("/families/{family_id}/members")
+def list_family_members(family_id: int, db: Session = Depends(get_db), user: User = Depends(get_current_user)):
+    # 检查当前用户是否是该家庭成员
+    membership = db.query(FamilyMember).filter(
+        FamilyMember.family_id == family_id,
+        FamilyMember.user_id == user.id
+    ).first()
+    if not membership:
+        raise HTTPException(status_code=403, detail="你不是该家庭成员")
+
+    rows = (
+        db.query(User.id, User.nickname, User.avatar_url, FamilyMember.role)
+        .join(FamilyMember, FamilyMember.user_id == User.id)
+        .filter(FamilyMember.family_id == family_id)
+        .all()
+    )
+    return [
+        {"id": item.id, "nickname": item.nickname, "avatar_url": item.avatar_url, "role": item.role}
+        for item in rows
+    ]
+
+
+@router.delete("/families/{family_id}/members/{target_user_id}")
+def remove_family_member(family_id: int, target_user_id: int, db: Session = Depends(get_db), user: User = Depends(get_current_user)):
+    family = db.query(Family).filter(Family.id == family_id).first()
+    if not family:
+        raise HTTPException(status_code=404, detail="家庭不存在")
+
+    # 权限校验：只有家庭拥有者可以移除其他成员，普通成员只能移除自己（退出家庭）
+    if family.owner_user_id != user.id and user.id != target_user_id:
+        raise HTTPException(status_code=403, detail="无权执行此操作")
+
+    # 家庭拥有者不能移除自己（除非解散家庭，这里暂不支持直接移除 owner）
+    if target_user_id == family.owner_user_id:
+        raise HTTPException(status_code=400, detail="不能移除家庭创建人")
+
+    member = db.query(FamilyMember).filter(
+        FamilyMember.family_id == family_id,
+        FamilyMember.user_id == target_user_id
+    ).first()
+    if not member:
+        raise HTTPException(status_code=404, detail="该用户不是家庭成员")
+
+    db.delete(member)
+    db.commit()
+    return {"ok": True, "message": "移除成功"}
+
+
 @router.post("/bills", response_model=BillOut)
 def create_bill(payload: BillCreateIn, db: Session = Depends(get_db), user: User = Depends(get_current_user)):
     membership = db.query(FamilyMember).filter(
@@ -218,6 +266,40 @@ def delete_bill(bill_id: int, db: Session = Depends(get_db), user: User = Depend
     db.delete(bill)
     db.commit()
     return {"ok": True}
+
+
+@router.post("/bills/batch-delete")
+def batch_delete_bills(bill_ids: list[int], db: Session = Depends(get_db), user: User = Depends(get_current_user)):
+    bills = db.query(Bill).filter(Bill.id.in_(bill_ids)).all()
+    
+    # 权限校验：只能删除自己创建的账单
+    for bill in bills:
+        if bill.user_id != user.id:
+            raise HTTPException(status_code=403, detail=f"无权删除账单 ID: {bill.id}")
+    
+    for bill in bills:
+        db.delete(bill)
+    db.commit()
+    return {"ok": True, "count": len(bills)}
+
+
+@router.put("/bills/batch-update")
+def batch_update_bills(bill_ids: list[int], payload: BillUpdateIn, db: Session = Depends(get_db), user: User = Depends(get_current_user)):
+    bills = db.query(Bill).filter(Bill.id.in_(bill_ids)).all()
+    
+    # 权限校验：只能修改自己创建的账单
+    for bill in bills:
+        if bill.user_id != user.id:
+            raise HTTPException(status_code=403, detail=f"无权修改账单 ID: {bill.id}")
+            
+    for bill in bills:
+        bill.amount = payload.amount
+        bill.category = payload.category
+        bill.bill_date = payload.bill_date
+        bill.is_shared = payload.is_shared
+        
+    db.commit()
+    return {"ok": True, "count": len(bills)}
 
 
 @router.get("/bills", response_model=list[BillOut])
