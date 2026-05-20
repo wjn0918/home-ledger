@@ -1,6 +1,6 @@
 .header {
   background: linear-gradient(135deg, #3963bc 0%, #5a8dee 100%);
-  padding: 30rpx 30rpx 40rpx;
+  padding: 22rpx 20rpx 24rpx;
   color: #fff;
   position: sticky;
   top: 0;
@@ -11,18 +11,18 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20rpx;
+  margin-bottom: 12rpx;
 }
 
 .family-name {
-  font-size: 32rpx;
+  font-size: 24rpx;
   font-weight: 600;
 }
 
 .batch-btn {
-  font-size: 24rpx;
+  font-size: 22rpx;
   background: rgba(255, 255, 255, 0.2);
-  padding: 8rpx 24rpx;
+  padding: 6rpx 16rpx;
   border-radius: 30rpx;
   border: 1rpx solid rgba(255, 255, 255, 0.4);
 }
@@ -30,27 +30,27 @@
 .header-stats {
   display: flex;
   align-items: center;
-  font-size: 24rpx;
+  font-size: 22rpx;
   opacity: 0.9;
 }
 
 .stat-value {
   font-weight: 600;
-  margin-right: 20rpx;
+  margin-right: 12rpx;
 }
 
 .stat-sep {
-  margin: 0 20rpx;
+  margin: 0 12rpx;
   opacity: 0.5;
 }
 
 .bill-list {
-  padding: 20rpx 30rpx;
+  padding: 12rpx 16rpx;
   background: #f8f9fa;
 }
 
 .container.has-footer {
-  padding-bottom: 120rpx;
+  padding-bottom: 96rpx;
 }
 
 /* 批量操作样式 */
@@ -60,12 +60,12 @@
 }
 
 .checkbox-area {
-  padding: 0 20rpx 0 30rpx;
+  padding: 0 12rpx 0 16rpx;
 }
 
 .checkbox {
-  width: 36rpx;
-  height: 36rpx;
+  width: 30rpx;
+  height: 30rpx;
   border: 2rpx solid #dcdfe6;
   border-radius: 50%;
   position: relative;
@@ -80,8 +80,8 @@
 .checkbox.checked::after {
   content: '';
   position: absolute;
-  width: 18rpx;
-  height: 10rpx;
+  width: 14rpx;
+  height: 8rpx;
   border-left: 3rpx solid #fff;
   border-bottom: 3rpx solid #fff;
   left: 50%;
@@ -102,11 +102,11 @@
   bottom: 0;
   left: 0;
   right: 0;
-  height: 110rpx;
+  height: 88rpx;
   background: #fff;
   display: flex;
   align-items: center;
-  padding: 0 30rpx;
+  padding: 0 16rpx;
   box-shadow: 0 -4rpx 20rpx rgba(0, 0, 0, 0.05);
   z-index: 1000;
 }
@@ -114,9 +114,9 @@
 .footer-btn {
   flex: 1;
   text-align: center;
-  font-size: 28rpx;
+  font-size: 24rpx;
   color: #3963bc;
-  padding: 20rpx 0;
+  padding: 12rpx 0;
   font-weight: 500;
 }
 
@@ -125,24 +125,24 @@
 }
 
 .day-group {
-  margin-bottom: 30rpx;
+  margin-bottom: 16rpx;
 }
 
 .day-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20rpx 10rpx;
+  padding: 12rpx 6rpx;
 }
 
 .day-label {
-  font-size: 28rpx;
+  font-size: 24rpx;
   color: #909399;
   font-weight: 500;
 }
 
 .day-total {
-  font-size: 26rpx;
+  font-size: 22rpx;
   color: #303133;
   font-weight: 600;
 }
@@ -154,19 +154,19 @@
 
 .swipe-area {
   width: 100%;
-  height: 160rpx;
+  height: 124rpx;
 }
 
 .swipe-view {
-  width: calc(100vw + 150rpx);
-  height: 160rpx;
+  width: calc(100vw + 120rpx);
+  height: 124rpx;
   display: flex;
 }
 
 .bill-item {
   width: 100vw;
-  padding: 30rpx;
-  height: 160rpx;
+  padding: 16rpx 18rpx;
+  height: 124rpx;
   box-sizing: border-box;
   border-bottom: 1rpx solid #f2f3f5;
   display: flex;
@@ -176,23 +176,23 @@
 }
 
 .bill-note {
-  font-size: 24rpx;
+  font-size: 22rpx;
   color: var(--text-sub);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 400rpx;
+  max-width: 320rpx;
 }
 
 .swipe-delete {
-  width: 150rpx;
-  height: 160rpx;
+  width: 120rpx;
+  height: 124rpx;
   background: #ff4d4f;
   color: #fff;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 28rpx;
+  font-size: 24rpx;
   z-index: 1;
 }
 
@@ -201,11 +201,11 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding-top: 200rpx;
+  padding-top: 120rpx;
   color: #c0c4cc;
 }
 
 .empty-icon {
-  font-size: 100rpx;
-  margin-bottom: 20rpx;
+  font-size: 72rpx;
+  margin-bottom: 12rpx;
 }
