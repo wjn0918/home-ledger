@@ -209,3 +209,7 @@
   font-size: 72rpx;
   margin-bottom: 12rpx;
 }
+.bill-icon-font {
+  font-size: 40rpx;
+}
+

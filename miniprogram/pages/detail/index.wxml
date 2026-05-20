@@ -44,12 +44,7 @@
                   <view class="bill-item {{item.selected ? 'item-selected' : ''}}" bindtap="{{isBatchMode ? 'onSelectBill' : ''}}" data-id="{{item.id}}">
                     <view class="bill-left">
                       <view class="bill-icon">
-                        <text wx:if="{{item.category === '餐饮' || item.category === '蔬菜' || item.category === '水果'}}">🍔</text>
-                        <text wx:elif="{{item.category === '交通'}}">🚗</text>
-                        <text wx:elif="{{item.category === '住房'}}">🏠</text>
-                        <text wx:elif="{{item.category === '购物'}}">🛍️</text>
-                        <text wx:elif="{{item.category === '娱乐'}}">🎮</text>
-                        <text wx:else>📝</text>
+                        <text class="iconfont bill-icon-font {{item.category_icon || 'icon-qita'}}"></text>
                       </view>
                       <view class="bill-info">
                         <view class="bill-category">
