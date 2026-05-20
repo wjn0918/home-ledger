@@ -136,15 +136,13 @@
   margin-right: 12rpx;
 }
 
-.category-icon-img {
-  width: 48rpx;
-  height: 48rpx;
+.category-icon-font {
+  font-size: 44rpx;
   margin-bottom: 8rpx;
 }
 
-.cat-icon-img {
-  width: 36rpx;
-  height: 36rpx;
+.cat-icon-font {
+  font-size: 34rpx;
   margin-right: 12rpx;
 }
 
@@ -272,9 +270,8 @@
   font-weight: 600;
 }
 
-.current-icon-img {
-  width: 48rpx;
-  height: 48rpx;
+.current-icon-font {
+  font-size: 42rpx;
 }
 
 .new-category-input {
@@ -308,9 +305,8 @@
   font-size: 24rpx;
 }
 
-.icon-item-img {
-  width: 40rpx;
-  height: 40rpx;
+.icon-item-font {
+  font-size: 36rpx;
 }
 
 .icon-item.active {

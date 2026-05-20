@@ -23,7 +23,7 @@
       <view class="category-grid">
         <block wx:for="{{categoryOptions}}" wx:key="name">
           <view class="category-item {{category === item.name ? 'active' : ''}}" data-category="{{item.name}}" data-icon="{{item.icon}}" bindtap="onCategorySelect" bindlongpress="onCategoryLongPress">
-            <image class="category-icon-img" src="{{item.icon}}" mode="aspectFit" />
+            <text class="iconfont category-icon-font {{item.icon || 'icon-qita'}}"></text>
             <text class="category-name">{{item.name}}</text>
           </view>
         </block>
@@ -40,7 +40,7 @@
     <view class="modal-content detail-modal" catchtap="stopBubble">
       <view class="modal-header">
         <view class="selected-category">
-          <image class="cat-icon-img" src="{{categoryIcon}}" mode="aspectFit" />
+          <text class="iconfont cat-icon-font {{categoryIcon || 'icon-qita'}}"></text>
           <text>{{category}}</text>
         </view>
         <text class="close-icon" bindtap="closeModals">×</text>
@@ -106,7 +106,7 @@
       <view class="add-category-panel">
         <view class="current-icon-wrap">
           <text class="current-icon-label">当前图标</text>
-          <image class="current-icon-img" src="{{newCategoryIcon}}" mode="aspectFit" />
+          <text class="iconfont current-icon-font {{newCategoryIcon || 'icon-qita'}}"></text>
         </view>
         <input
           class="new-category-input"
@@ -122,7 +122,7 @@
               data-icon="{{item}}"
               bindtap="onNewCategoryIconSelect"
             >
-              <image class="icon-item-img" src="{{item}}" mode="aspectFit" />
+              <text class="iconfont icon-item-font {{item}}"></text>
             </view>
           </block>
         </view>

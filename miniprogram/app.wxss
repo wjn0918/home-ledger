@@ -11,6 +11,36 @@ page {
   --border-color: #f2f3f5;
 }
 
+@font-face {
+  font-family: "iconfont";
+  src: url("https://at.alicdn.com/t/c/font_0000000_demo.woff2?t=1710000000000") format("woff2"),
+       url("https://at.alicdn.com/t/c/font_0000000_demo.woff?t=1710000000000") format("woff"),
+       url("https://at.alicdn.com/t/c/font_0000000_demo.ttf?t=1710000000000") format("truetype");
+}
+
+.iconfont {
+  font-family: "iconfont" !important;
+  font-style: normal;
+}
+
+.icon-canyin:before { content: "\e600"; }
+.icon-yinliao:before { content: "\e601"; }
+.icon-shuiguo:before { content: "\e602"; }
+.icon-lingshi:before { content: "\e603"; }
+.icon-jiaotong:before { content: "\e604"; }
+.icon-gongjiao:before { content: "\e605"; }
+.icon-ditie:before { content: "\e606"; }
+.icon-chuzuche:before { content: "\e607"; }
+.icon-qiche:before { content: "\e608"; }
+.icon-gouwu:before { content: "\e609"; }
+.icon-gouwudai:before { content: "\e60a"; }
+.icon-fushi:before { content: "\e60b"; }
+.icon-meirong:before { content: "\e60c"; }
+.icon-gongzi:before { content: "\e60d"; }
+.icon-jiangjin:before { content: "\e60e"; }
+.icon-touzi:before { content: "\e60f"; }
+.icon-qita:before { content: "\e610"; }
+
 .lin-container {
   padding: 24rpx;
   min-height: 100vh;

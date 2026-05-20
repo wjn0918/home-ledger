@@ -29,31 +29,19 @@ def build_bill_out(bill: Bill, category: str, category_icon: str = "", creator_n
 
 
 DEFAULT_CATEGORY_OPTIONS = [
-    {"name": "餐饮", "icon": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='%23ff8f1f' d='M7 2v8a2 2 0 0 0 2 2v10h2V2H9v6H8V2Zm8 0c-2 0-4 2-4 5v7h3v8h2V2z'/></svg>"},
-    {"name": "交通", "icon": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='%234a90e2' d='M5 16a2 2 0 1 0 0 4a2 2 0 0 0 0-4m14 0a2 2 0 1 0 0 4a2 2 0 0 0 0-4M5 4h14a2 2 0 0 1 2 2v9h-2a3 3 0 0 0-6 0H11a3 3 0 0 0-6 0H3V6a2 2 0 0 1 2-2'/></svg>"},
-    {"name": "购物", "icon": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='%23ff5a7a' d='M6 7h12l-1 13H7zm3-3h6l1 2H8z'/></svg>"},
-    {"name": "工资", "icon": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='%2328c76f' d='M3 6h18v12H3zm9 2a3 3 0 0 0-3 3h2a1 1 0 1 1 1 1a3 3 0 0 0 0 6v1h2v-1a3 3 0 0 0 0-6a1 1 0 1 1 1-1h2a3 3 0 0 0-3-3V7h-2z'/></svg>"},
-    {"name": "其他", "icon": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><circle cx='12' cy='12' r='10' fill='%2399a2ad'/><circle cx='12' cy='8' r='1.5' fill='white'/><circle cx='12' cy='12' r='1.5' fill='white'/><circle cx='12' cy='16' r='1.5' fill='white'/></svg>"},
+    {"name": "餐饮", "icon": "icon-canyin"},
+    {"name": "交通", "icon": "icon-jiaotong"},
+    {"name": "购物", "icon": "icon-gouwu"},
+    {"name": "工资", "icon": "icon-gongzi"},
+    {"name": "其他", "icon": "icon-qita"},
 ]
 
 
 DEFAULT_CATEGORY_ICONS = [
-    "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='%23ff8f1f' d='M7 2v8a2 2 0 0 0 2 2v10h2V2H9v6H8V2Zm8 0c-2 0-4 2-4 5v7h3v8h2V2z'/></svg>",
-    "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='%23ff6f61' d='M7 3h10l-1 5H8Zm1 7h8l-1 11H9z'/></svg>",
-    "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='%23ff4d6d' d='M12 21s-7-4.35-7-10a4 4 0 0 1 7-2.65A4 4 0 0 1 19 11c0 5.65-7 10-7 10'/></svg>",
-    "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='%23f7b500' d='M4 10h16v10H4zM6 7h12v3H6z'/></svg>",
-    "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='%234a90e2' d='M5 16a2 2 0 1 0 0 4a2 2 0 0 0 0-4m14 0a2 2 0 1 0 0 4a2 2 0 0 0 0-4M5 4h14a2 2 0 0 1 2 2v9h-2a3 3 0 0 0-6 0H11a3 3 0 0 0-6 0H3V6a2 2 0 0 1 2-2'/></svg>",
-    "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='%235f6caf' d='M12 2l7 4v12l-7 4l-7-4V6z'/></svg>",
-    "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='%2300b8d9' d='M3 13l9-10l9 10h-4v8H7v-8z'/></svg>",
-    "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='%233495db' d='M5 11h14l-2 8H7zM7 8h10l1 3H6z'/></svg>",
-    "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='%23ff5a7a' d='M6 7h12l-1 13H7zm3-3h6l1 2H8z'/></svg>",
-    "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='%238e44ad' d='M4 8h16l-1 12H5zM8 5h8v3H8z'/></svg>",
-    "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='%23e91e63' d='M12 4a5 5 0 0 1 5 5v11H7V9a5 5 0 0 1 5-5'/></svg>",
-    "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><circle cx='12' cy='8' r='4' fill='%23ff9f43'/><path fill='%23ffbe76' d='M6 22a6 6 0 0 1 12 0z'/></svg>",
-    "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='%2328c76f' d='M3 6h18v12H3zm9 2a3 3 0 0 0-3 3h2a1 1 0 1 1 1 1a3 3 0 0 0 0 6v1h2v-1a3 3 0 0 0 0-6a1 1 0 1 1 1-1h2a3 3 0 0 0-3-3V7h-2z'/></svg>",
-    "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='%231abc9c' d='M12 3l8 5v8l-8 5l-8-5V8z'/></svg>",
-    "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='%2327ae60' d='M12 2l3 7h7l-5.5 4.5L18 21l-6-4l-6 4l1.5-7.5L2 9h7z'/></svg>",
-    "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><circle cx='12' cy='12' r='10' fill='%2399a2ad'/><circle cx='12' cy='8' r='1.5' fill='white'/><circle cx='12' cy='12' r='1.5' fill='white'/><circle cx='12' cy='16' r='1.5' fill='white'/></svg>",
+    "icon-canyin", "icon-yinliao", "icon-shuiguo", "icon-lingshi",
+    "icon-gongjiao", "icon-ditie", "icon-chuzuche", "icon-qiche",
+    "icon-gouwu", "icon-gouwudai", "icon-fushi", "icon-meirong",
+    "icon-gongzi", "icon-jiangjin", "icon-touzi", "icon-qita",
 ]
 
 
