@@ -18,6 +18,9 @@ Page({
     isShared: true,
     showCategoryModal: false,
     showDetailModal: false,
+    showAddCategoryModal: false,
+    newCategoryName: '',
+    newCategoryIcon: 'other',
     calcExpr: '',
     lastOp: ''
   },
@@ -59,7 +62,7 @@ Page({
   },
 
   closeModals() {
-    this.setData({ showCategoryModal: false, showDetailModal: false })
+    this.setData({ showCategoryModal: false, showDetailModal: false, showAddCategoryModal: false })
   },
 
   stopBubble() {},
@@ -209,31 +212,42 @@ Page({
       wx.showToast({ title: '请先选择家庭', icon: 'none' })
       return
     }
-    const iconList = (this.data.defaultIcons.length ? this.data.defaultIcons : ['other']).slice(0, 6)
-    wx.showActionSheet({
-      itemList: iconList.map((i) => `图标: ${i}`),
-      success: (actionRes) => {
-        wx.showModal({
-          title: '新增账单类别',
-          editable: true,
-          placeholderText: '例如：零食',
-          success: async (res) => {
-            if (!res.confirm) return
-            const value = (res.content || '').trim()
-            if (!value) return wx.showToast({ title: '请输入类别名称', icon: 'none' })
-            const icon = iconList[actionRes.tapIndex] || 'other'
-            try {
-              await request(`/families/${app.globalData.familyId}/categories`, 'POST', { name: value, icon })
-              await this.loadCategories()
-              this.setData({ category: value, categoryIcon: icon })
-              wx.showToast({ title: '类别已添加', icon: 'success' })
-            } catch (e) {
-              wx.showToast({ title: '新增失败', icon: 'none' })
-            }
-          }
-        })
-      }
+    const defaultIcon = (this.data.defaultIcons && this.data.defaultIcons[0]) || 'other'
+    this.setData({
+      showAddCategoryModal: true,
+      showCategoryModal: false,
+      newCategoryName: '',
+      newCategoryIcon: defaultIcon
     })
+  },
+
+  onNewCategoryNameInput(e) {
+    this.setData({ newCategoryName: (e.detail.value || '').trim() })
+  },
+
+  onNewCategoryIconSelect(e) {
+    this.setData({ newCategoryIcon: e.currentTarget.dataset.icon || 'other' })
+  },
+
+  async onConfirmAddCategory() {
+    const value = (this.data.newCategoryName || '').trim()
+    if (!value) {
+      wx.showToast({ title: '请输入类别名称', icon: 'none' })
+      return
+    }
+    const icon = this.data.newCategoryIcon || 'other'
+    try {
+      await request(`/families/${app.globalData.familyId}/categories`, 'POST', { name: value, icon })
+      await this.loadCategories()
+      this.setData({
+        category: value,
+        categoryIcon: icon,
+        showAddCategoryModal: false
+      })
+      wx.showToast({ title: '类别已添加', icon: 'success' })
+    } catch (e) {
+      wx.showToast({ title: '新增失败', icon: 'none' })
+    }
   },
 
   async onCategoryLongPress(e) {
