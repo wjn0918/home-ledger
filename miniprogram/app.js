@@ -2,6 +2,7 @@ App({
   globalData: {
     token: wx.getStorageSync('token') || '',
     familyId: wx.getStorageSync('familyId') || null,
+    userId: wx.getStorageSync('userId') || null,
     apiBase: '' // 动态设置
   },
 

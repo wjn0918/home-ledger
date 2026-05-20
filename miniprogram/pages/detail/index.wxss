@@ -164,7 +164,7 @@
 }
 
 .bill-item {
-  width: 100vw;
+  width: calc(100vw - 32rpx);
   padding: 16rpx 18rpx;
   height: 124rpx;
   box-sizing: border-box;
