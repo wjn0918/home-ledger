@@ -17,10 +17,13 @@ function request(url, method = 'GET', data = {}) {
           return
         }
         if (res.statusCode === 401) {
-          app.globalData.token = ""
-          wx.removeStorageSync("token")
-          wx.removeStorageSync("familyId")
+          app.globalData.token = ''
           app.globalData.familyId = null
+          app.globalData.userId = null
+          wx.removeStorageSync('token')
+          wx.removeStorageSync('familyId')
+          wx.removeStorageSync('userId')
+          wx.removeStorageSync('nickname')
         }
         reject({
           statusCode: res.statusCode,

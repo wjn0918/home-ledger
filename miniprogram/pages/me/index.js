@@ -22,14 +22,30 @@ Page({
     isFamilyOwner: false
   },
 
-  handleUnauthorized() {
+  resetLoginState() {
     app.globalData.token = ''
     app.globalData.familyId = null
     app.globalData.userId = null
     wx.removeStorageSync('token')
     wx.removeStorageSync('familyId')
     wx.removeStorageSync('userId')
-    this.setData({ loggedIn: false, familyId: null, joinRequests: [] })
+    wx.removeStorageSync('nickname')
+    this.setData({
+      loggedIn: false,
+      familyId: null,
+      userId: null,
+      nickname: '',
+      families: [],
+      familyIndex: 0,
+      familyMembers: [],
+      joinRequests: [],
+      currentFamilyName: '未选择',
+      isFamilyOwner: false
+    })
+  },
+
+  handleUnauthorized() {
+    this.resetLoginState()
     wx.showToast({ title: '登录已失效，请重新登录', icon: 'none' })
   },
 
@@ -300,9 +316,14 @@ Page({
     wx.showModal({
       title: '退出登录',
       content: '确定要退出当前账户吗？',
-      success: (res) => {
+      success: async (res) => {
         if (res.confirm) {
-          this.handleUnauthorized()
+          try {
+            await request('/auth/logout', 'POST')
+          } catch (e) {
+            // 忽略登出接口异常，保证本地状态能被清理
+          }
+          this.resetLoginState()
           wx.showToast({ title: '已退出登录', icon: 'none' })
         }
       }
@@ -319,19 +340,7 @@ Page({
           try {
             await request('/users/me', 'DELETE')
             wx.showToast({ title: '账号已注销', icon: 'success' })
-            // 清除本地状态
-            app.globalData.token = null
-            app.globalData.userId = null
-            app.globalData.familyId = null
-            wx.clearStorageSync()
-            this.setData({ 
-              loggedIn: false, 
-              userId: null, 
-              nickname: '',
-              families: [], 
-              familyMembers: [], 
-              joinRequests: [] 
-            })
+            this.resetLoginState()
           } catch (err) {
             wx.showToast({ title: '注销失败，请稍后重试', icon: 'none' })
           }

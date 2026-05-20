@@ -30,6 +30,12 @@ async def auth_wechat(payload: LoginByCodeIn, db: Session = Depends(get_db)):
     return LoginOut(token=create_token(user.id), user_id=user.id, nickname=user.nickname)
 
 
+@router.post("/auth/logout")
+def auth_logout(user: User = Depends(get_current_user)):
+    # JWT 为无状态令牌，服务端无需持久化会话；该接口用于前端统一触发退出流程
+    return {"ok": True, "message": "退出成功"}
+
+
 @router.put("/users/me")
 def update_my_profile(nickname: str, db: Session = Depends(get_db), user: User = Depends(get_current_user)):
     user.nickname = nickname
