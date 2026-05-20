@@ -30,6 +30,7 @@ Page({
     wx.removeStorageSync('familyId')
     wx.removeStorageSync('userId')
     wx.removeStorageSync('nickname')
+    wx.removeStorageSync('avatarUrl')
     this.setData({
       loggedIn: false,
       familyId: null,
@@ -54,7 +55,8 @@ Page({
     const familyId = app.globalData.familyId || wx.getStorageSync('familyId') || null
     const userId = app.globalData.userId || wx.getStorageSync('userId') || null
     const nickname = wx.getStorageSync('nickname') || null
-    this.setData({ loggedIn: !!token, familyId, userId, nickname })
+    const avatarUrl = wx.getStorageSync('avatarUrl') || ''
+    this.setData({ loggedIn: !!token, familyId, userId, nickname, userInfo: { avatarUrl } })
     if (!token) return
     try {
       const data = await syncFamilies(app)
@@ -112,9 +114,16 @@ Page({
     wx.setStorageSync('userId', res.user_id)
     if (res.nickname) {
       wx.setStorageSync('nickname', res.nickname)
-      this.setData({ nickname: res.nickname })
     }
-    this.setData({ loggedIn: true, userId: res.user_id })
+    if (res.avatar_url) {
+      wx.setStorageSync('avatarUrl', res.avatar_url)
+    }
+    this.setData({
+      loggedIn: true,
+      userId: res.user_id,
+      nickname: res.nickname || '',
+      userInfo: { avatarUrl: res.avatar_url || wx.getStorageSync('avatarUrl') || '' }
+    })
     // 登录后自动刷新数据
     this.onShow()
   },
@@ -126,15 +135,18 @@ Page({
       desc: '用于完善会员资料',
       success: (profileRes) => {
         const wechatNickname = profileRes.userInfo.nickName
+        const wechatAvatarUrl = profileRes.userInfo.avatarUrl
         wx.login({
           success: async ({ code }) => {
             try {
               const res = await request('/auth/wechat', 'POST', { code })
               // 如果微信获取到了昵称且后端没返回（或后端返回的是默认值），可以更新一下
               this.setLoginState(res)
-              if (wechatNickname && (!res.nickname || res.nickname === '微信用户')) {
-                await this.updateNickname(wechatNickname)
-              }
+              await this.updateWechatProfile({
+                nickname: wechatNickname,
+                avatarUrl: wechatAvatarUrl,
+                fallbackNickname: res.nickname
+              })
               wx.showToast({ title: '微信登录成功', icon: 'none' })
             } catch (error) {
               wx.showToast({ title: '登录失败', icon: 'none' })
@@ -189,6 +201,33 @@ Page({
       this.setData({ nickname: newNickname })
     } catch (e) {
       console.error('更新昵称失败', e)
+    }
+  },
+
+  async updateWechatProfile({ nickname, avatarUrl, fallbackNickname }) {
+    const safeNickname = (nickname || '').trim()
+    const shouldUpdateNickname = safeNickname && (!fallbackNickname || fallbackNickname === '微信用户')
+    const shouldUpdateAvatar = !!avatarUrl
+    if (!shouldUpdateNickname && !shouldUpdateAvatar) return
+
+    try {
+      const query = []
+      if (shouldUpdateNickname) query.push(`nickname=${encodeURIComponent(safeNickname)}`)
+      if (shouldUpdateAvatar) query.push(`avatar_url=${encodeURIComponent(avatarUrl)}`)
+      await request(`/users/me?${query.join('&')}`, 'PUT')
+
+      if (shouldUpdateNickname) {
+        wx.setStorageSync('nickname', safeNickname)
+      }
+      if (shouldUpdateAvatar) {
+        wx.setStorageSync('avatarUrl', avatarUrl)
+      }
+      this.setData({
+        nickname: shouldUpdateNickname ? safeNickname : this.data.nickname,
+        userInfo: { avatarUrl: shouldUpdateAvatar ? avatarUrl : (this.data.userInfo?.avatarUrl || '') }
+      })
+    } catch (e) {
+      console.error('更新微信资料失败', e)
     }
   },
 

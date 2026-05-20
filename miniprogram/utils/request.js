@@ -24,6 +24,7 @@ function request(url, method = 'GET', data = {}) {
           wx.removeStorageSync('familyId')
           wx.removeStorageSync('userId')
           wx.removeStorageSync('nickname')
+          wx.removeStorageSync('avatarUrl')
         }
         reject({
           statusCode: res.statusCode,

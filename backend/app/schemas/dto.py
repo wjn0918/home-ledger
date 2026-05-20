@@ -11,6 +11,7 @@ class LoginOut(BaseModel):
     token: str
     user_id: int
     nickname: str | None = None
+    avatar_url: str | None = None
 
 
 class AccountRegisterIn(BaseModel):
