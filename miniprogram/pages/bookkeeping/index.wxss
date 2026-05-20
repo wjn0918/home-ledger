@@ -136,6 +136,18 @@
   margin-right: 12rpx;
 }
 
+.category-icon-img {
+  width: 48rpx;
+  height: 48rpx;
+  margin-bottom: 8rpx;
+}
+
+.cat-icon-img {
+  width: 36rpx;
+  height: 36rpx;
+  margin-right: 12rpx;
+}
+
 .amount-display-area {
   padding: 40rpx;
   background: #f8f9fa;
@@ -260,6 +272,11 @@
   font-weight: 600;
 }
 
+.current-icon-img {
+  width: 48rpx;
+  height: 48rpx;
+}
+
 .new-category-input {
   height: 76rpx;
   border: 1rpx solid #dcdfe6;
@@ -289,6 +306,11 @@
   align-items: center;
   justify-content: center;
   font-size: 24rpx;
+}
+
+.icon-item-img {
+  width: 40rpx;
+  height: 40rpx;
 }
 
 .icon-item.active {

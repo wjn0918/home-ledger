@@ -1,6 +1,13 @@
 const { request } = require('../../utils/request')
 const { syncFamilies, switchFamily } = require('../../utils/family')
 const app = getApp()
+const FALLBACK_SVG_ICONS = [
+  "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='%23ff8f1f' d='M7 2v8a2 2 0 0 0 2 2v10h2V2H9v6H8V2Zm8 0c-2 0-4 2-4 5v7h3v8h2V2z'/></svg>",
+  "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='%234a90e2' d='M5 16a2 2 0 1 0 0 4a2 2 0 0 0 0-4m14 0a2 2 0 1 0 0 4a2 2 0 0 0 0-4M5 4h14a2 2 0 0 1 2 2v9h-2a3 3 0 0 0-6 0H11a3 3 0 0 0-6 0H3V6a2 2 0 0 1 2-2'/></svg>",
+  "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='%23ff5a7a' d='M6 7h12l-1 13H7zm3-3h6l1 2H8z'/></svg>",
+  "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='%2328c76f' d='M3 6h18v12H3zm9 2a3 3 0 0 0-3 3h2a1 1 0 1 1 1 1a3 3 0 0 0 0 6v1h2v-1a3 3 0 0 0 0-6a1 1 0 1 1 1-1h2a3 3 0 0 0-3-3V7h-2z'/></svg>",
+  "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><circle cx='12' cy='12' r='10' fill='%2399a2ad'/><circle cx='12' cy='8' r='1.5' fill='white'/><circle cx='12' cy='12' r='1.5' fill='white'/><circle cx='12' cy='16' r='1.5' fill='white'/></svg>"
+]
 
 Page({
   data: {
@@ -179,7 +186,7 @@ Page({
       const res = await request('/categories/default-icons', 'GET')
       this.setData({ defaultIcons: (res || []).map((x) => x.icon) })
     } catch (e) {
-      this.setData({ defaultIcons: ['food', 'transport', 'shopping', 'salary', 'other'] })
+      this.setData({ defaultIcons: FALLBACK_SVG_ICONS })
     }
   },
 
