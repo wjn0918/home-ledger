@@ -12,19 +12,54 @@ from app.services.auth import get_or_create_user_by_wechat_code, register_by_acc
 router = APIRouter()
 
 
-def build_bill_out(bill: Bill, category: str, creator_nickname: str | None = None) -> dict:
+def build_bill_out(bill: Bill, category: str, category_icon: str = "", creator_nickname: str | None = None) -> dict:
     return {
         "id": bill.id,
         "family_id": bill.family_id,
         "user_id": bill.user_id,
         "type": bill.type,
         "category": category,
+        "category_icon": category_icon,
         "amount": bill.amount,
         "note": bill.note,
         "bill_date": bill.bill_date,
         "is_shared": bill.is_shared,
         "creator_nickname": creator_nickname,
     }
+
+
+DEFAULT_CATEGORY_OPTIONS = [
+    {"name": "餐饮", "icon": "food"},
+    {"name": "交通", "icon": "transport"},
+    {"name": "购物", "icon": "shopping"},
+    {"name": "工资", "icon": "salary"},
+    {"name": "其他", "icon": "other"},
+]
+
+
+DEFAULT_CATEGORY_ICONS = [
+    "food", "drink", "fruit", "snack",
+    "bus", "subway", "taxi", "car",
+    "shopping", "bag", "clothes", "beauty",
+    "salary", "bonus", "invest", "other",
+]
+
+
+def get_or_create_family_category(db: Session, family_id: int, category_name: str, category_icon: str = "") -> FamilyCategory:
+    category = db.query(FamilyCategory).filter(
+        FamilyCategory.family_id == family_id,
+        FamilyCategory.name == category_name
+    ).first()
+    if category:
+        if category_icon and category.icon != category_icon:
+            category.icon = category_icon
+            db.flush()
+        return category
+
+    category = FamilyCategory(family_id=family_id, name=category_name, icon=category_icon)
+    db.add(category)
+    db.flush()
+    return category
 
 
 @router.post("/auth/register", response_model=LoginOut)
@@ -106,8 +141,8 @@ def create_family(payload: FamilyCreateIn, db: Session = Depends(get_db), user: 
     db.add(family)
     db.flush()
     db.add(FamilyMember(family_id=family.id, user_id=user.id, role="owner"))
-    for default_name in ["餐饮", "交通", "购物", "工资", "其他"]:
-        db.add(FamilyCategory(family_id=family.id, name=default_name))
+    for item in DEFAULT_CATEGORY_OPTIONS:
+        db.add(FamilyCategory(family_id=family.id, name=item["name"], icon=item["icon"]))
     db.commit()
     return {"id": family.id, "name": family.name}
 
@@ -285,21 +320,14 @@ def create_bill(payload: BillCreateIn, db: Session = Depends(get_db), user: User
     if not membership:
         raise HTTPException(status_code=403, detail="你不是该家庭成员")
 
-    category = db.query(FamilyCategory).filter(
-        FamilyCategory.family_id == payload.family_id,
-        FamilyCategory.name == payload.category
-    ).first()
-    if not category:
-        category = FamilyCategory(family_id=payload.family_id, name=payload.category)
-        db.add(category)
-        db.flush()
+    category = get_or_create_family_category(db, payload.family_id, payload.category, payload.category_icon)
 
-    bill_data = payload.model_dump(exclude={"category"})
+    bill_data = payload.model_dump(exclude={"category", "category_icon"})
     bill = Bill(**bill_data, category_id=category.id, user_id=user.id)
     db.add(bill)
     db.commit()
     db.refresh(bill)
-    return build_bill_out(bill, category.name)
+    return build_bill_out(bill, category.name, category.icon)
 
 
 @router.put("/bills/{bill_id}", response_model=BillOut)
@@ -317,14 +345,7 @@ def update_bill(bill_id: int, payload: BillUpdateIn, db: Session = Depends(get_d
     if bill.user_id != user.id:
         raise HTTPException(status_code=403, detail="只能修改自己创建的账单")
 
-    category = db.query(FamilyCategory).filter(
-        FamilyCategory.family_id == bill.family_id,
-        FamilyCategory.name == payload.category
-    ).first()
-    if not category:
-        category = FamilyCategory(family_id=bill.family_id, name=payload.category)
-        db.add(category)
-        db.flush()
+    category = get_or_create_family_category(db, bill.family_id, payload.category, payload.category_icon)
 
     bill.amount = payload.amount
     bill.category_id = category.id
@@ -332,7 +353,7 @@ def update_bill(bill_id: int, payload: BillUpdateIn, db: Session = Depends(get_d
     bill.is_shared = payload.is_shared
     db.commit()
     db.refresh(bill)
-    return build_bill_out(bill, category.name)
+    return build_bill_out(bill, category.name, category.icon)
 
 
 @router.delete("/bills/{bill_id}")
@@ -383,14 +404,7 @@ def batch_update_bills(bill_ids: list[int], payload: BillUpdateIn, db: Session =
     for bill in bills:
         family_category_key = (bill.family_id, payload.category)
         if family_category_key not in category_cache:
-            category = db.query(FamilyCategory).filter(
-                FamilyCategory.family_id == bill.family_id,
-                FamilyCategory.name == payload.category
-            ).first()
-            if not category:
-                category = FamilyCategory(family_id=bill.family_id, name=payload.category)
-                db.add(category)
-                db.flush()
+            category = get_or_create_family_category(db, bill.family_id, payload.category, payload.category_icon)
             category_cache[family_category_key] = category.id
 
         bill.amount = payload.amount
@@ -411,7 +425,7 @@ def list_bills(family_id: int, scope: str = "family", db: Session = Depends(get_
     if not membership:
         raise HTTPException(status_code=403, detail="你不是该家庭成员")
     query = (
-        db.query(Bill, User.nickname, FamilyCategory.name)
+        db.query(Bill, User.nickname, FamilyCategory.name, FamilyCategory.icon)
         .join(User, User.id == Bill.user_id)
         .join(FamilyCategory, FamilyCategory.id == Bill.category_id)
         .filter(Bill.family_id == family_id)
@@ -423,8 +437,8 @@ def list_bills(family_id: int, scope: str = "family", db: Session = Depends(get_
 
     rows = query.order_by(Bill.bill_date.desc()).all()
     result = []
-    for bill, nickname, category_name in rows:
-        item = build_bill_out(bill, category_name, nickname)
+    for bill, nickname, category_name, category_icon in rows:
+        item = build_bill_out(bill, category_name, category_icon, nickname)
         result.append(item)
     return result
 
@@ -458,7 +472,7 @@ def list_family_categories(family_id: int, db: Session = Depends(get_db), user: 
         raise HTTPException(status_code=403, detail="你不是该家庭成员")
 
     categories = db.query(FamilyCategory).filter(FamilyCategory.family_id == family_id).order_by(FamilyCategory.id.asc()).all()
-    return [{"id": c.id, "name": c.name} for c in categories]
+    return [{"id": c.id, "name": c.name, "icon": c.icon} for c in categories]
 
 
 @router.post("/families/{family_id}/categories")
@@ -475,10 +489,19 @@ def create_family_category(family_id: int, payload: FamilyCategoryCreateIn, db: 
         FamilyCategory.name == payload.name
     ).first()
     if exists:
-        return {"id": exists.id, "name": exists.name}
+        if payload.icon and payload.icon != exists.icon:
+            exists.icon = payload.icon
+            db.commit()
+            db.refresh(exists)
+        return {"id": exists.id, "name": exists.name, "icon": exists.icon}
 
-    category = FamilyCategory(family_id=family_id, name=payload.name)
+    category = FamilyCategory(family_id=family_id, name=payload.name, icon=payload.icon)
     db.add(category)
     db.commit()
     db.refresh(category)
-    return {"id": category.id, "name": category.name}
+    return {"id": category.id, "name": category.name, "icon": category.icon}
+
+
+@router.get("/categories/default-icons")
+def list_default_category_icons(user: User = Depends(get_current_user)):
+    return [{"icon": icon} for icon in DEFAULT_CATEGORY_ICONS]

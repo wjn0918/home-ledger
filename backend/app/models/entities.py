@@ -74,4 +74,5 @@ class FamilyCategory(Base):
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
     family_id: Mapped[int] = mapped_column(ForeignKey("families.id"), index=True)
     name: Mapped[str] = mapped_column(String(50))
+    icon: Mapped[str] = mapped_column(String(100), default="")
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
