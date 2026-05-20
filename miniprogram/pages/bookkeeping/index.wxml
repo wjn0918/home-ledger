@@ -21,17 +21,10 @@
         <text class="close-icon" bindtap="closeModals">×</text>
       </view>
       <view class="category-grid">
-        <block wx:for="{{categoryOptions}}" wx:key="*this">
-          <view class="category-item {{category === item ? 'active' : ''}}" data-category="{{item}}" bindtap="onCategorySelect">
-            <text class="category-icon">
-              <text wx:if="{{item === '餐饮' || item === '蔬菜' || item === '水果'}}">🍔</text>
-              <text wx:elif="{{item === '交通'}}">🚗</text>
-              <text wx:elif="{{item === '住房'}}">🏠</text>
-              <text wx:elif="{{item === '购物'}}">🛍️</text>
-              <text wx:elif="{{item === '娱乐'}}">🎮</text>
-              <text wx:else>📝</text>
-            </text>
-            <text class="category-name">{{item}}</text>
+        <block wx:for="{{categoryOptions}}" wx:key="name">
+          <view class="category-item {{category === item.name ? 'active' : ''}}" data-category="{{item.name}}" data-icon="{{item.icon}}" bindtap="onCategorySelect" bindlongpress="onCategoryLongPress">
+            <text class="category-icon">{{item.icon || 'other'}}</text>
+            <text class="category-name">{{item.name}}</text>
           </view>
         </block>
         <view class="category-item add-category" bindtap="onAddCategoryTap">
@@ -47,7 +40,7 @@
     <view class="modal-content detail-modal" catchtap="stopBubble">
       <view class="modal-header">
         <view class="selected-category">
-          <text class="cat-icon">📝</text>
+          <text class="cat-icon">{{categoryIcon || 'other'}}</text>
           <text>{{category}}</text>
         </view>
         <text class="close-icon" bindtap="closeModals">×</text>
