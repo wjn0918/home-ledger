@@ -12,34 +12,60 @@ page {
 }
 
 @font-face {
-  font-family: "iconfont";
-  src: url("https://at.alicdn.com/t/c/font_0000000_demo.woff2?t=1710000000000") format("woff2"),
-       url("https://at.alicdn.com/t/c/font_0000000_demo.woff?t=1710000000000") format("woff"),
-       url("https://at.alicdn.com/t/c/font_0000000_demo.ttf?t=1710000000000") format("truetype");
+  font-family: "iconfont"; /* Project id 5181223 */
+  /* Color fonts */
+  src: 
+       url('//at.alicdn.com/t/c/font_5181223_9tqysxxbfnk.woff2?t=1779259749254') format('woff2'),
+       url('//at.alicdn.com/t/c/font_5181223_9tqysxxbfnk.woff?t=1779259749254') format('woff'),
+       url('//at.alicdn.com/t/c/font_5181223_9tqysxxbfnk.ttf?t=1779259749254') format('truetype');
 }
 
 .iconfont {
   font-family: "iconfont" !important;
+  font-size: 16px;
   font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-.icon-canyin:before { content: "\e600"; }
-.icon-yinliao:before { content: "\e601"; }
-.icon-shuiguo:before { content: "\e602"; }
-.icon-lingshi:before { content: "\e603"; }
-.icon-jiaotong:before { content: "\e604"; }
-.icon-gongjiao:before { content: "\e605"; }
-.icon-ditie:before { content: "\e606"; }
-.icon-chuzuche:before { content: "\e607"; }
-.icon-qiche:before { content: "\e608"; }
-.icon-gouwu:before { content: "\e609"; }
-.icon-gouwudai:before { content: "\e60a"; }
-.icon-fushi:before { content: "\e60b"; }
-.icon-meirong:before { content: "\e60c"; }
-.icon-gongzi:before { content: "\e60d"; }
-.icon-jiangjin:before { content: "\e60e"; }
-.icon-touzi:before { content: "\e60f"; }
-.icon-qita:before { content: "\e610"; }
+.icon-lingshi:before {
+  content: "\e625";
+}
+
+.icon-canyin:before {
+  content: "\e644";
+}
+
+.icon-yinliao:before {
+  content: "\e691";
+}
+
+.icon-qita:before {
+  content: "\e6d5";
+}
+
+.icon-gongjiao:before {
+  content: "\e600";
+}
+
+.icon-zhufang:before {
+  content: "\e63b";
+}
+
+.icon-shuiguo:before {
+  content: "\e882";
+}
+
+.icon-gouwu:before {
+  content: "\e899";
+}
+
+.icon-shucai:before {
+  content: "\e606";
+}
+
+
+
 
 .lin-container {
   padding: 24rpx;

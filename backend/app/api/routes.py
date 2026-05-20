@@ -29,19 +29,16 @@ def build_bill_out(bill: Bill, category: str, category_icon: str = "", creator_n
 
 
 DEFAULT_CATEGORY_OPTIONS = [
-    {"name": "餐饮", "icon": "icon-canyin"},
-    {"name": "交通", "icon": "icon-jiaotong"},
+    {"name": "蔬菜", "icon": "icon-shucai"},
+    {"name": "住房", "icon": "icon-zhufang"},
+    {"name": "交通", "icon": "icon-gongjiao"},
     {"name": "购物", "icon": "icon-gouwu"},
-    {"name": "工资", "icon": "icon-gongzi"},
     {"name": "其他", "icon": "icon-qita"},
 ]
 
 
 DEFAULT_CATEGORY_ICONS = [
-    "icon-canyin", "icon-yinliao", "icon-shuiguo", "icon-lingshi",
-    "icon-gongjiao", "icon-ditie", "icon-chuzuche", "icon-qiche",
-    "icon-gouwu", "icon-gouwudai", "icon-fushi", "icon-meirong",
-    "icon-gongzi", "icon-jiangjin", "icon-touzi", "icon-qita",
+    "icon-canyin", "icon-yinliao", "icon-shuiguo", "icon-lingshi","icon-qita"
 ]
 
 
