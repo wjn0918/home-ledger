@@ -78,3 +78,7 @@ class JoinRequestOut(BaseModel):
 
 class JoinRequestReviewIn(BaseModel):
     approve: bool
+
+
+class FamilyCategoryCreateIn(BaseModel):
+    name: str

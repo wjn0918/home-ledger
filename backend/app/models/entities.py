@@ -57,9 +57,21 @@ class Bill(Base):
     family_id: Mapped[int] = mapped_column(ForeignKey("families.id"), index=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), index=True)
     type: Mapped[str] = mapped_column(String(20))
-    category: Mapped[str] = mapped_column(String(50))
+    category_id: Mapped[int] = mapped_column(ForeignKey("family_categories.id"), index=True)
     amount: Mapped[float] = mapped_column(DECIMAL(10, 2))
     note: Mapped[str] = mapped_column(String(255), default="")
     is_shared: Mapped[bool] = mapped_column(Boolean, default=True)
     bill_date: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+
+class FamilyCategory(Base):
+    __tablename__ = "family_categories"
+    __table_args__ = (
+        UniqueConstraint("family_id", "name", name="uq_family_category_name"),
+    )
+
+    id: Mapped[int] = mapped_column(primary_key=True, index=True)
+    family_id: Mapped[int] = mapped_column(ForeignKey("families.id"), index=True)
+    name: Mapped[str] = mapped_column(String(50))
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
