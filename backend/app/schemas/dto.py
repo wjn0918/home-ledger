@@ -10,6 +10,7 @@ class LoginByCodeIn(BaseModel):
 class LoginOut(BaseModel):
     token: str
     user_id: int
+    nickname: str | None = None
 
 
 class AccountRegisterIn(BaseModel):

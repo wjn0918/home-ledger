@@ -27,7 +27,14 @@ def auth_login(payload: AccountLoginIn, db: Session = Depends(get_db)):
 @router.post("/auth/wechat", response_model=LoginOut)
 async def auth_wechat(payload: LoginByCodeIn, db: Session = Depends(get_db)):
     user = await get_or_create_user_by_wechat_code(payload.code, db)
-    return LoginOut(token=create_token(user.id), user_id=user.id)
+    return LoginOut(token=create_token(user.id), user_id=user.id, nickname=user.nickname)
+
+
+@router.put("/users/me")
+def update_my_profile(nickname: str, db: Session = Depends(get_db), user: User = Depends(get_current_user)):
+    user.nickname = nickname
+    db.commit()
+    return {"ok": True, "nickname": user.nickname}
 
 
 @router.post("/families")

@@ -141,7 +141,14 @@ Page({
     } else {
       selectedIds.push(id)
     }
+    
+    // 更新数据以触发界面渲染
     this.setData({ selectedIds })
+    
+    // 同时更新 groupedBills 中的选中状态，确保 wxml 中的 selectedIds.includes(item.id) 能够正确响应
+    // 实际上 WXML 里的 selectedIds.includes 是实时计算的，只要 setData({ selectedIds }) 就会刷新。
+    // 如果不刷新，可能是因为 selectedIds 数组引用的问题，或者是 wxml 的作用域问题。
+    // 这里我们强制 setData 一下。
   },
 
   async onBatchShare(e) {

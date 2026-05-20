@@ -6,7 +6,10 @@
       <text wx:else>?</text>
     </view>
     <view class="user-info" wx:if="{{loggedIn}}">
-      <text class="nickname">{{nickname || '用户' + userId}}</text>
+      <view class="nickname-row" bindtap="showEditNicknameModal">
+        <text class="nickname">{{nickname || '用户' + userId}}</text>
+        <text class="edit-icon">✎</text>
+      </view>
       <text class="user-id">ID: {{userId}}</text>
     </view>
     <view class="user-info" wx:else bindtap="onLoginTabTap" data-tab="wechat">

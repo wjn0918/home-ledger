@@ -37,7 +37,8 @@ Page({
     const token = app.globalData.token || wx.getStorageSync('token')
     const familyId = app.globalData.familyId || wx.getStorageSync('familyId') || null
     const userId = app.globalData.userId || wx.getStorageSync('userId') || null
-    this.setData({ loggedIn: !!token, familyId, userId })
+    const nickname = wx.getStorageSync('nickname') || null
+    this.setData({ loggedIn: !!token, familyId, userId, nickname })
     if (!token) return
     try {
       const data = await syncFamilies(app)
@@ -93,23 +94,53 @@ Page({
     app.globalData.userId = res.user_id
     wx.setStorageSync('token', res.token)
     wx.setStorageSync('userId', res.user_id)
+    if (res.nickname) {
+      wx.setStorageSync('nickname', res.nickname)
+      this.setData({ nickname: res.nickname })
+    }
     this.setData({ loggedIn: true, userId: res.user_id })
+    // 登录后自动刷新数据
+    this.onShow()
   },
 
   onLoginTabTap(e) { this.setData({ loginTab: e.currentTarget.dataset.tab }) },
 
   onLogin() {
-    wx.login({
-      success: async ({ code }) => {
-        try {
-          const res = await request('/auth/wechat', 'POST', { code })
-          this.setLoginState(res)
-          wx.showToast({ title: '微信登录成功', icon: 'none' })
-        } catch (error) {
-          wx.showToast({ title: '登录失败', icon: 'none' })
-        }
+    wx.getUserProfile({
+      desc: '用于完善会员资料',
+      success: (profileRes) => {
+        const wechatNickname = profileRes.userInfo.nickName
+        wx.login({
+          success: async ({ code }) => {
+            try {
+              const res = await request('/auth/wechat', 'POST', { code })
+              // 如果微信获取到了昵称且后端没返回（或后端返回的是默认值），可以更新一下
+              this.setLoginState(res)
+              if (wechatNickname && (!res.nickname || res.nickname === '微信用户')) {
+                await this.updateNickname(wechatNickname)
+              }
+              wx.showToast({ title: '微信登录成功', icon: 'none' })
+            } catch (error) {
+              wx.showToast({ title: '登录失败', icon: 'none' })
+            }
+          },
+          fail: () => wx.showToast({ title: '微信登录失败', icon: 'none' })
+        })
       },
-      fail: () => wx.showToast({ title: '微信登录失败', icon: 'none' })
+      fail: () => {
+        // 用户拒绝授权昵称，降级为普通登录
+        wx.login({
+          success: async ({ code }) => {
+            try {
+              const res = await request('/auth/wechat', 'POST', { code })
+              this.setLoginState(res)
+              wx.showToast({ title: '微信登录成功', icon: 'none' })
+            } catch (error) {
+              wx.showToast({ title: '登录失败', icon: 'none' })
+            }
+          }
+        })
+      }
     })
   },
 
@@ -133,6 +164,33 @@ Page({
     } catch (error) {
       wx.showToast({ title: '注册失败，账号可能已存在', icon: 'none' })
     }
+  },
+
+  async updateNickname(newNickname) {
+    try {
+      await request(`/users/me?nickname=${encodeURIComponent(newNickname)}`, 'PUT')
+      wx.setStorageSync('nickname', newNickname)
+      this.setData({ nickname: newNickname })
+    } catch (e) {
+      console.error('更新昵称失败', e)
+    }
+  },
+
+  showEditNicknameModal() {
+    wx.showModal({
+      title: '修改昵称',
+      editable: true,
+      placeholderText: '请输入新昵称',
+      content: this.data.nickname,
+      success: async (res) => {
+        if (res.confirm && res.content) {
+          const newNickname = res.content.trim()
+          if (!newNickname) return
+          await this.updateNickname(newNickname)
+          wx.showToast({ title: '修改成功', icon: 'success' })
+        }
+      }
+    })
   },
 
   async onCreateFamily() {
