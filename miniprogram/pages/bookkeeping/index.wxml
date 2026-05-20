@@ -21,17 +21,10 @@
         <text class="close-icon" bindtap="closeModals">×</text>
       </view>
       <view class="category-grid">
-        <block wx:for="{{categoryOptions}}" wx:key="*this">
-          <view class="category-item {{category === item ? 'active' : ''}}" data-category="{{item}}" bindtap="onCategorySelect">
-            <text class="category-icon">
-              <text wx:if="{{item === '餐饮' || item === '蔬菜' || item === '水果'}}">🍔</text>
-              <text wx:elif="{{item === '交通'}}">🚗</text>
-              <text wx:elif="{{item === '住房'}}">🏠</text>
-              <text wx:elif="{{item === '购物'}}">🛍️</text>
-              <text wx:elif="{{item === '娱乐'}}">🎮</text>
-              <text wx:else>📝</text>
-            </text>
-            <text class="category-name">{{item}}</text>
+        <block wx:for="{{categoryOptions}}" wx:key="name">
+          <view class="category-item {{category === item.name ? 'active' : ''}}" data-category="{{item.name}}" data-icon="{{item.icon}}" bindtap="onCategorySelect" bindlongpress="onCategoryLongPress">
+            <text class="iconfont category-icon-font {{item.icon || 'icon-qita'}}"></text>
+            <text class="category-name">{{item.name}}</text>
           </view>
         </block>
         <view class="category-item add-category" bindtap="onAddCategoryTap">
@@ -47,7 +40,7 @@
     <view class="modal-content detail-modal" catchtap="stopBubble">
       <view class="modal-header">
         <view class="selected-category">
-          <text class="cat-icon">📝</text>
+          <text class="iconfont cat-icon-font {{categoryIcon || 'icon-qita'}}"></text>
           <text>{{category}}</text>
         </view>
         <text class="close-icon" bindtap="closeModals">×</text>
@@ -98,6 +91,44 @@
           <view class="calc-btn" bindtap="onCalcInput" data-val="0">0</view>
           <view class="calc-btn op" bindtap="onCalcInput" data-val="=">=</view>
           <view class="calc-btn submit" bindtap="onSubmit">完成</view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 弹窗3：新增分类（同页输入名称+选择图标） -->
+  <view class="modal-overlay" wx:if="{{showAddCategoryModal}}" bindtap="closeModals">
+    <view class="modal-content category-modal" catchtap="stopBubble">
+      <view class="modal-header">
+        <text class="modal-title">新增分类</text>
+        <text class="close-icon" bindtap="closeModals">×</text>
+      </view>
+      <view class="add-category-panel">
+        <view class="current-icon-wrap">
+          <text class="current-icon-label">当前图标</text>
+          <text class="iconfont current-icon-font {{newCategoryIcon || 'icon-qita'}}"></text>
+        </view>
+        <input
+          class="new-category-input"
+          placeholder="请输入类别名称，例如：零食"
+          value="{{newCategoryName}}"
+          bindinput="onNewCategoryNameInput"
+        />
+        <view class="icon-grid-title">选择图标</view>
+        <view class="icon-grid">
+          <block wx:for="{{defaultIcons}}" wx:key="*this">
+            <view
+              class="icon-item {{newCategoryIcon === item ? 'active' : ''}}"
+              data-icon="{{item}}"
+              bindtap="onNewCategoryIconSelect"
+            >
+              <text class="iconfont icon-item-font {{item}}"></text>
+            </view>
+          </block>
+        </view>
+        <view class="add-category-actions">
+          <view class="action-btn cancel" bindtap="closeModals">取消</view>
+          <view class="action-btn confirm" bindtap="onConfirmAddCategory">确定</view>
         </view>
       </view>
     </view>

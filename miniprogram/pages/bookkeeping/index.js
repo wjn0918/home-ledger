@@ -1,30 +1,35 @@
 const { request } = require('../../utils/request')
 const { syncFamilies, switchFamily } = require('../../utils/family')
 const app = getApp()
-
-const DEFAULT_CATEGORIES = ['蔬菜', '水果', '住房', '交通']
+const FALLBACK_ICONFONT_ICONS = [
+  'icon-canyin', 'icon-jiaotong', 'icon-gouwu', 'icon-gongzi', 'icon-qita'
+]
 
 Page({
   data: {
     amount: '',
-    category: '蔬菜',
+    category: '',
+    categoryIcon: '',
     type: 'expense',
     note: '',
     billDate: '',
     families: [],
     familyIndex: 0,
     currentFamilyName: '',
-    categoryOptions: DEFAULT_CATEGORIES,
+    categoryOptions: [],
+    defaultIcons: [],
     isShared: true,
     showCategoryModal: false,
     showDetailModal: false,
+    showAddCategoryModal: false,
+    newCategoryName: '',
+    newCategoryIcon: 'other',
     calcExpr: '',
     lastOp: ''
   },
 
   async onShow() {
     if (!app.requireLogin()) return
-    this.loadCategories()
     this.initTodayDate()
     try {
       const data = await syncFamilies(app)
@@ -34,6 +39,8 @@ Page({
         familyIndex: familyIndex >= 0 ? familyIndex : 0,
         currentFamilyName: data.selectedFamilyName
       })
+      await this.loadDefaultIcons()
+      await this.loadCategories()
     } catch (e) {
       wx.showToast({ title: '加载家庭信息失败', icon: 'none' })
     }
@@ -45,8 +52,10 @@ Page({
 
   onCategorySelect(e) {
     const category = e.currentTarget.dataset.category
+    const categoryIcon = e.currentTarget.dataset.icon || ''
     this.setData({ 
-      category, 
+      category,
+      categoryIcon,
       showCategoryModal: false, 
       showDetailModal: true,
       amount: '',
@@ -56,7 +65,7 @@ Page({
   },
 
   closeModals() {
-    this.setData({ showCategoryModal: false, showDetailModal: false })
+    this.setData({ showCategoryModal: false, showDetailModal: false, showAddCategoryModal: false })
   },
 
   stopBubble() {},
@@ -133,6 +142,7 @@ Page({
         family_id: app.globalData.familyId,
         amount: Number(finalAmount),
         category: this.data.category,
+        category_icon: this.data.categoryIcon,
         type: this.data.type,
         note: this.data.note,
         bill_date: `${this.data.billDate}T00:00:00`,
@@ -152,6 +162,7 @@ Page({
     const target = switchFamily(app, this.data.families, index)
     if (!target) return
     this.setData({ familyIndex: index, currentFamilyName: target.name })
+    this.loadCategories()
   },
 
   onCategoryTap(e) {
@@ -166,14 +177,29 @@ Page({
     this.setData({ billDate: `${now.getFullYear()}-${month}-${day}` })
   },
 
-  loadCategories() {
-    const custom = wx.getStorageSync('customCategories') || []
-    const categoryOptions = [...DEFAULT_CATEGORIES, ...custom]
-    const selected = categoryOptions.includes(this.data.category) ? this.data.category : categoryOptions[0]
-    this.setData({
-      categoryOptions,
-      category: selected
-    })
+  async loadDefaultIcons() {
+    try {
+      const res = await request('/categories/default-icons', 'GET')
+      this.setData({ defaultIcons: (res || []).map((x) => x.icon) })
+    } catch (e) {
+      this.setData({ defaultIcons: FALLBACK_ICONFONT_ICONS })
+    }
+  },
+
+  async loadCategories() {
+    if (!app.globalData.familyId) return
+    try {
+      const res = await request(`/families/${app.globalData.familyId}/categories`, 'GET')
+      const categoryOptions = (res || []).map((c) => ({ name: c.name, icon: c.icon || '' }))
+      const selectedItem = categoryOptions.find((c) => c.name === this.data.category) || categoryOptions[0] || { name: '', icon: '' }
+      this.setData({
+        categoryOptions,
+        category: selectedItem.name,
+        categoryIcon: selectedItem.icon
+      })
+    } catch (e) {
+      wx.showToast({ title: '加载分类失败', icon: 'none' })
+    }
   },
 
   onDateChange(e) {
@@ -185,28 +211,65 @@ Page({
   onShareChange(e) { this.setData({ isShared: !!e.detail.value }) },
 
   onAddCategoryTap() {
-    wx.showModal({
-      title: '新增账单类别',
-      editable: true,
-      placeholderText: '例如：零食',
-      success: (res) => {
-        if (!res.confirm) return
-        const value = (res.content || '').trim()
-        if (!value) {
-          wx.showToast({ title: '请输入类别名称', icon: 'none' })
-          return
+    if (!app.globalData.familyId) {
+      wx.showToast({ title: '请先选择家庭', icon: 'none' })
+      return
+    }
+    const defaultIcon = (this.data.defaultIcons && this.data.defaultIcons[0]) || 'other'
+    this.setData({
+      showAddCategoryModal: true,
+      showCategoryModal: false,
+      newCategoryName: '',
+      newCategoryIcon: defaultIcon
+    })
+  },
+
+  onNewCategoryNameInput(e) {
+    this.setData({ newCategoryName: (e.detail.value || '').trim() })
+  },
+
+  onNewCategoryIconSelect(e) {
+    this.setData({ newCategoryIcon: e.currentTarget.dataset.icon || 'other' })
+  },
+
+  async onConfirmAddCategory() {
+    const value = (this.data.newCategoryName || '').trim()
+    if (!value) {
+      wx.showToast({ title: '请输入类别名称', icon: 'none' })
+      return
+    }
+    const icon = this.data.newCategoryIcon || 'other'
+    try {
+      await request(`/families/${app.globalData.familyId}/categories`, 'POST', { name: value, icon })
+      await this.loadCategories()
+      this.setData({
+        category: value,
+        categoryIcon: icon,
+        showAddCategoryModal: false
+      })
+      wx.showToast({ title: '类别已添加', icon: 'success' })
+    } catch (e) {
+      wx.showToast({ title: '新增失败', icon: 'none' })
+    }
+  },
+
+  async onCategoryLongPress(e) {
+    const category = e.currentTarget.dataset.category
+    const currentIcon = e.currentTarget.dataset.icon || ''
+    if (!app.globalData.familyId || !category) return
+    const iconList = (this.data.defaultIcons.length ? this.data.defaultIcons : ['other']).slice(0, 6)
+    wx.showActionSheet({
+      itemList: iconList.map((i) => `${i}${i === currentIcon ? '（当前）' : ''}`),
+      success: async (res) => {
+        const icon = iconList[res.tapIndex]
+        try {
+          await request(`/families/${app.globalData.familyId}/categories`, 'POST', { name: category, icon })
+          await this.loadCategories()
+          if (this.data.category === category) this.setData({ categoryIcon: icon })
+          wx.showToast({ title: '图标已更新', icon: 'success' })
+        } catch (err) {
+          wx.showToast({ title: '更新失败', icon: 'none' })
         }
-        if (this.data.categoryOptions.includes(value)) {
-          wx.showToast({ title: '类别已存在', icon: 'none' })
-          this.setData({ category: value })
-          return
-        }
-        const custom = wx.getStorageSync('customCategories') || []
-        custom.push(value)
-        wx.setStorageSync('customCategories', custom)
-        this.loadCategories()
-        this.setData({ category: value })
-        wx.showToast({ title: '类别已添加', icon: 'none' })
       }
     })
   }

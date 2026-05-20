@@ -11,6 +11,62 @@ page {
   --border-color: #f2f3f5;
 }
 
+@font-face {
+  font-family: "iconfont"; /* Project id 5181223 */
+  /* Color fonts */
+  src: 
+       url('//at.alicdn.com/t/c/font_5181223_9tqysxxbfnk.woff2?t=1779259749254') format('woff2'),
+       url('//at.alicdn.com/t/c/font_5181223_9tqysxxbfnk.woff?t=1779259749254') format('woff'),
+       url('//at.alicdn.com/t/c/font_5181223_9tqysxxbfnk.ttf?t=1779259749254') format('truetype');
+}
+
+.iconfont {
+  font-family: "iconfont" !important;
+  font-size: 16px;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-lingshi:before {
+  content: "\e625";
+}
+
+.icon-canyin:before {
+  content: "\e644";
+}
+
+.icon-yinliao:before {
+  content: "\e691";
+}
+
+.icon-qita:before {
+  content: "\e6d5";
+}
+
+.icon-gongjiao:before {
+  content: "\e600";
+}
+
+.icon-zhufang:before {
+  content: "\e63b";
+}
+
+.icon-shuiguo:before {
+  content: "\e882";
+}
+
+.icon-gouwu:before {
+  content: "\e899";
+}
+
+.icon-shucai:before {
+  content: "\e606";
+}
+
+
+
+
 .lin-container {
   padding: 24rpx;
   min-height: 100vh;

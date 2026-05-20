@@ -37,6 +37,7 @@ class BillCreateIn(BaseModel):
     family_id: int
     type: str
     category: str
+    category_icon: str = ""
     amount: Decimal
     note: str = ""
     bill_date: datetime
@@ -46,6 +47,7 @@ class BillCreateIn(BaseModel):
 class BillUpdateIn(BaseModel):
     amount: Decimal
     category: str
+    category_icon: str = ""
     bill_date: datetime
     is_shared: bool = True
 
@@ -56,6 +58,7 @@ class BillOut(BaseModel):
     user_id: int
     type: str
     category: str
+    category_icon: str = ""
     amount: Decimal
     note: str
     bill_date: datetime
@@ -78,3 +81,8 @@ class JoinRequestOut(BaseModel):
 
 class JoinRequestReviewIn(BaseModel):
     approve: bool
+
+
+class FamilyCategoryCreateIn(BaseModel):
+    name: str
+    icon: str = ""
