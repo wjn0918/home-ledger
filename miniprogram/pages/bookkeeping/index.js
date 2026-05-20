@@ -209,7 +209,7 @@ Page({
       wx.showToast({ title: '请先选择家庭', icon: 'none' })
       return
     }
-    const iconList = this.data.defaultIcons.length ? this.data.defaultIcons : ['other']
+    const iconList = (this.data.defaultIcons.length ? this.data.defaultIcons : ['other']).slice(0, 6)
     wx.showActionSheet({
       itemList: iconList.map((i) => `图标: ${i}`),
       success: (actionRes) => {
@@ -240,7 +240,7 @@ Page({
     const category = e.currentTarget.dataset.category
     const currentIcon = e.currentTarget.dataset.icon || ''
     if (!app.globalData.familyId || !category) return
-    const iconList = this.data.defaultIcons.length ? this.data.defaultIcons : ['other']
+    const iconList = (this.data.defaultIcons.length ? this.data.defaultIcons : ['other']).slice(0, 6)
     wx.showActionSheet({
       itemList: iconList.map((i) => `${i}${i === currentIcon ? '（当前）' : ''}`),
       success: async (res) => {
