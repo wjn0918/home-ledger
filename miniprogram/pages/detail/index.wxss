@@ -66,15 +66,52 @@
 }
 
 .modern-card {
-  padding: 0 30rpx;
+  padding: 0;
+  overflow: hidden;
+}
+
+.swipe-area {
+  width: 100%;
+  height: 160rpx;
+}
+
+.swipe-view {
+  width: calc(100vw + 150rpx);
+  height: 160rpx;
+  display: flex;
 }
 
 .bill-item {
-  padding: 30rpx 0;
+  width: 100vw;
+  padding: 30rpx;
+  height: 160rpx;
+  box-sizing: border-box;
+  border-bottom: 1rpx solid #f2f3f5;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #fff;
 }
 
-.bill-item:last-child {
-  border-bottom: none;
+.bill-note {
+  font-size: 24rpx;
+  color: var(--text-sub);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 400rpx;
+}
+
+.swipe-delete {
+  width: 150rpx;
+  height: 160rpx;
+  background: #ff4d4f;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28rpx;
+  z-index: 1;
 }
 
 .empty-state {

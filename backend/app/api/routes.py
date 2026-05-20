@@ -200,6 +200,26 @@ def update_bill(bill_id: int, payload: BillUpdateIn, db: Session = Depends(get_d
     return bill
 
 
+@router.delete("/bills/{bill_id}")
+def delete_bill(bill_id: int, db: Session = Depends(get_db), user: User = Depends(get_current_user)):
+    bill = db.query(Bill).filter(Bill.id == bill_id).first()
+    if not bill:
+        raise HTTPException(status_code=404, detail="账单不存在")
+
+    membership = db.query(FamilyMember).filter(
+        FamilyMember.family_id == bill.family_id,
+        FamilyMember.user_id == user.id
+    ).first()
+    if not membership:
+        raise HTTPException(status_code=403, detail="你不是该家庭成员")
+    if bill.user_id != user.id:
+        raise HTTPException(status_code=403, detail="只能删除自己创建的账单")
+
+    db.delete(bill)
+    db.commit()
+    return {"ok": True}
+
+
 @router.get("/bills", response_model=list[BillOut])
 def list_bills(family_id: int, scope: str = "family", db: Session = Depends(get_db), user: User = Depends(get_current_user)):
     membership = db.query(FamilyMember).filter(

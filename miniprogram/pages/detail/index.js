@@ -16,6 +16,7 @@ function groupBillsByDay(bills, currentUserId) {
     const ownerId = Number(bill.user_id)
     const selfId = Number(currentUserId)
     bill.creatorClass = ownerId === selfId ? "bill-self" : `bill-member-${ownerId % 4}`
+    bill.x = 0 // 初始化滑动位置
     const day = toDay(bill.bill_date)
     if (!groups[day]) {
       groups[day] = { day, total: 0, items: [] }
@@ -106,6 +107,48 @@ Page({
     if (!bill) return
     if (Number(bill.user_id) !== Number(this.data.userId)) return wx.showToast({ title: "仅可修改自己账单", icon: "none" })
     await this.submitBillEdit(bill, { is_shared: !!e.detail.value })
+  },
+
+  onSwipeChange(e) {
+    // 可以在这里处理滑动互斥，即同时只允许一个项处于滑动状态
+  },
+
+  async onDeleteTap(e) {
+    const bill = this.findBillByDatasetId(e)
+    if (!bill) return
+    if (Number(bill.user_id) !== Number(this.data.userId)) return wx.showToast({ title: "仅可删除自己账单", icon: "none" })
+
+    wx.showModal({
+      title: '确认删除',
+      content: '确定要删除这条账单吗？',
+      success: async (res) => {
+        if (res.confirm) {
+          try {
+            await request(`/bills/${bill.id}`, 'DELETE')
+            await this.loadFamiliesAndBills()
+            wx.showToast({ title: '删除成功', icon: 'success' })
+          } catch (err) {
+            wx.showToast({ title: '删除失败', icon: 'none' })
+          }
+        } else {
+          // 如果取消，可以考虑把位置弹回去
+          this.resetSwipe(bill.id)
+        }
+      }
+    })
+  },
+
+  resetSwipe(billId) {
+    const groupedBills = this.data.groupedBills.map(group => {
+      group.items = group.items.map(item => {
+        if (item.id === billId) {
+          return { ...item, x: 0 }
+        }
+        return item
+      })
+      return group
+    })
+    this.setData({ groupedBills })
   },
 
   findBillByDatasetId(e) {

@@ -28,32 +28,37 @@
         
         <view class="modern-card">
           <block wx:for="{{item.items}}" wx:key="id">
-            <view class="bill-item">
-              <view class="bill-left">
-                <view class="bill-icon">
-                  <text wx:if="{{item.category === '餐饮' || item.category === '蔬菜' || item.category === '水果'}}">🍔</text>
-                  <text wx:elif="{{item.category === '交通'}}">🚗</text>
-                  <text wx:elif="{{item.category === '住房'}}">🏠</text>
-                  <text wx:elif="{{item.category === '购物'}}">🛍️</text>
-                  <text wx:elif="{{item.category === '娱乐'}}">🎮</text>
-                  <text wx:else>📝</text>
-                </view>
-                <view class="bill-info">
-                  <view class="bill-category">
-                    {{item.category}}
-                    <text class="bill-creator {{item.creatorClass}}">{{item.creator_nickname}}</text>
+            <movable-area class="swipe-area">
+              <movable-view class="swipe-view" direction="horizontal" x="{{item.x}}" out-of-bounds="true" damping="50" friction="1" bindchange="onSwipeChange" data-id="{{item.id}}">
+                <view class="bill-item">
+                  <view class="bill-left">
+                    <view class="bill-icon">
+                      <text wx:if="{{item.category === '餐饮' || item.category === '蔬菜' || item.category === '水果'}}">🍔</text>
+                      <text wx:elif="{{item.category === '交通'}}">🚗</text>
+                      <text wx:elif="{{item.category === '住房'}}">🏠</text>
+                      <text wx:elif="{{item.category === '购物'}}">🛍️</text>
+                      <text wx:elif="{{item.category === '娱乐'}}">🎮</text>
+                      <text wx:else>📝</text>
+                    </view>
+                    <view class="bill-info">
+                      <view class="bill-category">
+                        {{item.category}}
+                        <text class="bill-creator {{item.creatorClass}}">{{item.creator_nickname}}</text>
+                      </view>
+                      <text class="bill-note" data-id="{{item.id}}" bindtap="onCategoryTap">{{item.note || '无备注'}}</text>
+                    </view>
                   </view>
-                  <text class="bill-note" data-id="{{item.id}}" bindtap="onCategoryTap">{{item.note || '无备注'}}</text>
+                  <view class="bill-right">
+                    <view class="bill-amount expense" data-id="{{item.id}}" bindtap="onAmountTap">¥{{item.amount}}</view>
+                    <view class="modern-subtitle" style="display: flex; align-items: center; justify-content: flex-end;">
+                      <text style="margin-right: 10rpx;">共享</text>
+                      <switch data-id="{{item.id}}" checked="{{item.is_shared}}" bindchange="onShareSwitchChange" style="transform: scale(0.6);" />
+                    </view>
+                  </view>
                 </view>
-              </view>
-              <view class="bill-right">
-                <view class="bill-amount expense" data-id="{{item.id}}" bindtap="onAmountTap">¥{{item.amount}}</view>
-                <view class="modern-subtitle" style="display: flex; align-items: center; justify-content: flex-end;">
-                  <text style="margin-right: 10rpx;">共享</text>
-                  <switch data-id="{{item.id}}" checked="{{item.is_shared}}" bindchange="onShareSwitchChange" style="transform: scale(0.6);" />
-                </view>
-              </view>
-            </view>
+                <view class="swipe-delete" bindtap="onDeleteTap" data-id="{{item.id}}">删除</view>
+              </movable-view>
+            </movable-area>
           </block>
         </view>
       </view>
