@@ -130,6 +130,11 @@ Page({
 
   onLoginTabTap(e) { this.setData({ loginTab: e.currentTarget.dataset.tab }) },
 
+  shouldSyncWechatNickname(currentNickname) {
+    const normalized = (currentNickname || '').trim()
+    return !normalized || normalized === '微信用户' || normalized === '普通用户'
+  },
+
   onLogin() {
     wx.getUserProfile({
       desc: '用于完善会员资料',
@@ -140,12 +145,15 @@ Page({
           success: async ({ code }) => {
             try {
               const res = await request('/auth/wechat', 'POST', { code })
-              // 如果微信获取到了昵称且后端没返回（或后端返回的是默认值），可以更新一下
               this.setLoginState(res)
-              await this.updateWechatProfile({
-                nickname: wechatNickname,
-                avatarUrl: wechatAvatarUrl
-              })
+              const shouldSyncNickname = this.shouldSyncWechatNickname(res.nickname)
+              const shouldSyncAvatar = !(res.avatar_url || '').trim()
+              if (shouldSyncNickname || shouldSyncAvatar) {
+                await this.updateWechatProfile({
+                  nickname: shouldSyncNickname ? wechatNickname : '',
+                  avatarUrl: shouldSyncAvatar ? wechatAvatarUrl : ''
+                })
+              }
               wx.showToast({ title: '微信登录成功', icon: 'none' })
             } catch (error) {
               wx.showToast({ title: '登录失败', icon: 'none' })
