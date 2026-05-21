@@ -22,8 +22,11 @@ Page({
     showCategoryModal: false,
     showDetailModal: false,
     showAddCategoryModal: false,
+    showEditCategoryIconModal: false,
     newCategoryName: '',
     newCategoryIcon: 'other',
+    editingCategoryName: '',
+    editingCategoryIcon: '',
     calcExpr: '',
     lastOp: ''
   },
@@ -65,7 +68,14 @@ Page({
   },
 
   closeModals() {
-    this.setData({ showCategoryModal: false, showDetailModal: false, showAddCategoryModal: false })
+    this.setData({
+      showCategoryModal: false,
+      showDetailModal: false,
+      showAddCategoryModal: false,
+      showEditCategoryIconModal: false,
+      editingCategoryName: '',
+      editingCategoryIcon: ''
+    })
   },
 
   stopBubble() {},
@@ -257,20 +267,31 @@ Page({
     const category = e.currentTarget.dataset.category
     const currentIcon = e.currentTarget.dataset.icon || ''
     if (!app.globalData.familyId || !category) return
-    const iconList = (this.data.defaultIcons.length ? this.data.defaultIcons : ['other']).slice(0, 6)
-    wx.showActionSheet({
-      itemList: iconList.map((i) => `${i}${i === currentIcon ? '（当前）' : ''}`),
-      success: async (res) => {
-        const icon = iconList[res.tapIndex]
-        try {
-          await request(`/families/${app.globalData.familyId}/categories`, 'POST', { name: category, icon })
-          await this.loadCategories()
-          if (this.data.category === category) this.setData({ categoryIcon: icon })
-          wx.showToast({ title: '图标已更新', icon: 'success' })
-        } catch (err) {
-          wx.showToast({ title: '更新失败', icon: 'none' })
-        }
-      }
+    const iconList = this.data.defaultIcons.length ? this.data.defaultIcons : ['icon-qita']
+    this.setData({
+      showEditCategoryIconModal: true,
+      showCategoryModal: false,
+      editingCategoryName: category,
+      editingCategoryIcon: currentIcon || iconList[0]
     })
+  },
+
+  onEditCategoryIconSelect(e) {
+    this.setData({ editingCategoryIcon: e.currentTarget.dataset.icon || 'icon-qita' })
+  },
+
+  async onConfirmEditCategoryIcon() {
+    const category = this.data.editingCategoryName
+    const icon = this.data.editingCategoryIcon || 'icon-qita'
+    if (!app.globalData.familyId || !category) return
+    try {
+      await request(`/families/${app.globalData.familyId}/categories`, 'POST', { name: category, icon })
+      await this.loadCategories()
+      if (this.data.category === category) this.setData({ categoryIcon: icon })
+      this.setData({ showEditCategoryIconModal: false, editingCategoryName: '', editingCategoryIcon: '' })
+      wx.showToast({ title: '图标已更新', icon: 'success' })
+    } catch (err) {
+      wx.showToast({ title: '更新失败', icon: 'none' })
+    }
   }
 })

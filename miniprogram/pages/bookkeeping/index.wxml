@@ -133,4 +133,32 @@
       </view>
     </view>
   </view>
+
+  <!-- 弹窗4：编辑分类图标 -->
+  <view class="modal-overlay" wx:if="{{showEditCategoryIconModal}}" bindtap="closeModals">
+    <view class="modal-content category-modal" catchtap="stopBubble">
+      <view class="modal-header">
+        <text class="modal-title">选择分类图标</text>
+        <text class="close-icon" bindtap="closeModals">×</text>
+      </view>
+      <view class="add-category-panel">
+        <view class="icon-grid-title">长按「{{editingCategoryName}}」后选择图标</view>
+        <view class="icon-grid">
+          <block wx:for="{{defaultIcons}}" wx:key="*this">
+            <view
+              class="icon-item {{editingCategoryIcon === item ? 'active' : ''}}"
+              data-icon="{{item}}"
+              bindtap="onEditCategoryIconSelect"
+            >
+              <text class="iconfont icon-item-font {{item}}"></text>
+            </view>
+          </block>
+        </view>
+        <view class="add-category-actions">
+          <view class="action-btn cancel" bindtap="closeModals">取消</view>
+          <view class="action-btn confirm" bindtap="onConfirmEditCategoryIcon">确定</view>
+        </view>
+      </view>
+    </view>
+  </view>
 </view>
