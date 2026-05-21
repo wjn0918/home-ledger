@@ -37,6 +37,8 @@ DEFAULT_CATEGORY_OPTIONS = [
     {"name": "住房", "icon": "icon-zhufang"},
     {"name": "交通", "icon": "icon-gongjiao"},
     {"name": "购物", "icon": "icon-gouwu"},
+    {"name": "健身", "icon": "icon-jianshen"},
+    {"name": "护肤", "icon": "icon-hufu"},
     {"name": "其他", "icon": "icon-qita"},
 ]
 
@@ -55,7 +57,9 @@ DEFAULT_CATEGORY_ICONS = [
     "icon-zhufang",
     "icon-shuiguo",
     "icon-gouwu",
-    "icon-shucai"
+    "icon-shucai",
+    "icon-jianshen",
+    "icon-hufu"
 ]
 
 

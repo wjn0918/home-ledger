@@ -15,9 +15,9 @@ page {
   font-family: "iconfont"; /* Project id 5181223 */
   /* Color fonts */
   src: 
-       url('//at.alicdn.com/t/c/font_5181223_nyvi0uadyxa.woff2?t=1779326234059') format('woff2'),
-       url('//at.alicdn.com/t/c/font_5181223_nyvi0uadyxa.woff?t=1779326234059') format('woff'),
-       url('//at.alicdn.com/t/c/font_5181223_nyvi0uadyxa.ttf?t=1779326234059') format('truetype');
+       url('//at.alicdn.com/t/c/font_5181223_s3lvsa8qvqd.woff2?t=1779335550588') format('woff2'),
+       url('//at.alicdn.com/t/c/font_5181223_s3lvsa8qvqd.woff?t=1779335550588') format('woff'),
+       url('//at.alicdn.com/t/c/font_5181223_s3lvsa8qvqd.ttf?t=1779335550588') format('truetype');
 }
 
 .iconfont {
@@ -26,6 +26,18 @@ page {
   font-style: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-hufu:before {
+  content: "\e654";
+}
+
+.icon-jianshen:before {
+  content: "\e626";
+}
+
+.icon-yinliao:before {
+  content: "\e6ae";
 }
 
 .icon-xuexi:before {
@@ -58,10 +70,6 @@ page {
 
 .icon-canyin:before {
   content: "\e644";
-}
-
-.icon-yinliao:before {
-  content: "\e691";
 }
 
 .icon-gongjiao:before {
