@@ -15,9 +15,9 @@ page {
   font-family: "iconfont"; /* Project id 5181223 */
   /* Color fonts */
   src: 
-       url('//at.alicdn.com/t/c/font_5181223_9tqysxxbfnk.woff2?t=1779259749254') format('woff2'),
-       url('//at.alicdn.com/t/c/font_5181223_9tqysxxbfnk.woff?t=1779259749254') format('woff'),
-       url('//at.alicdn.com/t/c/font_5181223_9tqysxxbfnk.ttf?t=1779259749254') format('truetype');
+       url('//at.alicdn.com/t/c/font_5181223_nyvi0uadyxa.woff2?t=1779326234059') format('woff2'),
+       url('//at.alicdn.com/t/c/font_5181223_nyvi0uadyxa.woff?t=1779326234059') format('woff'),
+       url('//at.alicdn.com/t/c/font_5181223_nyvi0uadyxa.ttf?t=1779326234059') format('truetype');
 }
 
 .iconfont {
@@ -26,6 +26,30 @@ page {
   font-style: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-xuexi:before {
+  content: "\e635";
+}
+
+.icon-yule:before {
+  content: "\e639";
+}
+
+.icon-qita:before {
+  content: "\e60a";
+}
+
+.icon-chengchang:before {
+  content: "\e674";
+}
+
+.icon-yiliao:before {
+  content: "\e6ee";
+}
+
+.icon-clothes:before {
+  content: "\e8c7";
 }
 
 .icon-lingshi:before {
@@ -38,10 +62,6 @@ page {
 
 .icon-yinliao:before {
   content: "\e691";
-}
-
-.icon-qita:before {
-  content: "\e6d5";
 }
 
 .icon-gongjiao:before {
@@ -63,6 +83,7 @@ page {
 .icon-shucai:before {
   content: "\e606";
 }
+
 
 
 
