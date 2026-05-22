@@ -46,12 +46,17 @@ Page({
   },
 
   async onShow() {
-    const cachedToken = app.globalData.token || wx.getStorageSync('token') || ''
-    if (!cachedToken) {
-      app.requireLogin()
+    if (!app.isLoggedIn()) {
+      this.setData({
+        bills: [],
+        groupedBills: [],
+        currentFamilyName: '体验模式',
+        userId: null,
+        isBatchMode: false,
+        selectedIds: []
+      })
       return
     }
-    app.globalData.token = cachedToken
     await this.loadFamiliesAndBills()
   },
 
@@ -63,6 +68,15 @@ Page({
       const list = await request(`/bills?family_id=${data.selectedFamilyId}`)
       this.setData({ bills: list, groupedBills: groupBillsByDay(list, this.data.userId, this.data.selectedIds) })
     } catch (e) {
+      if (e.statusCode === 401) {
+        this.setData({
+          bills: [],
+          groupedBills: [],
+          currentFamilyName: '体验模式',
+          userId: null
+        })
+        return
+      }
       wx.showToast({ title: '加载家庭信息失败', icon: 'none' })
     }
   },

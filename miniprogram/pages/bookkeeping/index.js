@@ -32,8 +32,17 @@ Page({
   },
 
   async onShow() {
-    if (!app.requireLogin()) return
     this.initTodayDate()
+    if (!app.isLoggedIn()) {
+      await this.loadDefaultIcons()
+      this.setData({
+        families: [],
+        familyIndex: 0,
+        currentFamilyName: '体验模式',
+        categoryOptions: []
+      })
+      return
+    }
     try {
       const data = await syncFamilies(app)
       const familyIndex = data.families.findIndex((f) => f.id === data.selectedFamilyId)
@@ -45,6 +54,15 @@ Page({
       await this.loadDefaultIcons()
       await this.loadCategories()
     } catch (e) {
+      if (e.statusCode === 401) {
+        this.setData({
+          families: [],
+          familyIndex: 0,
+          currentFamilyName: '体验模式',
+          categoryOptions: []
+        })
+        return
+      }
       wx.showToast({ title: '加载家庭信息失败', icon: 'none' })
     }
   },

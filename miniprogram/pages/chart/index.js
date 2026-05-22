@@ -107,7 +107,21 @@ Page({
   },
 
   async onShow() {
-    if (!app.requireLogin()) return
+    if (!app.isLoggedIn()) {
+      this.setData({
+        currentFamilyName: '体验模式',
+        bills: [],
+        periodOptions: buildPeriods('week'),
+        periodIndex: 4,
+        totalExpense: '0.00',
+        linePoints: [],
+        ranking: [],
+        memberStats: []
+      })
+      this.updateLineChart([], [])
+      this.updatePieChart([])
+      return
+    }
     await this.loadFamiliesAndChart()
   },
 
@@ -123,6 +137,17 @@ Page({
       if (!data.selectedFamilyId) return
       await this.reloadBillsAndMetrics(data.selectedFamilyId)
     } catch (e) {
+      if (e.statusCode === 401) {
+        this.setData({
+          currentFamilyName: '体验模式',
+          bills: [],
+          totalExpense: '0.00',
+          linePoints: [],
+          ranking: [],
+          memberStats: []
+        })
+        return
+      }
       wx.showToast({ title: '加载图表失败', icon: 'none' })
     }
   },
