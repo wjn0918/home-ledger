@@ -8,7 +8,6 @@ App({
 
   onLaunch() {
     this.initEnv()
-    this.requireLogin('欢迎使用家庭记账，请先登录后再使用系统功能。')
   },
 
   initEnv() {
