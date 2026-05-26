@@ -71,14 +71,9 @@ Page({
       const data = await syncFamilies(app)
       this.setData({ currentFamilyName: data.selectedFamilyName, userId: app.globalData.userId || wx.getStorageSync("userId") || null })
       if (!data.selectedFamilyId) return
-      await this.loadCategoryOptions(data.selectedFamilyId)
       const list = await request(`/bills?family_id=${data.selectedFamilyId}`)
-      if (!this.data.selectedMonth) {
-        const now = new Date()
-        const month = `${now.getMonth() + 1}`.padStart(2, '0')
-        this.setData({ selectedMonth: `${now.getFullYear()}-${month}` })
-      }
-      this.setData({ bills: list })
+      const categoryOptions = Array.from(new Set((list || []).map((item) => item.category).filter(Boolean)))
+      this.setData({ bills: list, categoryOptions, selectedCategory: '' })
       this.refreshFilteredBills()
     } catch (e) {
       if (e.statusCode === 401) {
@@ -91,15 +86,6 @@ Page({
         return
       }
       wx.showToast({ title: '加载家庭信息失败', icon: 'none' })
-    }
-  },
-
-  async loadCategoryOptions(familyId) {
-    try {
-      const res = await request(`/families/${familyId}/categories`, 'GET')
-      this.setData({ categoryOptions: (res || []).map((c) => c.name) })
-    } catch (e) {
-      this.setData({ categoryOptions: [] })
     }
   },
 
@@ -218,6 +204,11 @@ Page({
     // 实际上 WXML 里的 selectedIds.includes 是实时计算的，只要 setData({ selectedIds }) 就会刷新。
     // 如果不刷新，可能是因为 selectedIds 数组引用的问题，或者是 wxml 的作用域问题。
     // 这里我们强制 setData 一下。
+  },
+
+  onBillItemTap(e) {
+    if (!this.data.isBatchMode) return
+    this.onSelectBill(e)
   },
 
   async onBatchShare(e) {

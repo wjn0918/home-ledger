@@ -49,7 +49,7 @@
               
               <movable-area class="swipe-area {{isBatchMode ? 'batch-mode' : ''}}">
                 <movable-view class="swipe-view" direction="horizontal" x="{{item.x}}" out-of-bounds="true" damping="50" friction="1" bindchange="onSwipeChange" data-id="{{item.id}}" disabled="{{isBatchMode}}">
-                  <view class="bill-item {{item.selected ? 'item-selected' : ''}}" bindtap="{{isBatchMode ? 'onSelectBill' : ''}}" data-id="{{item.id}}">
+                  <view class="bill-item {{item.selected ? 'item-selected' : ''}}" bindtap="onBillItemTap" data-id="{{item.id}}">
                     <view class="bill-left">
                       <view class="bill-icon">
                         <text class="iconfont bill-icon-font {{item.category_icon || 'icon-qita'}}"></text>
