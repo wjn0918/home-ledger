@@ -13,9 +13,8 @@
       <picker mode="date" fields="month" value="{{selectedMonth}}" bindchange="onMonthChange">
         <view class="filter-item">月份：{{selectedMonth || '全部'}}</view>
       </picker>
-      <picker mode="selector" range="{{categoryFilterOptions}}" bindchange="onCategoryFilterChange">
-        <view class="filter-item">类别：{{selectedCategory || '全部'}}</view>
-      </picker>
+      <view class="filter-item" bindtap="openCategoryFilterModal">类别：{{selectedCategory || '全部'}}</view>
+      <view class="filter-item clear-filter-btn" bindtap="clearFilters">清空筛选</view>
     </view>
     <view class="header-stats">
       <text class="stat-label">总笔数：</text>

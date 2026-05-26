@@ -47,6 +47,10 @@
   border-radius: 30rpx;
 }
 
+.clear-filter-btn {
+  border: 1rpx solid rgba(255, 255, 255, 0.45);
+}
+
 .stat-value {
   font-weight: 600;
   margin-right: 12rpx;

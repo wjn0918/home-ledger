@@ -131,6 +131,18 @@ Page({
     this.refreshFilteredBills()
   },
 
+  clearFilters() {
+    this.setData({ selectedMonth: '', selectedCategory: '' })
+    this.refreshFilteredBills()
+  },
+
+  openCategoryFilterModal() {
+    if (!(this.data.categoryOptions || []).length) {
+      return wx.showToast({ title: '暂无可选类别', icon: 'none' })
+    }
+    this.setData({ showCategoryModal: true, editingBillId: null })
+  },
+
 
   async onAmountTap(e) {
     if (this.data.isBatchMode) return
@@ -165,6 +177,14 @@ Page({
 
   async onEditCategorySelect(e) {
     if (!this.data.showCategoryModal) return
+    if (!this.data.editingBillId) {
+      const category = e.currentTarget.dataset.category
+      if (!category) return
+      this.setData({ selectedCategory: category })
+      this.closeCategoryModal()
+      this.refreshFilteredBills()
+      return
+    }
     const bill = this.data.bills.find((item) => item.id === this.data.editingBillId)
     if (!bill) return this.closeCategoryModal()
     const category = e.currentTarget.dataset.category
