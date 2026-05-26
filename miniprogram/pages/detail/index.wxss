@@ -269,4 +269,5 @@
 }
 
 .category-icon-font { font-size: 42rpx; display: block; margin-bottom: 6rpx; }
-.category-name { font-size: 22rpx; color: #303133; }
+.modal-category-item { display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.modal-category-name { font-size: 22rpx; color: #303133; line-height: 1.3; }

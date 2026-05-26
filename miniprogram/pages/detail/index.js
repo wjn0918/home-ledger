@@ -133,6 +133,7 @@ Page({
 
 
   async onAmountTap(e) {
+    if (this.data.isBatchMode) return
     const bill = this.findBillByDatasetId(e)
     if (!bill) return
     if (Number(bill.user_id) !== Number(this.data.userId)) return wx.showToast({ title: "仅可修改自己账单", icon: "none" })
@@ -150,6 +151,7 @@ Page({
   },
 
   async onCategoryTap(e) {
+    if (this.data.isBatchMode) return
     const bill = this.findBillByDatasetId(e)
     if (!bill) return
     if (Number(bill.user_id) !== Number(this.data.userId)) return wx.showToast({ title: "仅可修改自己账单", icon: "none" })
@@ -162,6 +164,7 @@ Page({
   },
 
   async onEditCategorySelect(e) {
+    if (!this.data.showCategoryModal) return
     const bill = this.data.bills.find((item) => item.id === this.data.editingBillId)
     if (!bill) return this.closeCategoryModal()
     const category = e.currentTarget.dataset.category

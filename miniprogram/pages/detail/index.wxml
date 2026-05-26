@@ -55,7 +55,7 @@
                         <text class="iconfont bill-icon-font {{item.category_icon || 'icon-qita'}}"></text>
                       </view>
                       <view class="bill-info">
-                        <view class="bill-category" data-id="{{item.id}}" bindtap="{{isBatchMode ? '' : 'onCategoryTap'}}">
+                        <view class="bill-category" data-id="{{item.id}}" bindtap="onCategoryTap">
                           {{item.category}}
                           <text class="bill-creator {{item.creatorClass}}">{{item.creator_nickname}}</text>
                         </view>
@@ -63,7 +63,7 @@
                       </view>
                     </view>
                     <view class="bill-right">
-                      <view class="bill-amount expense" data-id="{{item.id}}" bindtap="{{isBatchMode ? '' : 'onAmountTap'}}">¥{{item.amount}}</view>
+                      <view class="bill-amount expense" data-id="{{item.id}}" bindtap="onAmountTap">¥{{item.amount}}</view>
                       <view class="modern-subtitle" style="display: flex; align-items: center; justify-content: flex-end;" wx:if="{{!isBatchMode}}">
                         <text style="margin-right: 10rpx;">共享</text>
                         <switch data-id="{{item.id}}" checked="{{item.is_shared}}" bindchange="onShareSwitchChange" style="transform: scale(0.6);" />
@@ -95,9 +95,9 @@
       </view>
       <view class="category-grid">
         <block wx:for="{{categoryOptions}}" wx:key="name">
-          <view class="category-item" data-category="{{item.name}}" bindtap="onEditCategorySelect">
+          <view class="category-item modal-category-item" data-category="{{item.name}}" bindtap="onEditCategorySelect">
             <text class="iconfont category-icon-font {{item.icon || 'icon-qita'}}"></text>
-            <text class="category-name">{{item.name}}</text>
+            <text class="modal-category-name">{{item.name}}</text>
           </view>
         </block>
       </view>
