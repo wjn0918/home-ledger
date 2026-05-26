@@ -9,6 +9,13 @@
         {{isBatchMode ? '取消' : '批量操作'}}
       </view>
     </view>
+    <view class="header-filters">
+      <picker mode="date" fields="month" value="{{selectedMonth}}" bindchange="onMonthChange">
+        <view class="filter-item">月份：{{selectedMonth || '全部'}}</view>
+      </picker>
+      <view class="filter-item" bindtap="openCategoryFilterModal">类别：{{selectedCategory || '全部'}}</view>
+      <view class="filter-item clear-filter-btn" bindtap="clearFilters">清空筛选</view>
+    </view>
     <view class="header-stats">
       <text class="stat-label">总笔数：</text>
       <text class="stat-value">{{bills.length}}</text>
@@ -41,21 +48,21 @@
               
               <movable-area class="swipe-area {{isBatchMode ? 'batch-mode' : ''}}">
                 <movable-view class="swipe-view" direction="horizontal" x="{{item.x}}" out-of-bounds="true" damping="50" friction="1" bindchange="onSwipeChange" data-id="{{item.id}}" disabled="{{isBatchMode}}">
-                  <view class="bill-item {{item.selected ? 'item-selected' : ''}}" bindtap="{{isBatchMode ? 'onSelectBill' : ''}}" data-id="{{item.id}}">
+                  <view class="bill-item {{item.selected ? 'item-selected' : ''}}" bindtap="onBillItemTap" data-id="{{item.id}}">
                     <view class="bill-left">
                       <view class="bill-icon">
                         <text class="iconfont bill-icon-font {{item.category_icon || 'icon-qita'}}"></text>
                       </view>
                       <view class="bill-info">
-                        <view class="bill-category">
+                        <view class="bill-category" data-id="{{item.id}}" bindtap="onCategoryTap">
                           {{item.category}}
                           <text class="bill-creator {{item.creatorClass}}">{{item.creator_nickname}}</text>
                         </view>
-                        <text class="bill-note" data-id="{{item.id}}" bindtap="{{isBatchMode ? '' : 'onCategoryTap'}}">{{item.note || '无备注'}}</text>
+                        <text class="bill-note">{{item.note || '无备注'}}</text>
                       </view>
                     </view>
                     <view class="bill-right">
-                      <view class="bill-amount expense" data-id="{{item.id}}" bindtap="{{isBatchMode ? '' : 'onAmountTap'}}">¥{{item.amount}}</view>
+                      <view class="bill-amount expense" data-id="{{item.id}}" bindtap="onAmountTap">¥{{item.amount}}</view>
                       <view class="modern-subtitle" style="display: flex; align-items: center; justify-content: flex-end;" wx:if="{{!isBatchMode}}">
                         <text style="margin-right: 10rpx;">共享</text>
                         <switch data-id="{{item.id}}" checked="{{item.is_shared}}" bindchange="onShareSwitchChange" style="transform: scale(0.6);" />
@@ -77,5 +84,22 @@
     <view class="footer-btn" bindtap="onBatchShare" data-shared="true">批量共享</view>
     <view class="footer-btn" bindtap="onBatchShare" data-shared="false">取消共享</view>
     <view class="footer-btn delete" bindtap="onBatchDelete">批量删除</view>
+  </view>
+
+  <view class="modal-overlay" wx:if="{{showCategoryModal}}" bindtap="closeCategoryModal">
+    <view class="modal-content category-modal" catchtap="stopBubble">
+      <view class="modal-header">
+        <text class="modal-title">选择分类</text>
+        <text class="close-icon" bindtap="closeCategoryModal">×</text>
+      </view>
+      <view class="category-grid">
+        <block wx:for="{{categoryOptions}}" wx:key="name">
+          <view class="category-item modal-category-item" data-category="{{item.name}}" bindtap="onEditCategorySelect">
+            <text class="iconfont category-icon-font {{item.icon || 'icon-qita'}}"></text>
+            <text class="modal-category-name">{{item.name}}</text>
+          </view>
+        </block>
+      </view>
+    </view>
   </view>
 </view>
