@@ -42,8 +42,11 @@ Page({
     currentFamilyName: '', 
     userId: null,
     categoryOptions: [],
+    categoryFilterOptions: ['全部'],
     selectedMonth: '',
     selectedCategory: '',
+    showCategoryModal: false,
+    editingBillId: null,
     isBatchMode: false,
     selectedIds: []
   },
@@ -56,8 +59,11 @@ Page({
         currentFamilyName: '体验模式',
         userId: null,
         categoryOptions: [],
+        categoryFilterOptions: ['全部'],
         selectedMonth: '',
         selectedCategory: '',
+        showCategoryModal: false,
+        editingBillId: null,
         isBatchMode: false,
         selectedIds: []
       })
@@ -72,8 +78,20 @@ Page({
       this.setData({ currentFamilyName: data.selectedFamilyName, userId: app.globalData.userId || wx.getStorageSync("userId") || null })
       if (!data.selectedFamilyId) return
       const list = await request(`/bills?family_id=${data.selectedFamilyId}`)
-      const categoryOptions = Array.from(new Set((list || []).map((item) => item.category).filter(Boolean)))
-      this.setData({ bills: list, categoryOptions, selectedCategory: '' })
+      const categoryOptionsMap = {}
+      ;(list || []).forEach((item) => {
+        if (!item.category) return
+        if (!categoryOptionsMap[item.category]) {
+          categoryOptionsMap[item.category] = { name: item.category, icon: item.category_icon || '' }
+        }
+      })
+      const categoryOptions = Object.values(categoryOptionsMap)
+      this.setData({
+        bills: list,
+        categoryOptions,
+        categoryFilterOptions: ['全部'].concat(categoryOptions.map((x) => x.name)),
+        selectedCategory: ''
+      })
       this.refreshFilteredBills()
     } catch (e) {
       if (e.statusCode === 401) {
@@ -107,7 +125,7 @@ Page({
 
   onCategoryFilterChange(e) {
     const index = Number(e.detail.value)
-    const categories = ['全部'].concat(this.data.categoryOptions || [])
+    const categories = this.data.categoryFilterOptions || ['全部']
     const selectedCategory = index <= 0 ? '' : (categories[index] || '')
     this.setData({ selectedCategory })
     this.refreshFilteredBills()
@@ -135,16 +153,21 @@ Page({
     const bill = this.findBillByDatasetId(e)
     if (!bill) return
     if (Number(bill.user_id) !== Number(this.data.userId)) return wx.showToast({ title: "仅可修改自己账单", icon: "none" })
-    const items = this.data.categoryOptions || []
-    if (!items.length) return wx.showToast({ title: '暂无可选类别', icon: 'none' })
-    wx.showActionSheet({
-      itemList: items,
-      success: async (res) => {
-        const category = items[res.tapIndex]
-        if (!category) return
-        await this.submitBillEdit(bill, { category })
-      }
-    })
+    if (!this.data.categoryOptions.length) return wx.showToast({ title: '暂无可选类别', icon: 'none' })
+    this.setData({ showCategoryModal: true, editingBillId: bill.id })
+  },
+
+  closeCategoryModal() {
+    this.setData({ showCategoryModal: false, editingBillId: null })
+  },
+
+  async onEditCategorySelect(e) {
+    const bill = this.data.bills.find((item) => item.id === this.data.editingBillId)
+    if (!bill) return this.closeCategoryModal()
+    const category = e.currentTarget.dataset.category
+    if (!category) return
+    this.closeCategoryModal()
+    await this.submitBillEdit(bill, { category })
   },
 
   async onDateTap(e) {
@@ -174,6 +197,8 @@ Page({
   onSwipeChange(e) {
     // 可以在这里处理滑动互斥，即同时只允许一个项处于滑动状态
   },
+
+  stopBubble() {},
 
   toggleBatchMode() {
     this.setData({

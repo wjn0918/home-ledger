@@ -13,7 +13,7 @@
       <picker mode="date" fields="month" value="{{selectedMonth}}" bindchange="onMonthChange">
         <view class="filter-item">月份：{{selectedMonth || '全部'}}</view>
       </picker>
-      <picker mode="selector" range="{{['全部'].concat(categoryOptions)}}" bindchange="onCategoryFilterChange">
+      <picker mode="selector" range="{{categoryFilterOptions}}" bindchange="onCategoryFilterChange">
         <view class="filter-item">类别：{{selectedCategory || '全部'}}</view>
       </picker>
     </view>
@@ -85,5 +85,22 @@
     <view class="footer-btn" bindtap="onBatchShare" data-shared="true">批量共享</view>
     <view class="footer-btn" bindtap="onBatchShare" data-shared="false">取消共享</view>
     <view class="footer-btn delete" bindtap="onBatchDelete">批量删除</view>
+  </view>
+
+  <view class="modal-overlay" wx:if="{{showCategoryModal}}" bindtap="closeCategoryModal">
+    <view class="modal-content category-modal" catchtap="stopBubble">
+      <view class="modal-header">
+        <text class="modal-title">选择分类</text>
+        <text class="close-icon" bindtap="closeCategoryModal">×</text>
+      </view>
+      <view class="category-grid">
+        <block wx:for="{{categoryOptions}}" wx:key="name">
+          <view class="category-item" data-category="{{item.name}}" bindtap="onEditCategorySelect">
+            <text class="iconfont category-icon-font {{item.icon || 'icon-qita'}}"></text>
+            <text class="category-name">{{item.name}}</text>
+          </view>
+        </block>
+      </view>
+    </view>
   </view>
 </view>
