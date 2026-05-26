@@ -9,6 +9,14 @@
         {{isBatchMode ? '取消' : '批量操作'}}
       </view>
     </view>
+    <view class="header-filters">
+      <picker mode="date" fields="month" value="{{selectedMonth}}" bindchange="onMonthChange">
+        <view class="filter-item">月份：{{selectedMonth || '全部'}}</view>
+      </picker>
+      <picker mode="selector" range="{{['全部'].concat(categoryOptions)}}" bindchange="onCategoryFilterChange">
+        <view class="filter-item">类别：{{selectedCategory || '全部'}}</view>
+      </picker>
+    </view>
     <view class="header-stats">
       <text class="stat-label">总笔数：</text>
       <text class="stat-value">{{bills.length}}</text>
@@ -47,11 +55,11 @@
                         <text class="iconfont bill-icon-font {{item.category_icon || 'icon-qita'}}"></text>
                       </view>
                       <view class="bill-info">
-                        <view class="bill-category">
+                        <view class="bill-category" data-id="{{item.id}}" bindtap="{{isBatchMode ? '' : 'onCategoryTap'}}">
                           {{item.category}}
                           <text class="bill-creator {{item.creatorClass}}">{{item.creator_nickname}}</text>
                         </view>
-                        <text class="bill-note" data-id="{{item.id}}" bindtap="{{isBatchMode ? '' : 'onCategoryTap'}}">{{item.note || '无备注'}}</text>
+                        <text class="bill-note">{{item.note || '无备注'}}</text>
                       </view>
                     </view>
                     <view class="bill-right">

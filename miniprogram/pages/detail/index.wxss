@@ -34,6 +34,19 @@
   opacity: 0.9;
 }
 
+.header-filters {
+  margin-top: 12rpx;
+  display: flex;
+  gap: 12rpx;
+}
+
+.filter-item {
+  font-size: 22rpx;
+  background: rgba(255, 255, 255, 0.2);
+  padding: 6rpx 14rpx;
+  border-radius: 30rpx;
+}
+
 .stat-value {
   font-weight: 600;
   margin-right: 12rpx;
@@ -212,4 +225,3 @@
 .bill-icon-font {
   font-size: 40rpx;
 }
-

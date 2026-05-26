@@ -41,6 +41,9 @@ Page({
     groupedBills: [], 
     currentFamilyName: '', 
     userId: null,
+    categoryOptions: [],
+    selectedMonth: '',
+    selectedCategory: '',
     isBatchMode: false,
     selectedIds: []
   },
@@ -52,6 +55,9 @@ Page({
         groupedBills: [],
         currentFamilyName: '体验模式',
         userId: null,
+        categoryOptions: [],
+        selectedMonth: '',
+        selectedCategory: '',
         isBatchMode: false,
         selectedIds: []
       })
@@ -65,8 +71,15 @@ Page({
       const data = await syncFamilies(app)
       this.setData({ currentFamilyName: data.selectedFamilyName, userId: app.globalData.userId || wx.getStorageSync("userId") || null })
       if (!data.selectedFamilyId) return
+      await this.loadCategoryOptions(data.selectedFamilyId)
       const list = await request(`/bills?family_id=${data.selectedFamilyId}`)
-      this.setData({ bills: list, groupedBills: groupBillsByDay(list, this.data.userId, this.data.selectedIds) })
+      if (!this.data.selectedMonth) {
+        const now = new Date()
+        const month = `${now.getMonth() + 1}`.padStart(2, '0')
+        this.setData({ selectedMonth: `${now.getFullYear()}-${month}` })
+      }
+      this.setData({ bills: list })
+      this.refreshFilteredBills()
     } catch (e) {
       if (e.statusCode === 401) {
         this.setData({
@@ -79,6 +92,39 @@ Page({
       }
       wx.showToast({ title: '加载家庭信息失败', icon: 'none' })
     }
+  },
+
+  async loadCategoryOptions(familyId) {
+    try {
+      const res = await request(`/families/${familyId}/categories`, 'GET')
+      this.setData({ categoryOptions: (res || []).map((c) => c.name) })
+    } catch (e) {
+      this.setData({ categoryOptions: [] })
+    }
+  },
+
+  refreshFilteredBills() {
+    const { bills, userId, selectedIds, selectedMonth, selectedCategory } = this.data
+    const filteredBills = bills.filter((bill) => {
+      const billMonth = toDay(bill.bill_date).slice(0, 7)
+      const hitMonth = !selectedMonth || billMonth === selectedMonth
+      const hitCategory = !selectedCategory || bill.category === selectedCategory
+      return hitMonth && hitCategory
+    })
+    this.setData({ groupedBills: groupBillsByDay(filteredBills, userId, selectedIds) })
+  },
+
+  onMonthChange(e) {
+    this.setData({ selectedMonth: e.detail.value })
+    this.refreshFilteredBills()
+  },
+
+  onCategoryFilterChange(e) {
+    const index = Number(e.detail.value)
+    const categories = ['全部'].concat(this.data.categoryOptions || [])
+    const selectedCategory = index <= 0 ? '' : (categories[index] || '')
+    this.setData({ selectedCategory })
+    this.refreshFilteredBills()
   },
 
 
@@ -103,14 +149,13 @@ Page({
     const bill = this.findBillByDatasetId(e)
     if (!bill) return
     if (Number(bill.user_id) !== Number(this.data.userId)) return wx.showToast({ title: "仅可修改自己账单", icon: "none" })
-    wx.showModal({
-      title: '修改类别',
-      editable: true,
-      placeholderText: bill.category,
+    const items = this.data.categoryOptions || []
+    if (!items.length) return wx.showToast({ title: '暂无可选类别', icon: 'none' })
+    wx.showActionSheet({
+      itemList: items,
       success: async (res) => {
-        if (!res.confirm) return
-        const category = (res.content || '').trim()
-        if (!category) return wx.showToast({ title: '类别不能为空', icon: 'none' })
+        const category = items[res.tapIndex]
+        if (!category) return
         await this.submitBillEdit(bill, { category })
       }
     })
@@ -166,8 +211,8 @@ Page({
       selectedIds.push(id)
     }
     
-    const groupedBills = groupBillsByDay(this.data.bills, this.data.userId, selectedIds)
-    this.setData({ selectedIds, groupedBills })
+    this.setData({ selectedIds })
+    this.refreshFilteredBills()
     
     // 同时更新 groupedBills 中的选中状态，确保 wxml 中的 selectedIds.includes(item.id) 能够正确响应
     // 实际上 WXML 里的 selectedIds.includes 是实时计算的，只要 setData({ selectedIds }) 就会刷新。
