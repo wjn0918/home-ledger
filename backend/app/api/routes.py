@@ -38,31 +38,15 @@ DEFAULT_CATEGORY_OPTIONS = [
     {"name": "住房", "icon": "icon-housing"},
     {"name": "零食", "icon": "icon-snacks"},
     {"name": "水电", "icon": "icon-water"},
-    {"name": "通讯", "icon": "icon-communication"},
-    {"name": "书籍", "icon": "icon-book"},
-    {"name": "运动", "icon": "icon-sport"},
-    {"name": "日用", "icon": "icon-daily-necessities"},
-    {"name": "化妆品", "icon": "icon-cosmetics"},
-    {"name": "娱乐", "icon": "icon-fun"},
-    {"name": "旅行", "icon": "icon-travel"},
-    {"name": "教育", "icon": "icon-education"},
-    {"name": "居家", "icon": "icon-home"},
-
-    {"name": "数码", "icon": "icon-digital"},
-    {"name": "培养", "icon": "icon-cultivate"},
-    {"name": "飞机", "icon": "icon-plane"},
-    {"name": "火车", "icon": "icon-train"},
-    {"name": "汽车", "icon": "icon-car"},
-    {"name": "礼金", "icon": "icon-cash-gift"},
-    {"name": "油费", "icon": "icon-oil"},
-    {"name": "美容", "icon": "icon-cosmetology"},
-    {"name": "家电", "icon": "icon-electric"},
-    {"name": "理财", "icon": "icon-financing"},
-
 ]
 
 # 提取自提供的CSS文件的准确图标列表
 DEFAULT_CATEGORY_ICONS = [
+    "icon-riyong",
+    "icon-yiliao",
+    "icon-yinliao",
+    "icon-xianhua",
+    "icon-shiyongyouo",
     "icon-book",
     "icon-travel",
     "icon-food",
