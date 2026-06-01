@@ -42,11 +42,6 @@ DEFAULT_CATEGORY_OPTIONS = [
 
 # 提取自提供的CSS文件的准确图标列表
 DEFAULT_CATEGORY_ICONS = [
-    "icon-riyong",
-    "icon-yiliao",
-    "icon-yinliao",
-    "icon-xianhua",
-    "icon-shiyongyouo",
     "icon-book",
     "icon-travel",
     "icon-food",

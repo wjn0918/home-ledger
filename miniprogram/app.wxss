@@ -14,9 +14,9 @@ page {
   font-family: "iconfont"; /* Project id 5181223 */
   /* Color fonts */
   src: 
-       url('//at.alicdn.com/t/c/font_5181223_95npzifdys.woff2?t=1780303291336') format('woff2'),
-       url('//at.alicdn.com/t/c/font_5181223_95npzifdys.woff?t=1780303291336') format('woff'),
-       url('//at.alicdn.com/t/c/font_5181223_95npzifdys.ttf?t=1780303291336') format('truetype');
+       url('//at.alicdn.com/t/c/font_5181223_3mzcz6buzx5.woff2?t=1780304811601') format('woff2'),
+       url('//at.alicdn.com/t/c/font_5181223_3mzcz6buzx5.woff?t=1780304811601') format('woff'),
+       url('//at.alicdn.com/t/c/font_5181223_3mzcz6buzx5.ttf?t=1780304811601') format('truetype');
 }
 
 .iconfont {
@@ -27,24 +27,24 @@ page {
   -moz-osx-font-smoothing: grayscale;
 }
 
-.icon-riyong:before {
-  content: "\f0d7";
+.icon-pets:before {
+  content: "\e627";
 }
 
-.icon-yiliao:before {
-  content: "\e600";
+.icon-lottery:before {
+  content: "\e633";
 }
 
-.icon-yinliao:before {
-  content: "\e60b";
+.icon-bookkeeping:before {
+  content: "\e634";
 }
 
-.icon-xianhua:before {
-  content: "\e625";
+.icon-reimbursement:before {
+  content: "\e635";
 }
 
-.icon-shiyongyou:before {
-  content: "\e601";
+.icon-user:before {
+  content: "\e637";
 }
 
 .icon-book:before {
