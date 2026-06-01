@@ -14,9 +14,9 @@ page {
   font-family: "iconfont"; /* Project id 5181223 */
   /* Color fonts */
   src: 
-       url('//at.alicdn.com/t/c/font_5181223_3mzcz6buzx5.woff2?t=1780304811601') format('woff2'),
-       url('//at.alicdn.com/t/c/font_5181223_3mzcz6buzx5.woff?t=1780304811601') format('woff'),
-       url('//at.alicdn.com/t/c/font_5181223_3mzcz6buzx5.ttf?t=1780304811601') format('truetype');
+       url('https://at.alicdn.com/t/c/font_5181223_3mzcz6buzx5.woff2?t=1780304811601') format('woff2'),
+       url('https://at.alicdn.com/t/c/font_5181223_3mzcz6buzx5.woff?t=1780304811601') format('woff'),
+       url('https://at.alicdn.com/t/c/font_5181223_3mzcz6buzx5.ttf?t=1780304811601') format('truetype');
 }
 
 .iconfont {
@@ -26,6 +26,65 @@ page {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+.iconfont:before {
+  color: var(--icon-color, currentColor);
+}
+
+/*
+ * The Alibaba color-font file is rendered as a monochrome font in some
+ * Mini Program runtimes. Set a deterministic color per icon class so these
+ * font-class icons keep their category colors regardless of platform support.
+ */
+.icon-pets { color: #ff8a65; --icon-color: #ff8a65; }
+.icon-lottery { color: #f06292; --icon-color: #f06292; }
+.icon-bookkeeping { color: #5c6bc0; --icon-color: #5c6bc0; }
+.icon-reimbursement { color: #26a69a; --icon-color: #26a69a; }
+.icon-user { color: #42a5f5; --icon-color: #42a5f5; }
+.icon-book { color: #7e57c2; --icon-color: #7e57c2; }
+.icon-travel { color: #26c6da; --icon-color: #26c6da; }
+.icon-food { color: #ff7043; --icon-color: #ff7043; }
+.icon-digital { color: #29b6f6; --icon-color: #29b6f6; }
+.icon-cultivate { color: #66bb6a; --icon-color: #66bb6a; }
+.icon-plane { color: #42a5f5; --icon-color: #42a5f5; }
+.icon-clothes1 { color: #ab47bc; --icon-color: #ab47bc; }
+.icon-train { color: #5c6bc0; --icon-color: #5c6bc0; }
+.icon-car { color: #78909c; --icon-color: #78909c; }
+.icon-education { color: #7e57c2; --icon-color: #7e57c2; }
+.icon-cash-gift { color: #ffca28; --icon-color: #ffca28; }
+.icon-oil { color: #8d6e63; --icon-color: #8d6e63; }
+.icon-cosmetology { color: #ec407a; --icon-color: #ec407a; }
+.icon-electric { color: #ffa726; --icon-color: #ffa726; }
+.icon-home { color: #5c6bc0; --icon-color: #5c6bc0; }
+.icon-shopping { color: #ef5350; --icon-color: #ef5350; }
+.icon-financing { color: #26a69a; --icon-color: #26a69a; }
+.icon-fruits { color: #ff7043; --icon-color: #ff7043; }
+.icon-cosmetics { color: #f06292; --icon-color: #f06292; }
+.icon-work { color: #5c6bc0; --icon-color: #5c6bc0; }
+.icon-snacks { color: #ffb74d; --icon-color: #ffb74d; }
+.icon-communication { color: #29b6f6; --icon-color: #29b6f6; }
+.icon-car-repair { color: #78909c; --icon-color: #78909c; }
+.icon-traffic { color: #26c6da; --icon-color: #26c6da; }
+.icon-social { color: #ff8a65; --icon-color: #ff8a65; }
+.icon-friends { color: #42a5f5; --icon-color: #42a5f5; }
+.icon-housing { color: #8d6e63; --icon-color: #8d6e63; }
+.icon-tuition { color: #7e57c2; --icon-color: #7e57c2; }
+.icon-child { color: #ffca28; --icon-color: #ffca28; }
+.icon-parking { color: #5c6bc0; --icon-color: #5c6bc0; }
+.icon-water { color: #29b6f6; --icon-color: #29b6f6; }
+.icon-config { color: #78909c; --icon-color: #78909c; }
+.icon-express { color: #26a69a; --icon-color: #26a69a; }
+.icon-elderly { color: #ab47bc; --icon-color: #ab47bc; }
+.icon-vegetables { color: #66bb6a; --icon-color: #66bb6a; }
+.icon-fun { color: #ff7043; --icon-color: #ff7043; }
+.icon-sport { color: #ef5350; --icon-color: #ef5350; }
+.icon-wifi { color: #42a5f5; --icon-color: #42a5f5; }
+.icon-daily-necessities { color: #26a69a; --icon-color: #26a69a; }
+.icon-canyin { color: #ff7043; --icon-color: #ff7043; }
+.icon-jiaotong { color: #26c6da; --icon-color: #26c6da; }
+.icon-gouwu { color: #ef5350; --icon-color: #ef5350; }
+.icon-gongzi { color: #26a69a; --icon-color: #26a69a; }
+.icon-qita { color: #78909c; --icon-color: #78909c; }
 
 .icon-pets:before {
   content: "\e627";
@@ -202,10 +261,25 @@ page {
 .icon-daily-necessities:before {
   content: "\e636";
 }
+.icon-canyin:before {
+  content: "\e60f";
+}
 
+.icon-jiaotong:before {
+  content: "\e624";
+}
 
+.icon-gouwu:before {
+  content: "\e61c";
+}
 
+.icon-gongzi:before {
+  content: "\e61d";
+}
 
+.icon-qita:before {
+  content: "\e62e";
+}
 
 
 .lin-container {
