@@ -10,6 +10,13 @@ function toDay(dateStr) {
   return `${y}-${m}-${day}`
 }
 
+function getCurrentMonth() {
+  const d = new Date()
+  const y = d.getFullYear()
+  const m = `${d.getMonth() + 1}`.padStart(2, '0')
+  return `${y}-${m}`
+}
+
 function toAmount(value) {
   return Number(value || 0)
 }
@@ -43,7 +50,7 @@ Page({
     userId: null,
     categoryOptions: [],
     categoryFilterOptions: ['全部'],
-    selectedMonth: '',
+    selectedMonth: getCurrentMonth(),
     selectedCategory: '',
     showCategoryModal: false,
     editingBillId: null,
@@ -90,6 +97,7 @@ Page({
         bills: list,
         categoryOptions,
         categoryFilterOptions: ['全部'].concat(categoryOptions.map((x) => x.name)),
+        selectedMonth: getCurrentMonth(),
         selectedCategory: ''
       })
       this.refreshFilteredBills()

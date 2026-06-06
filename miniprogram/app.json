@@ -1,8 +1,8 @@
 {
   "pages": [
+    "pages/bookkeeping/index",
     "pages/detail/index",
     "pages/chart/index",
-    "pages/bookkeeping/index",
     "pages/me/index"
   ],
   "window": {
@@ -10,9 +10,9 @@
   },
   "tabBar": {
     "list": [
+      {"pagePath": "pages/bookkeeping/index", "text": "记账"},
       {"pagePath": "pages/detail/index", "text": "明细"},
       {"pagePath": "pages/chart/index", "text": "图表"},
-      {"pagePath": "pages/bookkeeping/index", "text": "记账"},
       {"pagePath": "pages/me/index", "text": "我的"}
     ]
   }
