@@ -19,7 +19,8 @@ Page({
     loginTab: 'wechat',
     userInfo: null, // Add userInfo to store nickname/avatar
     currentFamilyName: '未选择',
-    isFamilyOwner: false
+    isFamilyOwner: false,
+    settingsOpen: false
   },
 
   resetLoginState() {
@@ -129,6 +130,9 @@ Page({
   },
 
   onLoginTabTap(e) { this.setData({ loginTab: e.currentTarget.dataset.tab }) },
+
+  showSettings() { this.setData({ settingsOpen: true }) },
+  closeSettings() { this.setData({ settingsOpen: false }) },
 
   shouldSyncWechatNickname(currentNickname) {
     const normalized = (currentNickname || '').trim()
@@ -314,6 +318,17 @@ Page({
       currentFamilyName: target.name 
     })
     await this.loadFamilyMembers()
+  },
+
+  copyFamilyId() {
+    const familyId = String(this.data.familyId || '')
+    if (!familyId) return
+    wx.setClipboardData({
+      data: familyId,
+      success: () => {
+        wx.showToast({ title: '家庭ID已复制', icon: 'none' })
+      }
+    })
   },
 
   async loadFamilyMembers() {

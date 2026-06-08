@@ -138,6 +138,11 @@
   border-radius: 8rpx;
 }
 
+.copyable {
+  text-decoration: underline;
+  text-decoration-color: rgba(96, 98, 102, 0.7);
+}
+
 .member-list {
   display: flex;
   flex-direction: column;
@@ -206,29 +211,134 @@
 }
 
 /* 功能列表 */
-.menu-list {
+.action-list {
   margin: 30rpx;
   background: var(--bg-card);
-  border-radius: 20rpx;
+  border-radius: 24rpx;
   overflow: hidden;
-  box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.02);
+  box-shadow: 0 4rpx 16rpx rgba(19, 23, 34, 0.05);
 }
 
-.menu-item {
+.action-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 34rpx 30rpx;
+  padding: 24rpx 28rpx;
   border-bottom: 1rpx solid var(--border-color);
   transition: background 0.2s;
 }
 
-.menu-item:active {
-  background-color: #f9f9f9;
+.action-item:last-child {
+  border-bottom: none;
 }
 
-.menu-item:last-child {
-  border-bottom: none;
+.action-item:active {
+  background: #f5f7ff;
+}
+
+.action-left {
+  display: flex;
+  align-items: center;
+}
+
+.action-left .menu-icon {
+  font-size: 32rpx;
+  margin-right: 18rpx;
+}
+
+.action-left .menu-text {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.action-arrow {
+  font-size: 30rpx;
+  color: #c0c4cc;
+}
+
+.logout-card {
+  background: #fff7ed;
+}
+
+.settings-card {
+  background: #f5f7ff;
+}
+
+.settings-page {
+  margin: 30rpx;
+  padding: 24rpx;
+  background: var(--bg-card);
+  border-radius: 24rpx;
+  box-shadow: 0 4rpx 16rpx rgba(19, 23, 34, 0.06);
+}
+
+.settings-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 28rpx;
+}
+
+.settings-back {
+  font-size: 36rpx;
+  margin-right: 18rpx;
+}
+
+.settings-title {
+  font-size: 32rpx;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.settings-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 22rpx 18rpx;
+  background: #ffffff;
+  border-radius: 20rpx;
+  margin-bottom: 16rpx;
+}
+
+.settings-item:last-child {
+  margin-bottom: 0;
+}
+
+.settings-item.danger-section {
+  flex-direction: column;
+  align-items: flex-start;
+  background: #fff5f5;
+}
+
+.settings-item-title {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.settings-item-note {
+  display: block;
+  margin-top: 8rpx;
+  font-size: 22rpx;
+  color: #8c1d0b;
+}
+
+.settings-item-arrow {
+  font-size: 28rpx;
+  color: #c0c4cc;
+}
+
+.danger-btn {
+  display: inline-flex;
+  width: 100%;
+  justify-content: center;
+  padding: 14rpx 0;
+  border-radius: 18rpx;
+  background: #ff4d4f;
+  color: #ffffff;
+  font-size: 26rpx;
+  font-weight: 600;
+  margin-top: 18rpx;
 }
 
 .menu-left {
