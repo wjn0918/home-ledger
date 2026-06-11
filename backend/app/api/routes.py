@@ -541,6 +541,52 @@ def create_family_category(family_id: int, payload: FamilyCategoryCreateIn, db: 
     return {"id": category.id, "name": category.name, "icon": category.icon}
 
 
+@router.delete("/families/{family_id}/categories/{category_id}")
+def delete_family_category(
+    family_id: int,
+    category_id: int,
+    target_category_id: int | None = None,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user)
+):
+    membership = db.query(FamilyMember).filter(
+        FamilyMember.family_id == family_id,
+        FamilyMember.user_id == user.id
+    ).first()
+    if not membership:
+        raise HTTPException(status_code=403, detail="你不是该家庭成员")
+
+    category = db.query(FamilyCategory).filter(
+        FamilyCategory.id == category_id,
+        FamilyCategory.family_id == family_id
+    ).first()
+    if not category:
+        raise HTTPException(status_code=404, detail="类别不存在")
+
+    if target_category_id is not None:
+        if target_category_id == category_id:
+            raise HTTPException(status_code=400, detail="转移目标不能与当前类别相同")
+        target_category = db.query(FamilyCategory).filter(
+            FamilyCategory.id == target_category_id,
+            FamilyCategory.family_id == family_id
+        ).first()
+        if not target_category:
+            raise HTTPException(status_code=404, detail="目标类别不存在")
+        db.query(Bill).filter(
+            Bill.family_id == family_id,
+            Bill.category_id == category_id
+        ).update({Bill.category_id: target_category.id}, synchronize_session=False)
+    else:
+        db.query(Bill).filter(
+            Bill.family_id == family_id,
+            Bill.category_id == category_id
+        ).delete(synchronize_session=False)
+
+    db.delete(category)
+    db.commit()
+    return {"ok": True}
+
+
 @router.get("/categories/default-icons")
 def list_default_category_icons(user: User = Depends(get_current_user)):
     return [{"icon": icon} for icon in DEFAULT_CATEGORY_ICONS]

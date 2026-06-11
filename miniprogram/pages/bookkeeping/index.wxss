@@ -109,6 +109,103 @@
   padding: 40rpx;
 }
 
+.settings-list {
+  padding: 0 40rpx 20rpx;
+}
+
+.settings-item-wrapper {
+  overflow: hidden;
+  border-bottom: 1rpx solid #f2f3f5;
+  position: relative;
+}
+
+.settings-item {
+  flex: 1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18rpx 0;
+  background: #fff;
+  transition: transform 0.1s ease;
+}
+
+.settings-item.dragging {
+  box-shadow: 0 10rpx 24rpx rgba(0, 0, 0, 0.08);
+  z-index: 2;
+}
+
+.drag-hint {
+  font-size: 24rpx;
+  color: #909399;
+  margin-right: 14rpx;
+}
+
+.settings-meta {
+  display: flex;
+  align-items: center;
+}
+
+.settings-name {
+  font-size: 30rpx;
+  color: #303133;
+  margin-left: 18rpx;
+}
+
+.settings-actions {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+}
+
+.sort-btn,
+.delete-btn {
+  padding: 12rpx 16rpx;
+  border-radius: 14rpx;
+  background: #f2f3f5;
+  font-size: 24rpx;
+  color: #606266;
+}
+
+.delete-btn {
+  background: #ffecec;
+  color: #f56c6c;
+}
+
+.transfer-note {
+  padding: 28rpx 40rpx 0;
+  font-size: 28rpx;
+  color: #606266;
+}
+
+.transfer-grid {
+  padding: 20rpx 40rpx 0;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16rpx;
+}
+
+.transfer-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20rpx;
+  border-radius: 20rpx;
+  background: #f8f9fa;
+  transition: all 0.2s;
+}
+
+.transfer-item.active {
+  background: #edf4ff;
+  border: 1rpx solid #3963bc;
+}
+
+.transfer-name {
+  margin-top: 12rpx;
+  font-size: 26rpx;
+  color: #303133;
+}
+
 .category-item {
   display: flex;
   flex-direction: column;

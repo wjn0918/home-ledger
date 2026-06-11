@@ -21,12 +21,22 @@ Page({
     isShared: true,
     showCategoryModal: false,
     showDetailModal: false,
-    showAddCategoryModal: false,
+    showCategorySettingsModal: false,
+    showTransferModal: false,
     showEditCategoryIconModal: false,
+    showAddCategoryPanel: false,
     newCategoryName: '',
     newCategoryIcon: 'other',
     editingCategoryName: '',
     editingCategoryIcon: '',
+    pendingDeleteCategoryId: null,
+    pendingDeleteCategoryName: '',
+    pendingDeleteCount: 0,
+    transferTargetCategoryId: null,
+    transferOptions: [],
+    draggingCategoryId: null,
+    dragStartY: 0,
+    dragStartIndex: -1,
     calcExpr: '',
     lastOp: ''
   },
@@ -68,7 +78,13 @@ Page({
   },
 
   openCategoryModal() {
-    this.setData({ showCategoryModal: true, showDetailModal: false })
+    this.setData({
+      showCategoryModal: true,
+      showDetailModal: false,
+      showCategorySettingsModal: false,
+      showTransferModal: false,
+      showEditCategoryIconModal: false
+    })
   },
 
   onCategorySelect(e) {
@@ -84,18 +100,6 @@ Page({
       note: ''
     })
   },
-
-  closeModals() {
-    this.setData({
-      showCategoryModal: false,
-      showDetailModal: false,
-      showAddCategoryModal: false,
-      showEditCategoryIconModal: false,
-      editingCategoryName: '',
-      editingCategoryIcon: ''
-    })
-  },
-
   stopBubble() {},
 
   onCalcInput(e) {
@@ -218,8 +222,8 @@ Page({
     if (!app.globalData.familyId) return
     try {
       const res = await request(`/families/${app.globalData.familyId}/categories`, 'GET')
-      const categoryOptions = (res || []).map((c) => ({ name: c.name, icon: c.icon || '' }))
-      const selectedItem = categoryOptions.find((c) => c.name === this.data.category) || categoryOptions[0] || { name: '', icon: '' }
+      const categoryOptions = (res || []).map((c) => ({ id: c.id, name: c.name, icon: c.icon || '', y: 0 }))
+      const selectedItem = categoryOptions.find((c) => c.name === this.data.category) || categoryOptions[0] || { id: null, name: '', icon: '', y: 0 }
       this.setData({
         categoryOptions,
         category: selectedItem.name,
@@ -243,13 +247,18 @@ Page({
       wx.showToast({ title: '请先选择家庭', icon: 'none' })
       return
     }
-    const defaultIcon = (this.data.defaultIcons && this.data.defaultIcons[0]) || 'other'
+    this.openCategorySettingsModal()
+  },
+
+  openAddCategoryPanel() {
     this.setData({
-      showAddCategoryModal: true,
-      showCategoryModal: false,
-      newCategoryName: '',
-      newCategoryIcon: defaultIcon
+      showAddCategoryPanel: true,
+      showCategorySettingsModal: false
     })
+  },
+
+  closeAddCategoryPanel() {
+    this.setData({ showAddCategoryPanel: false })
   },
 
   onNewCategoryNameInput(e) {
@@ -273,7 +282,8 @@ Page({
       this.setData({
         category: value,
         categoryIcon: icon,
-        showAddCategoryModal: false
+        newCategoryName: '',
+        showAddCategoryPanel: false
       })
       wx.showToast({ title: '类别已添加', icon: 'success' })
     } catch (e) {
@@ -281,18 +291,212 @@ Page({
     }
   },
 
-  async onCategoryLongPress(e) {
-    const category = e.currentTarget.dataset.category
-    const currentIcon = e.currentTarget.dataset.icon || ''
-    if (!app.globalData.familyId || !category) return
-    const iconList = this.data.defaultIcons.length ? this.data.defaultIcons : ['icon-qita']
+  openCategorySettingsModal() {
+    if (!app.globalData.familyId) {
+      wx.showToast({ title: '请先选择家庭', icon: 'none' })
+      return
+    }
+    const defaultIcon = (this.data.defaultIcons && this.data.defaultIcons[0]) || 'other'
     this.setData({
-      showEditCategoryIconModal: true,
+      showCategorySettingsModal: true,
       showCategoryModal: false,
-      editingCategoryName: category,
-      editingCategoryIcon: currentIcon || iconList[0]
+      showAddCategoryPanel: false,
+      pendingDeleteCategoryId: null,
+      pendingDeleteCategoryName: '',
+      pendingDeleteCount: 0,
+      transferTargetCategoryId: null,
+      transferOptions: [],
+      newCategoryIcon: defaultIcon,
+      newCategoryName: ''
     })
   },
+
+  onCategoryTouchStart(e) {
+    e.stopPropagation?.()
+    const categoryId = Number(e.currentTarget.dataset.id)
+    const index = Number(e.currentTarget.dataset.index)
+    const startY = e.touches[0]?.clientY || 0
+
+    this.setData({
+      draggingCategoryId: categoryId,
+      dragStartY: startY,
+      dragStartIndex: index,
+      categoryOptions: this.data.categoryOptions.map((item) =>
+        item.id === categoryId ? { ...item, y: 0 } : item
+      )
+    })
+  },
+
+  onCategoryTouchMove(e) {
+    e.stopPropagation?.()
+    e.preventDefault?.()
+    if (!this.data.draggingCategoryId) return
+    const clientY = e.touches[0]?.clientY || 0
+    const deltaY = clientY - this.data.dragStartY
+    const categoryOptions = [...this.data.categoryOptions]
+    const currentIndex = this.data.dragStartIndex
+    const item = categoryOptions[currentIndex]
+    if (!item || item.id !== this.data.draggingCategoryId) return
+
+    item.y = deltaY
+
+    const swapThreshold = 55
+    if (deltaY > swapThreshold && currentIndex < categoryOptions.length - 1) {
+      categoryOptions[currentIndex] = categoryOptions[currentIndex + 1]
+      categoryOptions[currentIndex + 1] = item
+      this.setData({
+        dragStartY: this.data.dragStartY + swapThreshold,
+        dragStartIndex: currentIndex + 1,
+        categoryOptions
+      })
+      return
+    }
+
+    if (deltaY < -swapThreshold && currentIndex > 0) {
+      categoryOptions[currentIndex] = categoryOptions[currentIndex - 1]
+      categoryOptions[currentIndex - 1] = item
+      this.setData({
+        dragStartY: this.data.dragStartY - swapThreshold,
+        dragStartIndex: currentIndex - 1,
+        categoryOptions
+      })
+      return
+    }
+
+    this.setData({ categoryOptions })
+  },
+
+  onCategoryTouchEnd(e) {
+    e.stopPropagation?.()
+    this.setData({
+      draggingCategoryId: null,
+      dragStartY: 0,
+      dragStartIndex: -1,
+      categoryOptions: this.data.categoryOptions.map((item) => ({ ...item, y: 0 }))
+    })
+  },
+
+  async onDeleteCategoryTap(e) {
+    const categoryId = Number(e.currentTarget.dataset.id)
+    const categoryName = e.currentTarget.dataset.name
+    if (!app.globalData.familyId || !categoryId) return
+
+    try {
+      const bills = await request('/bills', 'GET', { family_id: app.globalData.familyId, scope: 'family' })
+      const categoryBills = (bills || []).filter((bill) => bill.category === categoryName)
+      if (categoryBills.length === 0) {
+        wx.showModal({
+          title: '删除类别',
+          content: `确定删除类别“${categoryName}”？`,
+          confirmText: '删除',
+          cancelText: '取消',
+          success: (res) => {
+            if (res.confirm) {
+              this.confirmDeleteCategory(categoryId)
+            }
+          }
+        })
+        return
+      }
+
+      const targetCandidates = this.data.categoryOptions.filter((item) => item.id !== categoryId)
+      this.setData({
+        pendingDeleteCategoryId: categoryId,
+        pendingDeleteCategoryName: categoryName,
+        pendingDeleteCount: categoryBills.length,
+        transferOptions: targetCandidates,
+        transferTargetCategoryId: targetCandidates.length ? targetCandidates[0].id : null
+      })
+
+      wx.showModal({
+        title: '删除类别',
+        content: `“${categoryName}” 下有 ${categoryBills.length} 笔账单，是否转移数据到其他类别？否则将删除该类别下所有账单。`,
+        confirmText: '转移',
+        cancelText: '删除',
+        success: (res) => {
+          if (res.confirm) {
+            if (!targetCandidates.length) {
+              wx.showToast({ title: '没有可转移的目标类别', icon: 'none' })
+              return
+            }
+            this.setData({ showTransferModal: true })
+          } else {
+            this.confirmDeleteCategory(categoryId)
+          }
+        }
+      })
+    } catch (err) {
+      wx.showToast({ title: '获取账单数据失败', icon: 'none' })
+    }
+  },
+
+  async confirmDeleteCategory(categoryId) {
+    try {
+      await request(`/families/${app.globalData.familyId}/categories/${categoryId}`, 'DELETE')
+      await this.loadCategories()
+      this.setData({ showCategorySettingsModal: false, showTransferModal: false })
+      wx.showToast({ title: '类别已删除', icon: 'success' })
+    } catch (err) {
+      wx.showToast({ title: '删除失败', icon: 'none' })
+    }
+  },
+
+  resetCategorySwipe(categoryId) {
+    const categoryOptions = this.data.categoryOptions.map((item) => {
+      if (item.id === categoryId) {
+        return { ...item, x: 0 }
+      }
+      return item
+    })
+    this.setData({ categoryOptions })
+  },
+
+  onTransferTargetSelect(e) {
+    this.setData({ transferTargetCategoryId: Number(e.currentTarget.dataset.id) })
+  },
+
+  async onConfirmTransfer() {
+    const categoryId = this.data.pendingDeleteCategoryId
+    const targetId = this.data.transferTargetCategoryId
+    if (!categoryId || !targetId) {
+      wx.showToast({ title: '请选择目标分类', icon: 'none' })
+      return
+    }
+    if (categoryId === targetId) {
+      wx.showToast({ title: '请选择不同的目标分类', icon: 'none' })
+      return
+    }
+
+    try {
+      await request(`/families/${app.globalData.familyId}/categories/${categoryId}?target_category_id=${targetId}`, 'DELETE')
+      await this.loadCategories()
+      this.setData({ showCategorySettingsModal: false, showTransferModal: false })
+      wx.showToast({ title: '已转移并删除类别', icon: 'success' })
+    } catch (err) {
+      wx.showToast({ title: '转移失败', icon: 'none' })
+    }
+  },
+
+  closeModals() {
+    this.setData({
+      showCategoryModal: false,
+      showDetailModal: false,
+      showCategorySettingsModal: false,
+      showTransferModal: false,
+      showEditCategoryIconModal: false,
+      showAddCategoryPanel: false,
+      editingCategoryName: '',
+      editingCategoryIcon: '',
+      pendingDeleteCategoryId: null,
+      pendingDeleteCategoryName: '',
+      pendingDeleteCount: 0,
+      transferTargetCategoryId: null,
+      transferOptions: []
+    })
+  },
+
+  stopBubble() {},
+
 
   onEditCategoryIconSelect(e) {
     this.setData({ editingCategoryIcon: e.currentTarget.dataset.icon || 'icon-qita' })
