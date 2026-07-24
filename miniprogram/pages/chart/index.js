@@ -168,6 +168,8 @@ Page({
   },
 
   calcStats() {
+    const dimMap = ['week', 'month', 'year']
+    const dimension = dimMap[this.data.dimensionIndex]
     let period = this.data.periodOptions[this.data.periodIndex]
     if (this.data.periodIndex === -1) {
       if (!this.data.startDate || !this.data.endDate) return
@@ -178,16 +180,18 @@ Page({
     const list = filterBillsByPeriod(this.data.bills, period).filter((b) => b.type === 'expense')
     const total = list.reduce((sum, b) => sum + Number(b.amount || 0), 0)
 
-    // 1. 每日支出趋势
-    const byDay = {}
+    // 1. 支出趋势：年维度按月聚合，其余维度按日聚合
+    const trendBy = {}
     list.forEach((b) => {
-      const day = formatDay(new Date(b.bill_date))
-      byDay[day] = (byDay[day] || 0) + Number(b.amount || 0)
+      const date = new Date(b.bill_date)
+      const day = formatDay(date)
+      const key = dimension === 'year' ? day.slice(0, 7) : day
+      trendBy[key] = (trendBy[key] || 0) + Number(b.amount || 0)
     })
     
-    const sortedDays = Object.keys(byDay).sort()
-    const lineLabels = sortedDays.map(day => day.slice(5)).slice(-15)
-    const lineData = sortedDays.map(day => byDay[day].toFixed(2)).slice(-15)
+    const sortedTrendKeys = Object.keys(trendBy).sort()
+    const lineLabels = sortedTrendKeys.map(key => dimension === 'year' ? `${Number(key.slice(5))}月` : key.slice(5)).slice(-15)
+    const lineData = sortedTrendKeys.map(key => trendBy[key].toFixed(2)).slice(-15)
 
     this.updateLineChart(lineLabels, lineData)
 
@@ -225,7 +229,7 @@ Page({
 
     this.setData({ 
       totalExpense: total.toFixed(2), 
-      linePoints: sortedDays, // 用于判断是否有数据显示 empty-chart
+      linePoints: sortedTrendKeys, // 用于判断是否有数据显示 empty-chart
       ranking,
       memberStats 
     })

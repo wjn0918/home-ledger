@@ -17,7 +17,7 @@ App({
 
     // 根据环境设置 apiBase
     const baseUrls = {
-      develop: 'http://localhost:8000/api', // 开发版
+      develop: 'https://hapi.ly1997.top/api', // 开发版
       trial: 'https://hapi.ly1997.top/api',    // 体验版
       release: 'https://hapi.ly1997.top/api'   // 正式版
     };
