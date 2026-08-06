@@ -34,9 +34,9 @@ Page({
     pendingDeleteCount: 0,
     transferTargetCategoryId: null,
     transferOptions: [],
-    draggingCategoryId: null,
-    dragStartY: 0,
-    dragStartIndex: -1,
+    showEditCategoryNameModal: false,
+    editingCategoryId: null,
+    editingCategoryNewName: '',
     calcExpr: '',
     lastOp: ''
   },
@@ -222,8 +222,8 @@ Page({
     if (!app.globalData.familyId) return
     try {
       const res = await request(`/families/${app.globalData.familyId}/categories`, 'GET')
-      const categoryOptions = (res || []).map((c) => ({ id: c.id, name: c.name, icon: c.icon || '', y: 0 }))
-      const selectedItem = categoryOptions.find((c) => c.name === this.data.category) || categoryOptions[0] || { id: null, name: '', icon: '', y: 0 }
+      const categoryOptions = (res || []).map((c) => ({ id: c.id, name: c.name, icon: c.icon || '' }))
+      const selectedItem = categoryOptions.find((c) => c.name === this.data.category) || categoryOptions[0] || { id: null, name: '', icon: '' }
       this.setData({
         categoryOptions,
         category: selectedItem.name,
@@ -311,69 +311,65 @@ Page({
     })
   },
 
-  onCategoryTouchStart(e) {
-    e.stopPropagation?.()
+  onEditCategoryTap(e) {
     const categoryId = Number(e.currentTarget.dataset.id)
-    const index = Number(e.currentTarget.dataset.index)
-    const startY = e.touches[0]?.clientY || 0
-
+    const categoryName = e.currentTarget.dataset.name
+    if (!app.globalData.familyId || !categoryId) return
     this.setData({
-      draggingCategoryId: categoryId,
-      dragStartY: startY,
-      dragStartIndex: index,
-      categoryOptions: this.data.categoryOptions.map((item) =>
-        item.id === categoryId ? { ...item, y: 0 } : item
-      )
+      showEditCategoryNameModal: true,
+      editingCategoryId: categoryId,
+      editingCategoryNewName: categoryName
     })
   },
 
-  onCategoryTouchMove(e) {
-    e.stopPropagation?.()
-    e.preventDefault?.()
-    if (!this.data.draggingCategoryId) return
-    const clientY = e.touches[0]?.clientY || 0
-    const deltaY = clientY - this.data.dragStartY
-    const categoryOptions = [...this.data.categoryOptions]
-    const currentIndex = this.data.dragStartIndex
-    const item = categoryOptions[currentIndex]
-    if (!item || item.id !== this.data.draggingCategoryId) return
-
-    item.y = deltaY
-
-    const swapThreshold = 55
-    if (deltaY > swapThreshold && currentIndex < categoryOptions.length - 1) {
-      categoryOptions[currentIndex] = categoryOptions[currentIndex + 1]
-      categoryOptions[currentIndex + 1] = item
-      this.setData({
-        dragStartY: this.data.dragStartY + swapThreshold,
-        dragStartIndex: currentIndex + 1,
-        categoryOptions
-      })
-      return
-    }
-
-    if (deltaY < -swapThreshold && currentIndex > 0) {
-      categoryOptions[currentIndex] = categoryOptions[currentIndex - 1]
-      categoryOptions[currentIndex - 1] = item
-      this.setData({
-        dragStartY: this.data.dragStartY - swapThreshold,
-        dragStartIndex: currentIndex - 1,
-        categoryOptions
-      })
-      return
-    }
-
-    this.setData({ categoryOptions })
+  onEditCategoryIconTap(e) {
+    const categoryId = Number(e.currentTarget.dataset.id)
+    const categoryName = e.currentTarget.dataset.name
+    const categoryIcon = e.currentTarget.dataset.icon || ''
+    if (!app.globalData.familyId || !categoryId) return
+    this.setData({
+      showEditCategoryIconModal: true,
+      showCategorySettingsModal: false,
+      editingCategoryId: categoryId,
+      editingCategoryName: categoryName,
+      editingCategoryIcon: categoryIcon || (this.data.defaultIcons && this.data.defaultIcons[0]) || 'icon-qita'
+    })
   },
 
-  onCategoryTouchEnd(e) {
-    e.stopPropagation?.()
+  onEditingCategoryNameInput(e) {
+    this.setData({ editingCategoryNewName: (e.detail.value || '').trim() })
+  },
+
+  closeEditCategoryNameModal() {
     this.setData({
-      draggingCategoryId: null,
-      dragStartY: 0,
-      dragStartIndex: -1,
-      categoryOptions: this.data.categoryOptions.map((item) => ({ ...item, y: 0 }))
+      showEditCategoryNameModal: false,
+      editingCategoryId: null,
+      editingCategoryNewName: ''
     })
+  },
+
+  async onConfirmEditCategoryName() {
+    const categoryId = this.data.editingCategoryId
+    const newName = (this.data.editingCategoryNewName || '').trim()
+    if (!categoryId) return
+    if (!newName) {
+      wx.showToast({ title: '请输入类别名称', icon: 'none' })
+      return
+    }
+    const category = this.data.categoryOptions.find((c) => c.id === categoryId)
+    if (!category) return
+    try {
+      await request(`/families/${app.globalData.familyId}/categories/${categoryId}`, 'PUT', { name: newName, icon: category.icon || '' })
+      const oldName = category.name
+      await this.loadCategories()
+      if (this.data.category === oldName) {
+        this.setData({ category: newName })
+      }
+      this.closeEditCategoryNameModal()
+      wx.showToast({ title: '类别已更新', icon: 'success' })
+    } catch (err) {
+      wx.showToast({ title: '更新失败', icon: 'none' })
+    }
   },
 
   async onDeleteCategoryTap(e) {
@@ -389,7 +385,7 @@ Page({
           title: '删除类别',
           content: `确定删除类别“${categoryName}”？`,
           confirmText: '删除',
-          cancelText: '取消',
+          cancelText: '关闭',
           success: (res) => {
             if (res.confirm) {
               this.confirmDeleteCategory(categoryId)
@@ -412,7 +408,7 @@ Page({
         title: '删除类别',
         content: `“${categoryName}” 下有 ${categoryBills.length} 笔账单，是否转移数据到其他类别？否则将删除该类别下所有账单。`,
         confirmText: '转移',
-        cancelText: '删除',
+        cancelText: '关闭',
         success: (res) => {
           if (res.confirm) {
             if (!targetCandidates.length) {
@@ -421,7 +417,7 @@ Page({
             }
             this.setData({ showTransferModal: true })
           } else {
-            this.confirmDeleteCategory(categoryId)
+            // 用户选择关闭，不做任何操作（避免误删）
           }
         }
       })
@@ -484,9 +480,12 @@ Page({
       showCategorySettingsModal: false,
       showTransferModal: false,
       showEditCategoryIconModal: false,
+      showEditCategoryNameModal: false,
       showAddCategoryPanel: false,
       editingCategoryName: '',
       editingCategoryIcon: '',
+      editingCategoryId: null,
+      editingCategoryNewName: '',
       pendingDeleteCategoryId: null,
       pendingDeleteCategoryName: '',
       pendingDeleteCount: 0,
@@ -503,14 +502,15 @@ Page({
   },
 
   async onConfirmEditCategoryIcon() {
-    const category = this.data.editingCategoryName
+    const categoryId = this.data.editingCategoryId
+    const categoryName = this.data.editingCategoryName
     const icon = this.data.editingCategoryIcon || 'icon-qita'
-    if (!app.globalData.familyId || !category) return
+    if (!app.globalData.familyId || !categoryId) return
     try {
-      await request(`/families/${app.globalData.familyId}/categories`, 'POST', { name: category, icon })
+      await request(`/families/${app.globalData.familyId}/categories/${categoryId}`, 'PUT', { name: categoryName || '', icon })
       await this.loadCategories()
-      if (this.data.category === category) this.setData({ categoryIcon: icon })
-      this.setData({ showEditCategoryIconModal: false, editingCategoryName: '', editingCategoryIcon: '' })
+      if (this.data.category === categoryName) this.setData({ categoryIcon: icon })
+      this.setData({ showEditCategoryIconModal: false, editingCategoryName: '', editingCategoryIcon: '', editingCategoryId: null })
       wx.showToast({ title: '图标已更新', icon: 'success' })
     } catch (err) {
       wx.showToast({ title: '更新失败', icon: 'none' })

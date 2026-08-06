@@ -73,7 +73,7 @@
     </view>
   </view>
 
-  <!-- 弹窗：分类设置（排序、删除、添加） -->
+  <!-- 弹窗：分类设置（编辑、删除、添加） -->
   <view class="modal-overlay" wx:if="{{showCategorySettingsModal}}" bindtap="closeModals">
     <view class="modal-content category-modal" catchtap="stopBubble">
       <view class="modal-header">
@@ -82,26 +82,15 @@
       </view>
       <view class="settings-list">
         <block wx:for="{{categoryOptions}}" wx:key="id">
-          <view
-            class="settings-item-wrapper"
-            data-id="{{item.id}}"
-            data-index="{{index}}"
-            bindtouchstart="onCategoryTouchStart"
-            catchtouchstart="onCategoryTouchStart"
-            bindtouchmove="onCategoryTouchMove"
-            catchtouchmove="onCategoryTouchMove"
-            bindtouchend="onCategoryTouchEnd"
-            catchtouchend="onCategoryTouchEnd"
-            bindtouchcancel="onCategoryTouchEnd"
-            catchtouchcancel="onCategoryTouchEnd"
-          >
-            <view class="settings-item {{draggingCategoryId === item.id ? 'dragging' : ''}}" style="transform: translateY({{item.y || 0}}px);">
+          <view class="settings-item-wrapper">
+            <view class="settings-item">
               <view class="settings-meta">
                 <text class="iconfont category-icon-font {{item.icon || 'icon-qita'}}"></text>
                 <text class="settings-name">{{item.name}}</text>
               </view>
               <view class="settings-actions">
-                <view class="drag-hint">按住拖动</view>
+                <view class="edit-btn" bindtap="onEditCategoryTap" data-id="{{item.id}}" data-name="{{item.name}}">编辑</view>
+                <view class="icon-btn" bindtap="onEditCategoryIconTap" data-id="{{item.id}}" data-name="{{item.name}}" data-icon="{{item.icon}}">设置图标</view>
                 <view class="delete-btn" bindtap="onDeleteCategoryTap" data-id="{{item.id}}" data-name="{{item.name}}">删除</view>
               </view>
             </view>
@@ -110,6 +99,29 @@
       </view>
       <view class="add-category-footer">
         <view class="action-btn confirm" bindtap="openAddCategoryPanel">添加类别</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 弹窗：编辑分类名称 -->
+  <view class="modal-overlay" wx:if="{{showEditCategoryNameModal}}" bindtap="closeEditCategoryNameModal">
+    <view class="modal-content category-modal" catchtap="stopBubble">
+      <view class="modal-header">
+        <text class="modal-title">编辑类别名称</text>
+        <text class="close-icon" bindtap="closeEditCategoryNameModal">×</text>
+      </view>
+      <view class="add-category-panel">
+        <input
+          class="new-category-input"
+          placeholder="请输入类别名称"
+          value="{{editingCategoryNewName}}"
+          bindinput="onEditingCategoryNameInput"
+          focus="{{showEditCategoryNameModal}}"
+        />
+        <view class="add-category-actions">
+          <view class="action-btn cancel" bindtap="closeEditCategoryNameModal">取消</view>
+          <view class="action-btn confirm" bindtap="onConfirmEditCategoryName">确定</view>
+        </view>
       </view>
     </view>
   </view>

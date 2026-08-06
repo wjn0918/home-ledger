@@ -126,18 +126,6 @@
   align-items: center;
   padding: 18rpx 0;
   background: #fff;
-  transition: transform 0.1s ease;
-}
-
-.settings-item.dragging {
-  box-shadow: 0 10rpx 24rpx rgba(0, 0, 0, 0.08);
-  z-index: 2;
-}
-
-.drag-hint {
-  font-size: 24rpx;
-  color: #909399;
-  margin-right: 14rpx;
 }
 
 .settings-meta {
@@ -157,7 +145,7 @@
   gap: 12rpx;
 }
 
-.sort-btn,
+.edit-btn,
 .delete-btn {
   padding: 12rpx 16rpx;
   border-radius: 14rpx;
@@ -166,9 +154,22 @@
   color: #606266;
 }
 
+.edit-btn {
+  background: #ecf5ff;
+  color: #3963bc;
+}
+
 .delete-btn {
   background: #ffecec;
   color: #f56c6c;
+}
+
+.add-category-footer {
+  padding: 20rpx 40rpx 40rpx;
+}
+
+.add-category-footer .action-btn {
+  width: 100%;
 }
 
 .transfer-note {

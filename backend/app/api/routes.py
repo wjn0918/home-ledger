@@ -541,6 +541,41 @@ def create_family_category(family_id: int, payload: FamilyCategoryCreateIn, db: 
     return {"id": category.id, "name": category.name, "icon": category.icon}
 
 
+@router.put("/families/{family_id}/categories/{category_id}")
+def update_family_category(family_id: int, category_id: int, payload: FamilyCategoryCreateIn, db: Session = Depends(get_db), user: User = Depends(get_current_user)):
+    membership = db.query(FamilyMember).filter(
+        FamilyMember.family_id == family_id,
+        FamilyMember.user_id == user.id
+    ).first()
+    if not membership:
+        raise HTTPException(status_code=403, detail="你不是该家庭成员")
+
+    category = db.query(FamilyCategory).filter(
+        FamilyCategory.id == category_id,
+        FamilyCategory.family_id == family_id
+    ).first()
+    if not category:
+        raise HTTPException(status_code=404, detail="类别不存在")
+
+    # 检查是否存在同名但不同 id 的类别，避免重复名称
+    conflict = db.query(FamilyCategory).filter(
+        FamilyCategory.family_id == family_id,
+        FamilyCategory.name == payload.name,
+        FamilyCategory.id != category_id
+    ).first()
+    if conflict:
+        raise HTTPException(status_code=400, detail="类别名称已存在")
+
+    if payload.name is not None:
+        category.name = payload.name
+    if payload.icon is not None:
+        category.icon = payload.icon
+
+    db.commit()
+    db.refresh(category)
+    return {"id": category.id, "name": category.name, "icon": category.icon}
+
+
 @router.delete("/families/{family_id}/categories/{category_id}")
 def delete_family_category(
     family_id: int,
