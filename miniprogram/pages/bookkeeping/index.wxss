@@ -16,7 +16,59 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding-bottom: 200rpx;
+  padding: 80rpx 0 200rpx;
+}
+
+.pending-bubble-section {
+  margin: -40rpx 30rpx 0;
+  padding: 28rpx;
+  border-radius: 28rpx;
+  background: #fff;
+  box-shadow: 0 12rpx 32rpx rgba(57, 99, 188, 0.12);
+}
+
+.pending-title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20rpx;
+}
+
+.pending-title {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #303133;
+}
+
+.pending-subtitle {
+  font-size: 24rpx;
+  color: #909399;
+}
+
+.pending-bubble-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+}
+
+.pending-bubble {
+  display: inline-flex;
+  align-items: center;
+  max-width: 100%;
+  padding: 14rpx 20rpx;
+  border-radius: 999rpx;
+  background: #edf4ff;
+  color: #3963bc;
+}
+
+.pending-bubble-icon {
+  font-size: 28rpx;
+  margin-right: 10rpx;
+}
+
+.pending-bubble-text {
+  font-size: 24rpx;
+  white-space: nowrap;
 }
 
 .start-circle-btn {
@@ -418,6 +470,54 @@
   grid-template-columns: 1fr 1fr;
   gap: 16rpx;
   margin-top: 26rpx;
+}
+
+.pending-action-panel {
+  padding: 28rpx 32rpx 36rpx;
+}
+
+.pending-action-card {
+  display: flex;
+  align-items: center;
+  padding: 24rpx;
+  border-radius: 20rpx;
+  background: #f8f9fa;
+}
+
+.pending-action-icon {
+  font-size: 56rpx;
+  color: #3963bc;
+}
+
+.pending-action-meta {
+  display: flex;
+  flex-direction: column;
+  margin-left: 20rpx;
+}
+
+.pending-action-category {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #303133;
+}
+
+.pending-action-amount {
+  margin-top: 8rpx;
+  font-size: 28rpx;
+  color: #3963bc;
+}
+
+.pending-action-note {
+  margin-top: 8rpx;
+  font-size: 24rpx;
+  color: #909399;
+}
+
+.pending-action-tip {
+  margin-top: 24rpx;
+  font-size: 26rpx;
+  line-height: 1.6;
+  color: #606266;
 }
 
 .action-btn {

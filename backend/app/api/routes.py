@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 from app.api.deps import get_current_user
 from app.db.session import get_db
 from app.models.entities import User, Family, FamilyMember, FamilyJoinRequest, Bill, FamilyCategory
-from app.schemas.dto import LoginByCodeIn, LoginOut, AccountRegisterIn, AccountLoginIn, FamilyCreateIn, FamilyMemberIn, BillCreateIn, BillUpdateIn, BillOut, JoinRequestOut, JoinRequestReviewIn, FamilyCategoryCreateIn
+from app.schemas.dto import LoginByCodeIn, LoginOut, AccountRegisterIn, AccountLoginIn, FamilyCreateIn, FamilyMemberIn, BillCreateIn, BillUpdateIn, BillOut, JoinRequestOut, JoinRequestReviewIn, FamilyCategoryCreateIn, BillPostingIn
 from app.services.auth import get_or_create_user_by_wechat_code, register_by_account, login_by_account, create_token
 
 router = APIRouter()
@@ -24,6 +24,7 @@ def build_bill_out(bill: Bill, category: str, category_icon: str = "", creator_n
         "note": bill.note,
         "bill_date": bill.bill_date,
         "is_shared": bill.is_shared,
+        "is_posted": bill.is_posted,
         "creator_nickname": creator_nickname,
     }
 
@@ -390,6 +391,7 @@ def update_bill(bill_id: int, payload: BillUpdateIn, db: Session = Depends(get_d
     bill.category_id = category.id
     bill.bill_date = payload.bill_date
     bill.is_shared = payload.is_shared
+    bill.is_posted = payload.is_posted
     db.commit()
     db.refresh(bill)
     return build_bill_out(bill, category.name, category.icon)
@@ -450,6 +452,7 @@ def batch_update_bills(bill_ids: list[int], payload: BillUpdateIn, db: Session =
         bill.category_id = category_cache[family_category_key]
         bill.bill_date = payload.bill_date
         bill.is_shared = payload.is_shared
+        bill.is_posted = payload.is_posted
         
     db.commit()
     return {"ok": True, "count": len(bills)}
@@ -468,6 +471,7 @@ def list_bills(family_id: int, scope: str = "family", db: Session = Depends(get_
         .join(User, User.id == Bill.user_id)
         .join(FamilyCategory, FamilyCategory.id == Bill.category_id)
         .filter(Bill.family_id == family_id)
+        .filter(Bill.is_posted == True)
     )
     if scope == "self":
         query = query.filter(Bill.user_id == user.id)
@@ -482,6 +486,64 @@ def list_bills(family_id: int, scope: str = "family", db: Session = Depends(get_
     return result
 
 
+@router.get("/bills/unposted", response_model=list[BillOut])
+def list_unposted_bills(family_id: int, db: Session = Depends(get_db), user: User = Depends(get_current_user)):
+    membership = db.query(FamilyMember).filter(
+        FamilyMember.family_id == family_id,
+        FamilyMember.user_id == user.id
+    ).first()
+    if not membership:
+        raise HTTPException(status_code=403, detail="你不是该家庭成员")
+
+    rows = (
+        db.query(Bill, User.nickname, FamilyCategory.name, FamilyCategory.icon)
+        .join(User, User.id == Bill.user_id)
+        .join(FamilyCategory, FamilyCategory.id == Bill.category_id)
+        .filter(Bill.family_id == family_id, Bill.user_id == user.id, Bill.is_posted == False)
+        .order_by(Bill.created_at.desc())
+        .all()
+    )
+    return [
+        build_bill_out(bill, category_name, category_icon, nickname)
+        for bill, nickname, category_name, category_icon in rows
+    ]
+
+
+@router.post("/bills/{bill_id}/posting")
+def update_bill_posting(
+    bill_id: int,
+    payload: BillPostingIn,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user)
+):
+    bill = db.query(Bill).filter(Bill.id == bill_id).first()
+    if not bill:
+        raise HTTPException(status_code=404, detail="账单不存在")
+
+    membership = db.query(FamilyMember).filter(
+        FamilyMember.family_id == bill.family_id,
+        FamilyMember.user_id == user.id
+    ).first()
+    if not membership:
+        raise HTTPException(status_code=403, detail="你不是该家庭成员")
+    if bill.user_id != user.id:
+        raise HTTPException(status_code=403, detail="只能处理自己创建的未入账账单")
+
+    if payload.action not in {"post", "discard"}:
+        raise HTTPException(status_code=400, detail="不支持的操作")
+
+    if payload.action == "discard":
+        db.delete(bill)
+        db.commit()
+        return {"ok": True, "action": "discarded"}
+
+    bill.is_posted = True
+    db.commit()
+    db.refresh(bill)
+    category = db.query(FamilyCategory).filter(FamilyCategory.id == bill.category_id).first()
+    return build_bill_out(bill, category.name if category else "", category.icon if category else "")
+
+
 @router.get("/charts/summary")
 def chart_summary(family_id: int, db: Session = Depends(get_db), user: User = Depends(get_current_user)):
     membership = db.query(FamilyMember).filter(
@@ -494,7 +556,7 @@ def chart_summary(family_id: int, db: Session = Depends(get_db), user: User = De
     rows = (
         db.query(FamilyCategory.name, func.sum(Bill.amount))
         .join(Bill, Bill.category_id == FamilyCategory.id)
-        .filter(Bill.family_id == family_id)
+        .filter(Bill.family_id == family_id, Bill.is_posted == True)
         .group_by(FamilyCategory.name)
         .all()
     )

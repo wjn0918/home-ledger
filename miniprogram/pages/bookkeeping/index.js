@@ -13,12 +13,16 @@ Page({
     type: 'expense',
     note: '',
     billDate: '',
+    isPosted: true,
     families: [],
     familyIndex: 0,
     currentFamilyName: '',
     categoryOptions: [],
     defaultIcons: [],
     isShared: true,
+    pendingBills: [],
+    showPendingActionModal: false,
+    activePendingBill: null,
     showCategoryModal: false,
     showDetailModal: false,
     showCategorySettingsModal: false,
@@ -49,7 +53,8 @@ Page({
         families: [],
         familyIndex: 0,
         currentFamilyName: '体验模式',
-        categoryOptions: []
+        categoryOptions: [],
+        pendingBills: []
       })
       return
     }
@@ -63,13 +68,15 @@ Page({
       })
       await this.loadDefaultIcons()
       await this.loadCategories()
+      await this.loadPendingBills()
     } catch (e) {
       if (e.statusCode === 401) {
         this.setData({
           families: [],
           familyIndex: 0,
           currentFamilyName: '体验模式',
-          categoryOptions: []
+          categoryOptions: [],
+          pendingBills: []
         })
         return
       }
@@ -97,7 +104,8 @@ Page({
       showDetailModal: true,
       amount: '',
       calcExpr: '',
-      note: ''
+      note: '',
+      isPosted: true
     })
   },
   stopBubble() {},
@@ -178,12 +186,14 @@ Page({
         type: this.data.type,
         note: this.data.note,
         bill_date: `${this.data.billDate}T00:00:00`,
-        is_shared: this.data.isShared
+        is_shared: this.data.isShared,
+        is_posted: this.data.isPosted
       })
-      wx.showToast({ title: '记账成功', icon: 'success' })
+      wx.showToast({ title: this.data.isPosted ? '记账成功' : '已存为未入账', icon: 'success' })
       this.closeModals()
+      await this.loadPendingBills()
       // 重置数据
-      this.setData({ amount: '', note: '', calcExpr: '' })
+      this.setData({ amount: '', note: '', calcExpr: '', isPosted: true })
     } catch (err) {
       wx.showToast({ title: '提交失败', icon: 'none' })
     }
@@ -195,6 +205,7 @@ Page({
     if (!target) return
     this.setData({ familyIndex: index, currentFamilyName: target.name })
     this.loadCategories()
+    this.loadPendingBills()
   },
 
   onCategoryTap(e) {
@@ -219,7 +230,10 @@ Page({
   },
 
   async loadCategories() {
-    if (!app.globalData.familyId) return
+    if (!app.globalData.familyId) {
+      this.setData({ categoryOptions: [], category: '', categoryIcon: '' })
+      return
+    }
     try {
       const res = await request(`/families/${app.globalData.familyId}/categories`, 'GET')
       const categoryOptions = (res || []).map((c) => ({ id: c.id, name: c.name, icon: c.icon || '' }))
@@ -234,13 +248,69 @@ Page({
     }
   },
 
+  async loadPendingBills() {
+    if (!app.globalData.familyId || !app.isLoggedIn()) {
+      this.setData({ pendingBills: [] })
+      return
+    }
+    try {
+      const res = await request('/bills/unposted', 'GET', { family_id: app.globalData.familyId })
+      this.setData({ pendingBills: res || [] })
+    } catch (e) {
+      this.setData({ pendingBills: [] })
+    }
+  },
+
   onDateChange(e) {
     this.setData({ billDate: e.detail.value })
   },
 
   bindAmount(e) { this.setData({ amount: e.detail.value }) },
   bindNote(e) { this.setData({ note: e.detail.value }) },
+  onPostedChange(e) { this.setData({ isPosted: !!e.detail.value }) },
   onShareChange(e) { this.setData({ isShared: !!e.detail.value }) },
+
+  onPendingBillTap(e) {
+    const billId = Number(e.currentTarget.dataset.id)
+    const activePendingBill = (this.data.pendingBills || []).find((item) => Number(item.id) === billId)
+    if (!activePendingBill) return
+    this.setData({
+      showPendingActionModal: true,
+      activePendingBill
+    })
+  },
+
+  closePendingActionModal() {
+    this.setData({
+      showPendingActionModal: false,
+      activePendingBill: null
+    })
+  },
+
+  async updatePendingBill(action) {
+    const bill = this.data.activePendingBill
+    if (!bill) return
+    const loadingText = action === 'post' ? '入账中...' : '丢弃中...'
+    wx.showLoading({ title: loadingText })
+    try {
+      await request(`/bills/${bill.id}/posting`, 'POST', { action })
+      wx.hideLoading()
+      this.closePendingActionModal()
+      await this.loadPendingBills()
+      wx.showToast({ title: action === 'post' ? '已确认入账' : '已丢弃', icon: 'success' })
+    } catch (err) {
+      wx.hideLoading()
+      wx.showToast({ title: '操作失败', icon: 'none' })
+    }
+  },
+
+  onPendingBillPost() {
+    this.updatePendingBill('post')
+  },
+
+  onPendingBillDiscard() {
+    this.updatePendingBill('discard')
+  },
 
   onAddCategoryTap() {
     if (!app.globalData.familyId) {
@@ -480,6 +550,8 @@ Page({
       showCategorySettingsModal: false,
       showTransferModal: false,
       showEditCategoryIconModal: false,
+      showPendingActionModal: false,
+      activePendingBill: null,
       showEditCategoryNameModal: false,
       showAddCategoryPanel: false,
       editingCategoryName: '',
@@ -490,7 +562,8 @@ Page({
       pendingDeleteCategoryName: '',
       pendingDeleteCount: 0,
       transferTargetCategoryId: null,
-      transferOptions: []
+      transferOptions: [],
+      isPosted: true
     })
   },
 

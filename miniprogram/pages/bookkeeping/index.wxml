@@ -5,6 +5,20 @@
       <view class="modern-subtitle" style="color: rgba(255,255,255,0.8); margin-bottom: 10rpx;">每一笔支出都值得被记录</view>
       <view class="modern-title" style="color: #fff; margin-bottom: 0;">{{currentFamilyName || '未选择家庭'}}</view>
     </view>
+    <view class="pending-bubble-section" wx:if="{{pendingBills.length}}">
+      <view class="pending-title-row">
+        <text class="pending-title">未入账</text>
+        <text class="pending-subtitle">点击气泡可确认入账或丢弃</text>
+      </view>
+      <view class="pending-bubble-list">
+        <block wx:for="{{pendingBills}}" wx:key="id">
+          <view class="pending-bubble" bindtap="onPendingBillTap" data-id="{{item.id}}">
+            <text class="iconfont pending-bubble-icon {{item.category_icon || 'icon-qita'}}"></text>
+            <text class="pending-bubble-text">{{item.category}} ¥{{item.amount}}</text>
+          </view>
+        </block>
+      </view>
+    </view>
     <view class="start-btn-container">
       <view class="start-circle-btn" bindtap="openCategoryModal">
         <text class="plus-icon">+</text>
@@ -187,6 +201,10 @@
             <view class="row-value">{{billDate}}</view>
           </view>
         </picker>
+        <view class="input-row">
+          <text class="row-label">是否入账</text>
+          <switch checked="{{isPosted}}" bindchange="onPostedChange" color="#3963bc" />
+        </view>
       </view>
 
       <!-- 数字键盘/计算器 -->
@@ -239,6 +257,30 @@
         <view class="add-category-actions">
           <view class="action-btn cancel" bindtap="closeModals">取消</view>
           <view class="action-btn confirm" bindtap="onConfirmEditCategoryIcon">确定</view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="modal-overlay" wx:if="{{showPendingActionModal}}" bindtap="closePendingActionModal">
+    <view class="modal-content category-modal" catchtap="stopBubble">
+      <view class="modal-header">
+        <text class="modal-title">未入账处理</text>
+        <text class="close-icon" bindtap="closePendingActionModal">×</text>
+      </view>
+      <view class="pending-action-panel">
+        <view class="pending-action-card">
+          <text class="iconfont pending-action-icon {{activePendingBill.category_icon || 'icon-qita'}}"></text>
+          <view class="pending-action-meta">
+            <text class="pending-action-category">{{activePendingBill.category}}</text>
+            <text class="pending-action-amount">¥{{activePendingBill.amount}}</text>
+            <text class="pending-action-note">{{activePendingBill.note || '无备注'}}</text>
+          </view>
+        </view>
+        <view class="pending-action-tip">确认入账后将进入明细和图表；丢弃后会永久移除。</view>
+        <view class="add-category-actions">
+          <view class="action-btn cancel" bindtap="onPendingBillDiscard">丢弃</view>
+          <view class="action-btn confirm" bindtap="onPendingBillPost">确认入账</view>
         </view>
       </view>
     </view>

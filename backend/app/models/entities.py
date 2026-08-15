@@ -61,6 +61,7 @@ class Bill(Base):
     amount: Mapped[float] = mapped_column(DECIMAL(10, 2))
     note: Mapped[str] = mapped_column(String(255), default="")
     is_shared: Mapped[bool] = mapped_column(Boolean, default=True)
+    is_posted: Mapped[bool] = mapped_column(Boolean, default=True, index=True)
     bill_date: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 

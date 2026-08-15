@@ -42,6 +42,7 @@ class BillCreateIn(BaseModel):
     note: str = ""
     bill_date: datetime
     is_shared: bool = True
+    is_posted: bool = True
 
 
 class BillUpdateIn(BaseModel):
@@ -50,6 +51,7 @@ class BillUpdateIn(BaseModel):
     category_icon: str = ""
     bill_date: datetime
     is_shared: bool = True
+    is_posted: bool = True
 
 
 class BillOut(BaseModel):
@@ -63,10 +65,15 @@ class BillOut(BaseModel):
     note: str
     bill_date: datetime
     is_shared: bool
+    is_posted: bool
     creator_nickname: str | None = None
 
     class Config:
         from_attributes = True
+
+
+class BillPostingIn(BaseModel):
+    action: str
 
 
 class JoinRequestOut(BaseModel):
