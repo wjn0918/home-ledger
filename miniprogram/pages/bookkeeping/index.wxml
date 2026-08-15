@@ -5,16 +5,24 @@
       <view class="modern-subtitle" style="color: rgba(255,255,255,0.8); margin-bottom: 10rpx;">每一笔支出都值得被记录</view>
       <view class="modern-title" style="color: #fff; margin-bottom: 0;">{{currentFamilyName || '未选择家庭'}}</view>
     </view>
-    <view class="pending-bubble-section" wx:if="{{pendingBills.length}}">
-      <view class="pending-title-row">
-        <text class="pending-title">未入账</text>
-        <text class="pending-subtitle">点击气泡可确认入账或丢弃</text>
-      </view>
-      <view class="pending-bubble-list">
+    <view class="pending-strip" wx:if="{{pendingBills.length}}">
+      <view class="pending-strip-list">
         <block wx:for="{{pendingBills}}" wx:key="id">
-          <view class="pending-bubble" bindtap="onPendingBillTap" data-id="{{item.id}}">
-            <text class="iconfont pending-bubble-icon {{item.category_icon || 'icon-qita'}}"></text>
-            <text class="pending-bubble-text">{{item.category}} ¥{{item.amount}}</text>
+          <view
+            class="pending-chip"
+            hover-class="pending-chip-active"
+            hover-start-time="10"
+            hover-stay-time="80"
+            bindtap="onPendingBillTap"
+            data-id="{{item.id}}"
+          >
+            <view class="pending-chip-glow"></view>
+            <view class="pending-chip-header">
+              <text class="iconfont pending-chip-icon {{item.category_icon || 'icon-qita'}}"></text>
+              <text class="pending-chip-amount">¥{{item.amount}}</text>
+              <text class="pending-chip-action">›</text>
+            </view>
+            <text class="pending-chip-meta">{{item.note || item.category || '未分类'}}</text>
           </view>
         </block>
       </view>

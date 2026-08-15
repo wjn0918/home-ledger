@@ -71,6 +71,104 @@
   white-space: nowrap;
 }
 
+.pending-strip {
+  position: relative;
+  z-index: 2;
+  margin: 24rpx 30rpx 0;
+  padding: 0 0 18rpx;
+}
+
+.pending-strip-list {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  gap: 18rpx;
+  padding: 0 4rpx 8rpx;
+}
+
+.pending-chip {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  flex: 1 1 280rpx;
+  min-width: 280rpx;
+  max-width: calc(50% - 10rpx);
+  padding: 18rpx 22rpx 16rpx 18rpx;
+  border-radius: 26rpx;
+  background: linear-gradient(135deg, rgba(255,255,255,0.98) 0%, rgba(237,244,255,0.96) 100%);
+  border: 1px solid rgba(57, 99, 188, 0.12);
+  box-shadow: 0 10rpx 24rpx rgba(57, 99, 188, 0.12);
+  color: #3963bc;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.pending-chip-active {
+  transform: translateY(-2rpx) scale(0.98);
+  background: linear-gradient(135deg, rgba(238,246,255,1) 0%, rgba(220,234,255,1) 100%);
+  box-shadow: 0 14rpx 26rpx rgba(57, 99, 188, 0.18);
+}
+
+.pending-chip-glow {
+  position: absolute;
+  left: 16rpx;
+  top: 18rpx;
+  width: 14rpx;
+  height: 14rpx;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #73a8ff 0%, #3963bc 100%);
+  box-shadow: 0 0 0 8rpx rgba(57, 99, 188, 0.12);
+  animation: pendingPulse 1.8s ease-in-out infinite;
+}
+
+@keyframes pendingPulse {
+  0%, 100% { transform: scale(1); opacity: 0.9; }
+  50% { transform: scale(1.25); opacity: 1; }
+}
+
+.pending-chip-header,
+.pending-chip-meta {
+  position: relative;
+  z-index: 1;
+}
+
+.pending-chip-header {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-height: 42rpx;
+}
+
+.pending-chip-icon {
+  font-size: 30rpx;
+  margin-left: 18rpx;
+}
+
+.pending-chip-amount {
+  margin-left: 12rpx;
+  font-size: 30rpx;
+  font-weight: 700;
+  letter-spacing: 0.5rpx;
+}
+
+.pending-chip-action {
+  margin-left: auto;
+  font-size: 42rpx;
+  line-height: 1;
+  opacity: 0.75;
+}
+
+.pending-chip-meta {
+  margin-top: 8rpx;
+  margin-left: 18rpx;
+  font-size: 24rpx;
+  line-height: 1.5;
+  color: #5e6d99;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .start-circle-btn {
   width: 240rpx;
   height: 240rpx;
