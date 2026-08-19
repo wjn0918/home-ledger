@@ -74,6 +74,7 @@ class BillOut(BaseModel):
 
 class BillPostingIn(BaseModel):
     action: str
+    bill_date: datetime | None = None
 
 
 class JoinRequestOut(BaseModel):

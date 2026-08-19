@@ -169,6 +169,16 @@
   text-overflow: ellipsis;
 }
 
+.pending-chip-date {
+  position: relative;
+  z-index: 1;
+  margin-top: 4rpx;
+  margin-left: 18rpx;
+  font-size: 22rpx;
+  line-height: 1.4;
+  color: #7c8caf;
+}
+
 .start-circle-btn {
   width: 240rpx;
   height: 240rpx;
@@ -603,6 +613,12 @@
   margin-top: 8rpx;
   font-size: 28rpx;
   color: #3963bc;
+}
+
+.pending-action-date {
+  margin-top: 8rpx;
+  font-size: 24rpx;
+  color: #606266;
 }
 
 .pending-action-note {

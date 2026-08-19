@@ -537,6 +537,8 @@ def update_bill_posting(
         db.commit()
         return {"ok": True, "action": "discarded"}
 
+    if payload.bill_date:
+        bill.bill_date = payload.bill_date
     bill.is_posted = True
     db.commit()
     db.refresh(bill)

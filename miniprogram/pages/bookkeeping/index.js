@@ -255,7 +255,11 @@ Page({
     }
     try {
       const res = await request('/bills/unposted', 'GET', { family_id: app.globalData.familyId })
-      this.setData({ pendingBills: res || [] })
+      const pendingBills = (res || []).map((bill) => ({
+        ...bill,
+        display_date: bill.bill_date ? String(bill.bill_date).slice(0, 10) : '未设置'
+      }))
+      this.setData({ pendingBills })
     } catch (e) {
       this.setData({ pendingBills: [] })
     }
@@ -291,9 +295,16 @@ Page({
     const bill = this.data.activePendingBill
     if (!bill) return
     const loadingText = action === 'post' ? '入账中...' : '丢弃中...'
+    const payload = { action }
+    if (action === 'post') {
+      const now = new Date()
+      const month = `${now.getMonth() + 1}`.padStart(2, '0')
+      const day = `${now.getDate()}`.padStart(2, '0')
+      payload.bill_date = `${now.getFullYear()}-${month}-${day}T00:00:00`
+    }
     wx.showLoading({ title: loadingText })
     try {
-      await request(`/bills/${bill.id}/posting`, 'POST', { action })
+      await request(`/bills/${bill.id}/posting`, 'POST', payload)
       wx.hideLoading()
       this.closePendingActionModal()
       await this.loadPendingBills()

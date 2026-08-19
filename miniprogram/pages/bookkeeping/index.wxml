@@ -23,6 +23,7 @@
               <text class="pending-chip-action">›</text>
             </view>
             <text class="pending-chip-meta">{{item.note || item.category || '未分类'}}</text>
+            <text class="pending-chip-date">日期：{{item.display_date}}</text>
           </view>
         </block>
       </view>
@@ -282,6 +283,7 @@
           <view class="pending-action-meta">
             <text class="pending-action-category">{{activePendingBill.category}}</text>
             <text class="pending-action-amount">¥{{activePendingBill.amount}}</text>
+            <text class="pending-action-date">日期：{{activePendingBill.display_date}}</text>
             <text class="pending-action-note">{{activePendingBill.note || '无备注'}}</text>
           </view>
         </view>
