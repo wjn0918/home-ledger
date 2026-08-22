@@ -21,6 +21,16 @@ App({
            }
          }
        }
+       // 注入默认的"分享到朋友圈"
+      if (!config.onShareTimeline) {
+        config.onShareTimeline = function() {
+          return {
+            title: "家庭记账本",
+            query: "",  // 注意：朋友圈分享用 query 而不是 path
+            imageUrl: ""
+          }
+        }
+      }
        originalPage(config)
      }
   },
