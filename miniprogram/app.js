@@ -8,6 +8,21 @@ App({
 
   onLaunch() {
     this.initEnv()
+     // 保存原始 Page 构造函数
+     const originalPage = Page
+     Page = function(config) {
+       // 如果页面没有自定义分享，则注入默认分享
+       if (!config.onShareAppMessage) {
+         config.onShareAppMessage = function() {
+           return {
+             title: "家庭记账本",
+             path: "/pages/bookkeeping/index",
+             imageUrl: ""
+           }
+         }
+       }
+       originalPage(config)
+     }
   },
 
   initEnv() {
