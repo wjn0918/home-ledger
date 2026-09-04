@@ -58,7 +58,7 @@
                           {{item.category}}
                           <text class="bill-creator {{item.creatorClass}}">{{item.creator_nickname}}</text>
                         </view>
-                        <text class="bill-note">{{item.note || '无备注'}}</text>
+                        <text class="bill-note" data-id="{{item.id}}" bindtap="onNoteTap">{{item.note || '添加备注'}}</text>
                       </view>
                     </view>
                     <view class="bill-right">
@@ -99,6 +99,44 @@
             <text class="modal-category-name">{{item.name}}</text>
           </view>
         </block>
+      </view>
+    </view>
+  </view>
+
+  <view class="modal-overlay" wx:if="{{showNoteModal}}" bindtap="closeNoteModal">
+    <view class="modal-content note-modal" catchtap="stopBubble">
+      <view class="modal-header">
+        <text class="modal-title">修改备注</text>
+        <text class="close-icon" bindtap="closeNoteModal">×</text>
+      </view>
+      <view class="note-edit-body">
+        <view class="note-edit-preview">
+          <view class="note-preview-row">
+            <text class="note-preview-label">分类</text>
+            <text class="note-preview-value">{{editingNoteBill.category}}</text>
+          </view>
+          <view class="note-preview-row">
+            <text class="note-preview-label">金额</text>
+            <text class="note-preview-value amount">¥{{editingNoteBill.amount}}</text>
+          </view>
+        </view>
+        <textarea
+          class="note-textarea"
+          placeholder="请输入备注信息（可多行）"
+          placeholder-class="note-textarea-placeholder"
+          value="{{editingNoteValue}}"
+          bindinput="onNoteInput"
+          maxlength="200"
+          auto-height
+          focus="{{showNoteModal}}"
+        />
+        <view class="note-counter">
+          <text>{{editingNoteValue.length}} / 200</text>
+        </view>
+      </view>
+      <view class="note-modal-actions">
+        <view class="note-action-btn cancel" bindtap="closeNoteModal">取消</view>
+        <view class="note-action-btn confirm" bindtap="onNoteConfirm">保存</view>
       </view>
     </view>
   </view>

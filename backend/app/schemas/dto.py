@@ -49,6 +49,7 @@ class BillUpdateIn(BaseModel):
     amount: Decimal
     category: str
     category_icon: str = ""
+    note: str = ""
     bill_date: datetime
     is_shared: bool = True
     is_posted: bool = True

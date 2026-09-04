@@ -194,11 +194,16 @@
 
 .bill-note {
   font-size: 22rpx;
-  color: var(--text-sub);
+  color: var(--text-sub, #909399);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   max-width: 320rpx;
+  padding: 4rpx 0;
+}
+
+.bill-note:active {
+  opacity: 0.6;
 }
 
 .swipe-delete {
@@ -275,3 +280,96 @@
 .category-icon-font { font-size: 42rpx; display: block; margin-bottom: 6rpx; }
 .modal-category-item { display: flex; flex-direction: column; align-items: center; justify-content: center; }
 .modal-category-name { font-size: 22rpx; color: #303133; line-height: 1.3; }
+
+.note-modal {
+  width: 86%;
+  padding: 8rpx 0 32rpx;
+}
+
+.note-edit-body {
+  padding: 10rpx 28rpx 0;
+}
+
+.note-edit-preview {
+  display: flex;
+  gap: 40rpx;
+  padding: 20rpx 24rpx;
+  background: linear-gradient(135deg, #edf4ff 0%, rgba(237,244,255,0.4) 100%);
+  border-radius: 18rpx;
+  margin-bottom: 26rpx;
+}
+
+.note-preview-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4rpx;
+}
+
+.note-preview-label {
+  font-size: 22rpx;
+  color: #7c8caf;
+}
+
+.note-preview-value {
+  font-size: 28rpx;
+  color: #1f2937;
+  font-weight: 600;
+}
+
+.note-preview-value.amount {
+  color: #3963bc;
+}
+
+.note-textarea {
+  width: 100%;
+  min-height: 180rpx;
+  max-height: 360rpx;
+  padding: 22rpx 24rpx;
+  box-sizing: border-box;
+  background: #f7f8fa;
+  border: 1rpx solid #ebecef;
+  border-radius: 18rpx;
+  font-size: 28rpx;
+  line-height: 1.6;
+  color: #1f2937;
+}
+
+.note-textarea-placeholder {
+  color: #b8bcc4;
+}
+
+.note-counter {
+  margin-top: 10rpx;
+  text-align: right;
+  font-size: 22rpx;
+  color: #a8adb6;
+  padding-right: 6rpx;
+}
+
+.note-modal-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20rpx;
+  padding: 28rpx 28rpx 0;
+}
+
+.note-action-btn {
+  height: 84rpx;
+  border-radius: 16rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30rpx;
+  font-weight: 500;
+}
+
+.note-action-btn.cancel {
+  background: #f2f3f5;
+  color: #606266;
+}
+
+.note-action-btn.confirm {
+  background: linear-gradient(135deg, #3963bc 0%, #5a8dee 100%);
+  color: #fff;
+  box-shadow: 0 8rpx 20rpx rgba(57, 99, 188, 0.24);
+}

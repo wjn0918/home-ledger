@@ -55,7 +55,11 @@ Page({
     showCategoryModal: false,
     editingBillId: null,
     isBatchMode: false,
-    selectedIds: []
+    selectedIds: [],
+    showNoteModal: false,
+    editingNoteBillId: null,
+    editingNoteValue: '',
+    editingNoteBill: { category: '', amount: '0.00' }
   },
 
   async onShow() {
@@ -374,12 +378,58 @@ Page({
     const payload = {
       amount: patch.amount ?? Number(bill.amount),
       category: patch.category ?? bill.category,
+      category_icon: bill.category_icon || '',
+      note: patch.note != null ? patch.note : (bill.note || ''),
       bill_date: patch.bill_date ?? bill.bill_date,
-      is_shared: patch.is_shared ?? bill.is_shared
+      is_shared: patch.is_shared ?? bill.is_shared,
+      is_posted: bill.is_posted ?? true
     }
     await request(`/bills/${bill.id}`, 'PUT', payload)
     await this.loadFamiliesAndBills()
     wx.showToast({ title: '修改成功', icon: 'none' })
+  },
+
+  async onNoteTap(e) {
+    if (this.data.isBatchMode) return
+    const bill = this.findBillByDatasetId(e)
+    if (!bill) return
+    if (Number(bill.user_id) !== Number(this.data.userId)) return wx.showToast({ title: "仅可修改自己账单", icon: "none" })
+    this.setData({
+      showNoteModal: true,
+      editingNoteBillId: bill.id,
+      editingNoteValue: bill.note || '',
+      editingNoteBill: { category: bill.category, amount: bill.amount }
+    })
+  },
+
+  closeNoteModal() {
+    this.setData({
+      showNoteModal: false,
+      editingNoteBillId: null,
+      editingNoteValue: '',
+      editingNoteBill: { category: '', amount: '0.00' }
+    })
+  },
+
+  onNoteInput(e) {
+    this.setData({ editingNoteValue: e.detail.value })
+  },
+
+  async onNoteConfirm() {
+    const billId = this.data.editingNoteBillId
+    if (!billId) return this.closeNoteModal()
+    const bill = this.data.bills.find((item) => item.id === billId)
+    if (!bill) return this.closeNoteModal()
+    const note = this.data.editingNoteValue
+    wx.showLoading({ title: '保存中...' })
+    try {
+      await this.submitBillEdit(bill, { note })
+      wx.hideLoading()
+      this.closeNoteModal()
+    } catch (err) {
+      wx.hideLoading()
+      wx.showToast({ title: '保存失败', icon: 'none' })
+    }
   },
 
 

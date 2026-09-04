@@ -389,6 +389,7 @@ def update_bill(bill_id: int, payload: BillUpdateIn, db: Session = Depends(get_d
 
     bill.amount = payload.amount
     bill.category_id = category.id
+    bill.note = payload.note
     bill.bill_date = payload.bill_date
     bill.is_shared = payload.is_shared
     bill.is_posted = payload.is_posted
@@ -450,6 +451,7 @@ def batch_update_bills(bill_ids: list[int], payload: BillUpdateIn, db: Session =
 
         bill.amount = payload.amount
         bill.category_id = category_cache[family_category_key]
+        bill.note = payload.note
         bill.bill_date = payload.bill_date
         bill.is_shared = payload.is_shared
         bill.is_posted = payload.is_posted
