@@ -509,6 +509,30 @@ def list_unposted_bills(family_id: int, db: Session = Depends(get_db), user: Use
     ]
 
 
+@router.get("/bills/unposted/summary")
+def unposted_bills_summary(family_id: int, db: Session = Depends(get_db), user: User = Depends(get_current_user)):
+    membership = db.query(FamilyMember).filter(
+        FamilyMember.family_id == family_id,
+        FamilyMember.user_id == user.id
+    ).first()
+    if not membership:
+        raise HTTPException(status_code=403, detail="你不是该家庭成员")
+
+    row = (
+        db.query(func.count(Bill.id), func.coalesce(func.sum(Bill.amount), 0))
+        .filter(
+            Bill.family_id == family_id,
+            Bill.user_id == user.id,
+            Bill.is_posted == False
+        )
+        .first()
+    )
+    return {
+        "count": int(row[0] or 0),
+        "total_amount": float(row[1] or 0),
+    }
+
+
 @router.post("/bills/{bill_id}/posting")
 def update_bill_posting(
     bill_id: int,

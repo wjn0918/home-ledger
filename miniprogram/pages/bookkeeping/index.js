@@ -42,7 +42,8 @@ Page({
     editingCategoryId: null,
     editingCategoryNewName: '',
     calcExpr: '',
-    lastOp: ''
+    lastOp: '',
+    unpostedSummary: { count: 0, total_amount: '0.00' }
   },
 
   async onShow() {
@@ -69,6 +70,7 @@ Page({
       await this.loadDefaultIcons()
       await this.loadCategories()
       await this.loadPendingBills()
+      await this.loadUnpostedSummary()
     } catch (e) {
       if (e.statusCode === 401) {
         this.setData({
@@ -192,6 +194,7 @@ Page({
       wx.showToast({ title: this.data.isPosted ? '记账成功' : '已存为未入账', icon: 'success' })
       this.closeModals()
       await this.loadPendingBills()
+      await this.loadUnpostedSummary()
       // 重置数据
       this.setData({ amount: '', note: '', calcExpr: '', isPosted: true })
     } catch (err) {
@@ -206,6 +209,7 @@ Page({
     this.setData({ familyIndex: index, currentFamilyName: target.name })
     this.loadCategories()
     this.loadPendingBills()
+    this.loadUnpostedSummary()
   },
 
   onCategoryTap(e) {
@@ -260,8 +264,42 @@ Page({
         display_date: bill.bill_date ? String(bill.bill_date).slice(0, 10) : '未设置'
       }))
       this.setData({ pendingBills })
+      this.computeUnpostedSummaryFromBills(pendingBills)
     } catch (e) {
       this.setData({ pendingBills: [] })
+    }
+  },
+
+  computeUnpostedSummaryFromBills(bills) {
+    const list = bills || []
+    let total = 0
+    for (let i = 0; i < list.length; i++) {
+      total += Number(list[i].amount || 0)
+    }
+    this.setData({
+      unpostedSummary: {
+        count: list.length,
+        total_amount: total.toFixed(2)
+      }
+    })
+  },
+
+  async loadUnpostedSummary() {
+    if (!app.globalData.familyId || !app.isLoggedIn()) {
+      this.setData({ unpostedSummary: { count: 0, total_amount: '0.00' } })
+      return
+    }
+    try {
+      const res = await request('/bills/unposted/summary', 'GET', { family_id: app.globalData.familyId })
+      this.setData({
+        unpostedSummary: {
+          count: Number(res && res.count ? res.count : 0),
+          total_amount: Number(res && res.total_amount ? res.total_amount : 0).toFixed(2)
+        }
+      })
+    } catch (e) {
+      // fallback: 从 pendingBills 计算
+      this.computeUnpostedSummaryFromBills(this.data.pendingBills)
     }
   },
 
@@ -308,6 +346,7 @@ Page({
       wx.hideLoading()
       this.closePendingActionModal()
       await this.loadPendingBills()
+      await this.loadUnpostedSummary()
       wx.showToast({ title: action === 'post' ? '已确认入账' : '已丢弃', icon: 'success' })
     } catch (err) {
       wx.hideLoading()

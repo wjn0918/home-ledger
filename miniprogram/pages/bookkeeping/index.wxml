@@ -5,6 +5,19 @@
       <view class="modern-subtitle" style="color: rgba(255,255,255,0.8); margin-bottom: 10rpx;">每一笔支出都值得被记录</view>
       <view class="modern-title" style="color: #fff; margin-bottom: 0;">{{currentFamilyName || '未选择家庭'}}</view>
     </view>
+    <view class="unposted-summary-card" wx:if="{{unpostedSummary.count > 0}}">
+      <view class="unposted-summary-left">
+        <text class="iconfont unposted-summary-icon icon-daily-necessities"></text>
+        <view class="unposted-summary-text">
+          <text class="unposted-summary-label">未入账账单</text>
+          <text class="unposted-summary-count">{{unpostedSummary.count}} 笔</text>
+        </view>
+      </view>
+      <view class="unposted-summary-right">
+        <text class="unposted-summary-currency">¥</text>
+        <text class="unposted-summary-amount">{{unpostedSummary.total_amount}}</text>
+      </view>
+    </view>
     <view class="pending-strip" wx:if="{{pendingBills.length}}">
       <view class="pending-strip-list">
         <block wx:for="{{pendingBills}}" wx:key="id">
