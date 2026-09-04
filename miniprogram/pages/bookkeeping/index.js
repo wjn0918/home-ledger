@@ -87,6 +87,16 @@ Page({
   },
 
   openCategoryModal() {
+    // 如果未选择家庭，提示用户先在「我的」页面创建或加入家庭
+    if (!this.data.currentFamilyName || !getApp().globalData.familyId) {
+      wx.showModal({
+        title: '未选择家庭',
+        content: '请在我的页面创建或加入已有家庭，便可开始你的家庭账本',
+        showCancel: false
+      })
+      return
+    }
+
     this.setData({
       showCategoryModal: true,
       showDetailModal: false,
