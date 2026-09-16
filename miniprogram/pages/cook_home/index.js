@@ -151,7 +151,13 @@ Page({
     const menus = this.data.menus || []
     const menuIndex = menus.findIndex((menu) => menu.id === menuId)
     if (menuIndex < 0) return
-    this.setData({ [`menus[${menuIndex}].imageLoaded`]: true })
+    const menuRows = (this.data.menuRows || []).map((row) => row.map((menu) => (
+      Number(menu.id) === menuId ? { ...menu, imageLoaded: true } : menu
+    )))
+    this.setData({
+      [`menus[${menuIndex}].imageLoaded`]: true,
+      menuRows
+    })
   },
 
   onDetailImageLoad() {
