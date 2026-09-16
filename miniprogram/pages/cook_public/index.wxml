@@ -1,0 +1,5 @@
+<view class="cook-home">
+  <view class="mode-switch" bindtap="onSwitchAppMode">切换账单</view>
+  <view class="cook-title">公共厨房</view>
+  <view class="cook-empty">暂无菜谱</view>
+</view>

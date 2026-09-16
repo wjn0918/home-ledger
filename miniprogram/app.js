@@ -3,11 +3,37 @@ App({
     token: wx.getStorageSync('token') || '',
     familyId: wx.getStorageSync('familyId') || null,
     userId: wx.getStorageSync('userId') || null,
+    appMode: wx.getStorageSync('appMode') || 'ledger',
     apiBase: '' // 动态设置
+  },
+
+  setAppMode(mode) {
+    const isCookMode = mode === 'cook'
+    this.globalData.appMode = isCookMode ? 'cook' : 'ledger'
+    wx.setStorageSync('appMode', this.globalData.appMode)
+    wx.setNavigationBarTitle({ title: isCookMode ? '家庭菜谱' : '家庭记账' })
+  },
+
+  switchAppMode() {
+    const nextMode = this.globalData.appMode === 'cook' ? 'ledger' : 'cook'
+    this.setAppMode(nextMode)
+    wx.reLaunch({
+      url: nextMode === 'cook' ? '/pages/cook_home/index' : '/pages/bookkeeping/index',
+      fail: (error) => {
+        console.error('切换模式失败', error)
+        wx.showToast({ title: '切换失败，请重试', icon: 'none' })
+      }
+    })
   },
 
   onLaunch() {
     this.initEnv()
+    this.setAppMode(this.globalData.appMode)
+    wx.reLaunch({
+      url: this.globalData.appMode === 'cook'
+        ? '/pages/cook_home/index'
+        : '/pages/bookkeeping/index'
+    })
      // 保存原始 Page 构造函数
      const originalPage = Page
      Page = function(config) {

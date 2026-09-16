@@ -6,6 +6,10 @@ const FALLBACK_ICONFONT_ICONS = [
 ]
 
 Page({
+  onSwitchAppMode() {
+    app.switchAppMode()
+  },
+
   data: {
     amount: '',
     category: '',
