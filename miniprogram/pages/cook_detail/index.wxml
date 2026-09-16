@@ -1,0 +1,35 @@
+<view class="cook-page">
+  <view class="page-heading">
+    <view>
+      <text class="eyebrow">KITCHEN LOG</text>
+      <text class="page-title">烹饪明细</text>
+    </view>
+    <text class="recipe-count">{{recipes.length}} 道菜</text>
+  </view>
+
+  <view wx:if="{{!recipes.length}}" class="empty-panel">
+    <text class="empty-icon">🍲</text>
+    <text class="empty-title">还没有烹饪记录</text>
+    <text class="empty-copy">把家常味道记下来，下次做起来更轻松</text>
+  </view>
+
+  <view wx:else class="recipe-list">
+    <view wx:for="{{recipes}}" wx:key="id" class="recipe-card">
+      <view class="recipe-card-head">
+        <view>
+          <text class="recipe-name">{{item.name}}</text>
+          <text class="recipe-date">记录于 {{item.createdAt}}</text>
+        </view>
+        <view class="delete-btn" data-id="{{item.id}}" bindtap="onDeleteRecipe">删除</view>
+      </view>
+      <view class="recipe-section">
+        <text class="section-label">食材</text>
+        <text class="recipe-content">{{item.ingredients}}</text>
+      </view>
+      <view class="recipe-section">
+        <text class="section-label">做法</text>
+        <text class="recipe-content">{{item.steps}}</text>
+      </view>
+    </view>
+  </view>
+</view>

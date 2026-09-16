@@ -1,0 +1,26 @@
+<view class="cook-page">
+  <view class="page-heading">
+    <text class="eyebrow">NEW RECIPE</text>
+    <text class="page-title">加菜</text>
+    <text class="page-copy">记录一道今天想做、以后还想做的家常菜</text>
+  </view>
+
+  <view class="edit-form">
+    <view class="field-group">
+      <text class="field-label">菜名</text>
+      <input class="field-input" placeholder="例如：番茄炖牛腩" placeholder-class="placeholder" value="{{name}}" bindinput="onNameInput" maxlength="40" />
+    </view>
+
+    <view class="field-group">
+      <text class="field-label">食材</text>
+      <textarea class="field-textarea" placeholder="写下主要食材和用量" placeholder-class="placeholder" value="{{ingredients}}" bindinput="onIngredientsInput" maxlength="500" auto-height />
+    </view>
+
+    <view class="field-group">
+      <text class="field-label">做法</text>
+      <textarea class="field-textarea steps-input" placeholder="按顺序写下烹饪步骤" placeholder-class="placeholder" value="{{steps}}" bindinput="onStepsInput" maxlength="1000" auto-height />
+    </view>
+
+    <view class="save-btn" bindtap="saveRecipe">保存这道菜</view>
+  </view>
+</view>

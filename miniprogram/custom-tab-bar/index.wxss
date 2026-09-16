@@ -23,3 +23,12 @@
 .tab-item.active {
   color: #3963bc;
 }
+
+.cook-tab-bar {
+  background: #fffaf3;
+  border-top-color: #f0d9c5;
+}
+
+.cook-tab-bar .tab-item.active {
+  color: #a94f32;
+}

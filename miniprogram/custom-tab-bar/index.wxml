@@ -1,4 +1,4 @@
-<view class="tab-bar">
+<view class="tab-bar {{mode === 'cook' ? 'cook-tab-bar' : ''}}">
   <view
     wx:for="{{items}}"
     wx:key="pagePath"
