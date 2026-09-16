@@ -15,6 +15,7 @@ Page({
     recipeCategoryIndex: 0,
     menuCategories: [],
     hasFamily: false,
+    menusLoading: true,
     selectedCategoryId: null,
     menuRows: [],
     menuCount: 0,
@@ -312,20 +313,25 @@ Page({
 
   refreshMenuRows(categoryId = this.data.selectedCategoryId) {
     const menus = this.data.menus || []
+    this.setData({ menuRows: this.buildMenuRows(menus, categoryId) })
+  },
+
+  buildMenuRows(menus, categoryId) {
     const filtered = menus.filter((menu) => menu.category_id === categoryId)
     const rows = []
     for (let index = 0; index < filtered.length; index += 2) {
       rows.push(filtered.slice(index, index + 2))
     }
-    this.setData({ menuRows: rows })
+    return rows
   },
 
   async loadMenus() {
     if (!app.isLoggedIn() || !app.globalData.familyId) {
-      this.setData({ hasFamily: false, menuCategories: [], menus: [], menuRows: [], menuCount: 0 })
+      this.setData({ hasFamily: false, menusLoading: false, menuCategories: [], menus: [], menuRows: [], menuCount: 0 })
       return
     }
 
+    this.setData({ menusLoading: true })
     try {
       const familyId = app.globalData.familyId
       const [categories, menus] = await Promise.all([
@@ -341,16 +347,19 @@ Page({
       const selectedCategoryId = selectedExists
         ? this.data.selectedCategoryId
         : (menuCategories.length ? menuCategories[0].id : null)
+      const menuRows = this.buildMenuRows(normalizedMenus, selectedCategoryId)
       this.setData({
         hasFamily: true,
+        menusLoading: false,
         menus: normalizedMenus,
+        menuRows,
         menuCategories,
         selectedCategoryId,
         menuCount: normalizedMenus.length,
         recipeCategories: categories
       })
-      this.refreshMenuRows(selectedCategoryId)
     } catch (error) {
+      this.setData({ menusLoading: false })
       wx.showToast({ title: '菜单加载失败', icon: 'none' })
     }
   },

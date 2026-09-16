@@ -1,7 +1,8 @@
 <view class="cook-home theme-cook">
   <view class="mode-switch mode-switch-ledger" bindtap="onSwitchAppMode">去记账</view>
   <view class="cook-title">家庭菜谱</view>
-  <view wx:if="{{hasFamily}}" class="menu-layout">
+  <view wx:if="{{menusLoading}}" class="cook-empty">加载中...</view>
+  <view wx:elif="{{hasFamily}}" class="menu-layout">
     <view class="menu-category-column">
       <scroll-view class="menu-category-panel" scroll-y="true">
         <view
@@ -22,7 +23,7 @@
         <view wx:for="{{row}}" wx:for-item="menu" wx:key="id" class="menu-card" data-id="{{menu.id}}" bindtap="openMenuDetail">
           <view class="menu-cover-frame">
             <view wx:if="{{menu.coverImage && !menu.imageLoaded}}" class="menu-cover menu-cover-loading">加载图片...</view>
-            <image wx:if="{{menu.coverImage}}" class="menu-cover {{menu.imageLoaded ? 'menu-cover-ready' : 'menu-cover-hidden'}}" src="{{menu.coverImage}}" mode="aspectFill" data-id="{{menu.id}}" bindload="onMenuImageLoad" />
+            <image wx:if="{{menu.coverImage}}" class="menu-cover {{menu.imageLoaded ? 'menu-cover-ready' : 'menu-cover-hidden'}}" src="{{menu.coverImage}}" mode="aspectFill" lazy-load="true" data-id="{{menu.id}}" bindload="onMenuImageLoad" />
             <view wx:if="{{!menu.coverImage}}" class="menu-cover menu-cover-empty">🍲</view>
           </view>
           <view class="menu-card-body">
