@@ -13,9 +13,13 @@ Page({
     recipeCategories: [],
     recipeCategoryIndex: 0,
     menuCategories: [],
+    hasFamily: false,
     selectedCategoryId: null,
     menuRows: [],
     menuCount: 0,
+    showAddCategoryModal: false,
+    newCategoryName: '',
+    newCategoryIcon: '',
     showMenuDetailModal: false,
     menuDetailEditing: false,
     selectedMenu: null,
@@ -33,6 +37,50 @@ Page({
       showAddRecipeModal: true,
       recipeCategoryIndex: 0
     })
+  },
+
+  onAddCategory() {
+    this.setData({ showAddCategoryModal: true, newCategoryName: '', newCategoryIcon: '' })
+  },
+
+  closeAddCategoryModal() {
+    this.setData({ showAddCategoryModal: false })
+  },
+
+  stopCategoryModalPropagation() {},
+
+  onNewCategoryNameInput(e) {
+    this.setData({ newCategoryName: e.detail.value })
+  },
+
+  onNewCategoryIconInput(e) {
+    this.setData({ newCategoryIcon: e.detail.value })
+  },
+
+  async saveCategory() {
+    const name = this.data.newCategoryName.trim()
+    if (!name) return wx.showToast({ title: '请输入分类名称', icon: 'none' })
+    if (!app.isLoggedIn() || !app.globalData.familyId) {
+      return wx.showToast({ title: '请先登录并选择家庭', icon: 'none' })
+    }
+
+    wx.showLoading({ title: '保存中' })
+    try {
+      const category = await request(
+        `/cook/categories?family_id=${app.globalData.familyId}`,
+        'POST',
+        { name, icon: this.data.newCategoryIcon.trim() }
+      )
+      this.setData({ showAddCategoryModal: false })
+      await this.loadMenus()
+      this.setData({ selectedCategoryId: category.id })
+      this.refreshMenuRows(category.id)
+      wx.showToast({ title: '分类已添加', icon: 'success' })
+    } catch (error) {
+      wx.showToast({ title: error.statusCode === 400 ? '分类名称已存在' : '添加失败，请重试', icon: 'none' })
+    } finally {
+      wx.hideLoading()
+    }
   },
 
   closeAddRecipeModal() {
@@ -160,7 +208,7 @@ Page({
 
   async loadMenus() {
     if (!app.isLoggedIn() || !app.globalData.familyId) {
-      this.setData({ menuCategories: [], menus: [], menuRows: [], menuCount: 0 })
+      this.setData({ hasFamily: false, menuCategories: [], menus: [], menuRows: [], menuCount: 0 })
       return
     }
 
@@ -180,6 +228,7 @@ Page({
         ? this.data.selectedCategoryId
         : (menuCategories.length ? menuCategories[0].id : null)
       this.setData({
+        hasFamily: true,
         menus: normalizedMenus,
         menuCategories,
         selectedCategoryId,

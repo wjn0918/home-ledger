@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 from app.api.deps import get_current_user
 from app.db.session import get_db
 from app.models.entities import User, Family, FamilyMember, FamilyJoinRequest, Bill, FamilyCategory
+from app.models.entities_cook import CookCategory
 from app.schemas.dto import LoginByCodeIn, LoginOut, AccountRegisterIn, AccountLoginIn, FamilyCreateIn, FamilyMemberIn, BillCreateIn, BillUpdateIn, BillOut, JoinRequestOut, JoinRequestReviewIn, FamilyCategoryCreateIn, BillPostingIn
 from app.services.auth import get_or_create_user_by_wechat_code, register_by_account, login_by_account, create_token
 
@@ -183,6 +184,7 @@ def create_family(payload: FamilyCreateIn, db: Session = Depends(get_db), user: 
     db.add(FamilyMember(family_id=family.id, user_id=user.id, role="owner"))
     for item in DEFAULT_CATEGORY_OPTIONS:
         db.add(FamilyCategory(family_id=family.id, name=item["name"], icon=item["icon"]))
+    db.add(CookCategory(family_id=family.id, name="未分类", icon=""))
     db.commit()
     return {"id": family.id, "name": family.name}
 

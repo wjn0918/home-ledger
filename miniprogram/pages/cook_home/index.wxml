@@ -1,18 +1,21 @@
 <view class="cook-home theme-cook">
   <view class="mode-switch mode-switch-ledger" bindtap="onSwitchAppMode">去记账</view>
   <view class="cook-title">家庭菜谱</view>
-  <view wx:if="{{menuCategories.length}}" class="menu-layout">
-    <scroll-view class="menu-category-panel" scroll-y="true">
-      <view
-        wx:for="{{menuCategories}}"
-        wx:key="id"
-        class="menu-category-item {{selectedCategoryId === item.id ? 'active' : ''}}"
-        data-category-id="{{item.id}}"
-        bindtap="selectMenuCategory"
-      >
-        <text class="menu-category-name">{{item.name}}</text>
-      </view>
-    </scroll-view>
+  <view wx:if="{{hasFamily}}" class="menu-layout">
+    <view class="menu-category-column">
+      <scroll-view class="menu-category-panel" scroll-y="true">
+        <view
+          wx:for="{{menuCategories}}"
+          wx:key="id"
+          class="menu-category-item {{selectedCategoryId === item.id ? 'active' : ''}}"
+          data-category-id="{{item.id}}"
+          bindtap="selectMenuCategory"
+        >
+          <text class="menu-category-name">{{item.name}}</text>
+        </view>
+      </scroll-view>
+      <view class="add-category-btn" bindtap="onAddCategory">+ 添加分类</view>
+    </view>
     <scroll-view class="menu-content-panel" scroll-y="true">
       <view wx:if="{{!menuRows.length}}" class="menu-empty">该分类暂无菜谱</view>
       <view wx:for="{{menuRows}}" wx:for-item="row" wx:key="*this" class="menu-row">
@@ -59,6 +62,36 @@
         <textarea class="menu-detail-input" value="{{detailSteps}}" bindinput="onDetailStepsInput" placeholder="做法" auto-height />
         <view class="menu-detail-edit-btn" bindtap="saveMenuEdit">保存修改</view>
       </block>
+    </view>
+  </view>
+
+  <view wx:if="{{showAddCategoryModal}}" class="recipe-modal-mask" bindtap="closeAddCategoryModal">
+    <view class="recipe-modal category-modal" catchtap="stopCategoryModalPropagation">
+      <view class="recipe-modal-header">
+        <text class="recipe-modal-title">添加分类</text>
+        <text class="recipe-modal-close" bindtap="closeAddCategoryModal">×</text>
+      </view>
+      <view class="recipe-field">
+        <text class="recipe-field-label">分类名称</text>
+        <input
+          class="recipe-input"
+          placeholder="例如：家常菜"
+          value="{{newCategoryName}}"
+          bindinput="onNewCategoryNameInput"
+          maxlength="50"
+        />
+      </view>
+      <view class="recipe-field">
+        <text class="recipe-field-label">图标（可选）</text>
+        <input
+          class="recipe-input"
+          placeholder="例如：icon-food"
+          value="{{newCategoryIcon}}"
+          bindinput="onNewCategoryIconInput"
+          maxlength="100"
+        />
+      </view>
+      <view class="recipe-save-btn" bindtap="saveCategory">保存分类</view>
     </view>
   </view>
 
