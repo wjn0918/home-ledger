@@ -4,8 +4,11 @@
   <view wx:elif="{{!menus.length}}" class="cook-empty">暂无共享菜谱</view>
   <view wx:else class="public-menu-grid">
     <view wx:for="{{menus}}" wx:key="id" class="public-menu-card" data-id="{{item.id}}" bindtap="openMenuDetail">
-      <image wx:if="{{item.coverImage}}" class="public-menu-cover" src="{{item.coverImage}}" mode="aspectFill" />
-      <view wx:else class="public-menu-cover public-menu-cover-empty">🍲</view>
+      <view class="public-menu-cover-frame">
+        <view wx:if="{{item.coverImage && !item.imageLoaded}}" class="public-menu-cover public-menu-cover-loading">加载图片...</view>
+        <image wx:if="{{item.coverImage}}" class="public-menu-cover {{item.imageLoaded ? 'public-menu-cover-ready' : 'public-menu-cover-hidden'}}" src="{{item.coverImage}}" mode="aspectFill" data-id="{{item.id}}" bindload="onPublicMenuImageLoad" />
+        <view wx:if="{{!item.coverImage}}" class="public-menu-cover public-menu-cover-empty">🍲</view>
+      </view>
       <view class="public-menu-body">
         <text class="public-menu-name">{{item.name}}</text>
         <text class="public-menu-source">来源：{{item.source_family_name}}</text>
@@ -23,7 +26,10 @@
         </view>
         <text class="public-detail-close" bindtap="closeMenuDetail">×</text>
       </view>
-      <image wx:if="{{selectedMenu.coverImage}}" class="public-detail-cover" src="{{selectedMenu.coverImage}}" mode="aspectFill" />
+      <view class="public-detail-cover-frame">
+        <view wx:if="{{selectedMenu.coverImage && !detailImageLoaded}}" class="public-detail-cover public-detail-cover-loading">加载封面图...</view>
+        <image wx:if="{{selectedMenu.coverImage}}" class="public-detail-cover {{detailImageLoaded ? 'public-detail-cover-ready' : 'public-detail-cover-hidden'}}" src="{{selectedMenu.coverImage}}" mode="aspectFill" bindload="onPublicDetailImageLoad" />
+      </view>
       <view class="public-detail-section">
         <text class="public-detail-label">食材</text>
         <text class="public-detail-text">{{selectedMenu.ingredients}}</text>

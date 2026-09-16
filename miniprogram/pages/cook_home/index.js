@@ -136,6 +136,7 @@ Page({
       detailSteps: menu.steps,
       detailIsPublic: !!menu.is_public,
       detailCoverImage: menu.coverImage || '',
+      detailImageLoaded: false,
       detailCoverBase64: '',
       detailCoverChanged: false
     })
@@ -143,6 +144,18 @@ Page({
 
   closeMenuDetailModal() {
     this.setData({ showMenuDetailModal: false, menuDetailEditing: false })
+  },
+
+  onMenuImageLoad(e) {
+    const menuId = Number(e.currentTarget.dataset.id)
+    const menus = this.data.menus || []
+    const menuIndex = menus.findIndex((menu) => menu.id === menuId)
+    if (menuIndex < 0) return
+    this.setData({ [`menus[${menuIndex}].imageLoaded`]: true })
+  },
+
+  onDetailImageLoad() {
+    this.setData({ detailImageLoaded: true })
   },
 
   enterMenuEdit() {
@@ -286,6 +299,7 @@ Page({
     return {
       ...menu,
       coverImage,
+      imageLoaded: false,
       createdDate: menu.created_at ? menu.created_at.slice(0, 10) : ''
     }
   },

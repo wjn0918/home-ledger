@@ -20,7 +20,9 @@ Page({
       this.setData({
         menus: menus.map((menu) => ({
           ...menu,
-          coverImage: menu.images && menu.images.length ? menu.images[0].image_url : ''
+          coverImage: menu.images && menu.images.length ? menu.images[0].image_url : '',
+          imageLoaded: false,
+          detailImageLoaded: false
         }))
       })
     } catch (error) {
@@ -33,12 +35,26 @@ Page({
   openMenuDetail(e) {
     const menu = this.data.menus.find((item) => item.id === Number(e.currentTarget.dataset.id))
     if (!menu) return
-    this.setData({ showDetailModal: true, selectedMenu: menu })
+    this.setData({
+      showDetailModal: true,
+      selectedMenu: menu,
+      detailImageLoaded: false
+    })
   },
 
   closeMenuDetail() {
     this.setData({ showDetailModal: false, selectedMenu: null })
   },
 
-  stopDetailPropagation() {}
+  stopDetailPropagation() {},
+
+  onPublicMenuImageLoad(e) {
+    const menuId = Number(e.currentTarget.dataset.id)
+    const index = this.data.menus.findIndex((menu) => menu.id === menuId)
+    if (index >= 0) this.setData({ [`menus[${index}].imageLoaded`]: true })
+  },
+
+  onPublicDetailImageLoad() {
+    this.setData({ detailImageLoaded: true })
+  }
 })

@@ -20,8 +20,11 @@
       <view wx:if="{{!menuRows.length}}" class="menu-empty">该分类暂无菜谱</view>
       <view wx:for="{{menuRows}}" wx:for-item="row" wx:key="*this" class="menu-row">
         <view wx:for="{{row}}" wx:for-item="menu" wx:key="id" class="menu-card" data-id="{{menu.id}}" bindtap="openMenuDetail">
-          <image wx:if="{{menu.coverImage}}" class="menu-cover" src="{{menu.coverImage}}" mode="aspectFill" />
-          <view wx:else class="menu-cover menu-cover-empty">🍲</view>
+          <view class="menu-cover-frame">
+            <view wx:if="{{menu.coverImage && !menu.imageLoaded}}" class="menu-cover menu-cover-loading">加载图片...</view>
+            <image wx:if="{{menu.coverImage}}" class="menu-cover {{menu.imageLoaded ? 'menu-cover-ready' : 'menu-cover-hidden'}}" src="{{menu.coverImage}}" mode="aspectFill" data-id="{{menu.id}}" bindload="onMenuImageLoad" />
+            <view wx:if="{{!menu.coverImage}}" class="menu-cover menu-cover-empty">🍲</view>
+          </view>
           <view class="menu-card-body">
             <text class="menu-card-name">{{menu.name}}</text>
             <text class="menu-card-date">{{menu.createdDate}}</text>
@@ -42,7 +45,10 @@
         <text class="recipe-modal-close" bindtap="closeMenuDetailModal">×</text>
       </view>
       <block wx:if="{{!menuDetailEditing}}">
-        <image wx:if="{{selectedMenu.coverImage}}" class="menu-detail-cover" src="{{selectedMenu.coverImage}}" mode="aspectFill" />
+        <view class="menu-detail-cover-frame">
+          <view wx:if="{{selectedMenu.coverImage && !detailImageLoaded}}" class="menu-detail-cover menu-cover-loading">加载封面图...</view>
+          <image wx:if="{{selectedMenu.coverImage}}" class="menu-detail-cover {{detailImageLoaded ? 'menu-cover-ready' : 'menu-cover-hidden'}}" src="{{selectedMenu.coverImage}}" mode="aspectFill" bindload="onDetailImageLoad" />
+        </view>
         <view class="menu-detail-section">
           <text class="menu-detail-label">食材</text>
           <text class="menu-detail-text">{{selectedMenu.ingredients}}</text>
@@ -58,8 +64,12 @@
       </block>
       <block wx:else>
         <view class="detail-cover-editor">
-          <image wx:if="{{detailCoverImage}}" class="menu-detail-cover" src="{{detailCoverImage}}" mode="aspectFill" />
-          <view wx:else class="detail-cover-empty">暂无封面图</view>
+          <view wx:if="{{detailCoverImage && !detailImageLoaded}}" class="menu-detail-cover menu-cover-loading">加载封面图...</view>
+          <view class="menu-detail-cover-frame">
+            <view wx:if="{{detailCoverImage && !detailImageLoaded}}" class="menu-detail-cover menu-cover-loading">加载封面图...</view>
+            <image wx:if="{{detailCoverImage}}" class="menu-detail-cover {{detailImageLoaded ? 'menu-cover-ready' : 'menu-cover-hidden'}}" src="{{detailCoverImage}}" mode="aspectFill" bindload="onDetailImageLoad" />
+          </view>
+          <view wx:if="{{!detailCoverImage}}" class="detail-cover-empty">暂无封面图</view>
           <view class="detail-cover-actions">
             <view class="detail-cover-action" bindtap="chooseDetailCover">更新封面图</view>
             <view wx:if="{{detailCoverImage}}" class="detail-cover-action danger" bindtap="removeDetailCover">移除封面</view>

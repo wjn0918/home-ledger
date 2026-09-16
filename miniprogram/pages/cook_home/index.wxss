@@ -120,6 +120,47 @@
   font-size: 52rpx;
 }
 
+.menu-cover-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--primary-soft);
+  color: var(--text-muted);
+  font-size: 22rpx;
+}
+
+.menu-cover-hidden {
+  opacity: 0;
+}
+
+.menu-cover-ready {
+  opacity: 1;
+}
+
+.menu-cover-frame {
+  position: relative;
+  height: 180rpx;
+}
+
+.menu-cover-frame .menu-cover {
+  position: absolute;
+  inset: 0;
+}
+
+.menu-detail-cover-frame {
+  position: relative;
+  height: 300rpx;
+  margin-bottom: 24rpx;
+  border-radius: 16rpx;
+  overflow: hidden;
+}
+
+.menu-detail-cover-frame .menu-detail-cover {
+  position: absolute;
+  inset: 0;
+  margin-bottom: 0;
+}
+
 .menu-card-body {
   padding: 16rpx;
 }
