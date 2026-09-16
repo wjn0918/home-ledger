@@ -124,3 +124,14 @@ class CookMenuUpdateIn(BaseModel):
 class CookMenuImageCreateIn(BaseModel):
     image_url: str
     sort_order: int = 0
+
+
+class CookBillCreateIn(BaseModel):
+    family_id: int
+    menu_id: int
+    cooked_at: datetime | None = None
+
+
+class CookBillUpdateIn(BaseModel):
+    menu_id: int | None = None
+    cooked_at: datetime | None = None

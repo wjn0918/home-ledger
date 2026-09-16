@@ -1,12 +1,16 @@
+from datetime import datetime
+
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from app.api.deps import get_current_user
 from app.db.session import get_db
 from app.models.entities import FamilyMember, User
-from app.models.entities_cook import CookCategory, CookMenu, CookMenuImages
+from app.models.entities_cook import CookBill, CookCategory, CookMenu, CookMenuImages
 from app.schemas.dto import (
     CookCategoryCreateIn,
+    CookBillCreateIn,
+    CookBillUpdateIn,
     CookMenuCreateIn,
     CookMenuImageCreateIn,
     CookMenuUpdateIn,
@@ -99,6 +103,115 @@ def build_menu_out(db: Session, menu: CookMenu) -> dict:
         "created_at": menu.created_at,
         "updated_at": menu.updated_at,
     }
+
+
+def get_cook_bill(
+    db: Session,
+    bill_id: int,
+    user: User,
+    owner_only: bool = False,
+) -> CookBill:
+    bill = db.query(CookBill).filter(CookBill.id == bill_id).first()
+    if not bill:
+        raise HTTPException(status_code=404, detail="做菜记录不存在")
+    require_family_member(db, bill.family_id, user)
+    if owner_only and bill.user_id != user.id:
+        raise HTTPException(status_code=403, detail="只能操作自己创建的做菜记录")
+    return bill
+
+
+def build_cook_bill_out(db: Session, bill: CookBill) -> dict:
+    menu = db.query(CookMenu).filter(
+        CookMenu.id == bill.menu_id,
+        CookMenu.family_id == bill.family_id,
+    ).first()
+    return {
+        "id": bill.id,
+        "family_id": bill.family_id,
+        "user_id": bill.user_id,
+        "menu_id": bill.menu_id,
+        "menu_name": menu.name if menu else "",
+        "cooked_at": bill.cooked_at,
+        "created_at": bill.created_at,
+    }
+
+
+@router.get("/cook/bills")
+def list_cook_bills(
+    family_id: int,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+):
+    require_family_member(db, family_id, user)
+    bills = db.query(CookBill).filter(
+        CookBill.family_id == family_id,
+    ).order_by(CookBill.cooked_at.desc(), CookBill.id.desc()).all()
+    return [build_cook_bill_out(db, bill) for bill in bills]
+
+
+@router.get("/cook/bills/{bill_id}")
+def get_cook_bill_detail(
+    bill_id: int,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+):
+    bill = get_cook_bill(db, bill_id, user)
+    return build_cook_bill_out(db, bill)
+
+
+@router.post("/cook/bills")
+def create_cook_bill(
+    payload: CookBillCreateIn,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+):
+    require_family_member(db, payload.family_id, user)
+    menu = get_menu_for_member(db, payload.menu_id, user)
+    if menu.family_id != payload.family_id:
+        raise HTTPException(status_code=400, detail="菜单不属于当前家庭")
+
+    bill = CookBill(
+        family_id=payload.family_id,
+        user_id=user.id,
+        menu_id=payload.menu_id,
+        cooked_at=payload.cooked_at or datetime.utcnow(),
+    )
+    db.add(bill)
+    db.commit()
+    db.refresh(bill)
+    return build_cook_bill_out(db, bill)
+
+
+@router.put("/cook/bills/{bill_id}")
+def update_cook_bill(
+    bill_id: int,
+    payload: CookBillUpdateIn,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+):
+    bill = get_cook_bill(db, bill_id, user, owner_only=True)
+    if payload.menu_id is not None:
+        menu = get_menu_for_member(db, payload.menu_id, user)
+        if menu.family_id != bill.family_id:
+            raise HTTPException(status_code=400, detail="菜单不属于当前家庭")
+        bill.menu_id = payload.menu_id
+    if payload.cooked_at is not None:
+        bill.cooked_at = payload.cooked_at
+    db.commit()
+    db.refresh(bill)
+    return build_cook_bill_out(db, bill)
+
+
+@router.delete("/cook/bills/{bill_id}")
+def delete_cook_bill(
+    bill_id: int,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+):
+    bill = get_cook_bill(db, bill_id, user, owner_only=True)
+    db.delete(bill)
+    db.commit()
+    return {"ok": True}
 
 
 @router.get("/cook/categories")

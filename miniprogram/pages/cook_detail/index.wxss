@@ -95,6 +95,25 @@
   font-size: 22rpx;
 }
 
+.recipe-actions {
+  display: flex;
+  gap: 18rpx;
+}
+
+.edit-btn {
+  padding: 8rpx 14rpx;
+  color: var(--accent-color);
+  font-size: 22rpx;
+}
+
+.detail-cover {
+  display: block;
+  width: 100%;
+  height: 300rpx;
+  margin-bottom: 20rpx;
+  border-radius: 14rpx;
+}
+
 .recipe-section {
   margin-top: 18rpx;
   padding-top: 18rpx;
@@ -115,4 +134,67 @@
   font-size: 26rpx;
   line-height: 1.7;
   white-space: pre-wrap;
+}
+
+.edit-modal-mask {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32rpx 24rpx;
+  background: rgba(42, 24, 17, 0.42);
+  box-sizing: border-box;
+}
+
+.edit-modal {
+  width: 100%;
+  padding: 32rpx;
+  border-radius: 24rpx;
+  background: var(--surface-muted);
+  box-sizing: border-box;
+}
+
+.edit-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24rpx;
+}
+
+.edit-modal-title {
+  color: var(--text-strong);
+  font-size: 34rpx;
+  font-weight: 600;
+}
+
+.edit-modal-close {
+  color: var(--text-muted);
+  font-size: 42rpx;
+}
+
+.edit-input,
+.edit-textarea {
+  width: 100%;
+  min-height: 80rpx;
+  margin-bottom: 18rpx;
+  padding: 18rpx;
+  border: 1rpx solid var(--surface-border);
+  border-radius: 12rpx;
+  background: var(--page-background);
+  color: var(--text-strong);
+  box-sizing: border-box;
+}
+
+.edit-textarea {
+  min-height: 140rpx;
+}
+
+.edit-save-btn {
+  padding: 22rpx;
+  border-radius: 12rpx;
+  background: var(--cook-secondary);
+  color: #fff;
+  text-align: center;
 }

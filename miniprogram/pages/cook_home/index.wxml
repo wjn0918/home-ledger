@@ -1,9 +1,65 @@
 <view class="cook-home theme-cook">
   <view class="mode-switch mode-switch-ledger" bindtap="onSwitchAppMode">去记账</view>
   <view class="cook-title">家庭菜谱</view>
-  <view class="cook-empty">暂无菜谱</view>
+  <view wx:if="{{menuCategories.length}}" class="menu-layout">
+    <scroll-view class="menu-category-panel" scroll-y="true">
+      <view
+        wx:for="{{menuCategories}}"
+        wx:key="id"
+        class="menu-category-item {{selectedCategoryId === item.id ? 'active' : ''}}"
+        data-category-id="{{item.id}}"
+        bindtap="selectMenuCategory"
+      >
+        <text class="menu-category-name">{{item.name}}</text>
+      </view>
+    </scroll-view>
+    <scroll-view class="menu-content-panel" scroll-y="true">
+      <view wx:if="{{!menuRows.length}}" class="menu-empty">该分类暂无菜谱</view>
+      <view wx:for="{{menuRows}}" wx:for-item="row" wx:key="*this" class="menu-row">
+        <view wx:for="{{row}}" wx:for-item="menu" wx:key="id" class="menu-card" data-id="{{menu.id}}" bindtap="openMenuDetail">
+          <image wx:if="{{menu.coverImage}}" class="menu-cover" src="{{menu.coverImage}}" mode="aspectFill" />
+          <view wx:else class="menu-cover menu-cover-empty">🍲</view>
+          <view class="menu-card-body">
+            <text class="menu-card-name">{{menu.name}}</text>
+            <text class="menu-card-date">{{menu.createdDate}}</text>
+          </view>
+        </view>
+      </view>
+    </scroll-view>
+  </view>
+  <view wx:elif="{{!menuCount}}" class="cook-empty">暂无菜谱</view>
   <view class="fab-btn" bindtap="onAddRecipe" aria-label="加菜">
     <text class="fab-icon">+</text>
+  </view>
+
+  <view wx:if="{{showMenuDetailModal}}" class="menu-detail-mask" bindtap="closeMenuDetailModal">
+    <view class="menu-detail-modal" catchtap="stopMenuDetailPropagation">
+      <view class="recipe-modal-header">
+        <text class="recipe-modal-title">{{menuDetailEditing ? '编辑菜单' : selectedMenu.name}}</text>
+        <text class="recipe-modal-close" bindtap="closeMenuDetailModal">×</text>
+      </view>
+      <block wx:if="{{!menuDetailEditing}}">
+        <image wx:if="{{selectedMenu.coverImage}}" class="menu-detail-cover" src="{{selectedMenu.coverImage}}" mode="aspectFill" />
+        <view class="menu-detail-section">
+          <text class="menu-detail-label">食材</text>
+          <text class="menu-detail-text">{{selectedMenu.ingredients}}</text>
+        </view>
+        <view class="menu-detail-section">
+          <text class="menu-detail-label">做法</text>
+          <text class="menu-detail-text">{{selectedMenu.steps}}</text>
+        </view>
+        <view class="menu-detail-actions">
+          <view class="menu-detail-record-btn" bindtap="recordCooked">记录今天做过</view>
+          <view class="menu-detail-edit-btn" bindtap="enterMenuEdit">编辑菜单</view>
+        </view>
+      </block>
+      <block wx:else>
+        <input class="recipe-input" value="{{detailName}}" bindinput="onDetailNameInput" placeholder="菜名" />
+        <textarea class="menu-detail-input" value="{{detailIngredients}}" bindinput="onDetailIngredientsInput" placeholder="食材" auto-height />
+        <textarea class="menu-detail-input" value="{{detailSteps}}" bindinput="onDetailStepsInput" placeholder="做法" auto-height />
+        <view class="menu-detail-edit-btn" bindtap="saveMenuEdit">保存修改</view>
+      </block>
+    </view>
   </view>
 
   <view
@@ -25,6 +81,20 @@
           bindinput="onRecipeNameInput"
           maxlength="40"
         />
+      </view>
+      <view wx:if="{{recipeCategories.length}}" class="recipe-field">
+        <text class="recipe-field-label">分类</text>
+        <picker
+          mode="selector"
+          range="{{recipeCategories}}"
+          range-key="name"
+          value="{{recipeCategoryIndex}}"
+          bindchange="onRecipeCategoryChange"
+        >
+          <view class="recipe-category-picker">
+            {{recipeCategories[recipeCategoryIndex].name || '选择分类'}}
+          </view>
+        </picker>
       </view>
       <view class="recipe-field">
         <text class="recipe-field-label">封面图</text>

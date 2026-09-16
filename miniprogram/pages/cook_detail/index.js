@@ -1,4 +1,5 @@
-const RECIPE_STORAGE_KEY = 'homeLedgerRecipes'
+const { request } = require('../../utils/request')
+const app = getApp()
 
 Page({
   data: {
@@ -10,23 +11,23 @@ Page({
     this.loadRecipes()
   },
 
-  loadRecipes() {
-    const recipes = wx.getStorageSync(RECIPE_STORAGE_KEY) || []
-    this.setData({ recipes })
+  async loadRecipes() {
+    if (!app.isLoggedIn() || !app.globalData.familyId) {
+      this.setData({ recipes: [] })
+      return
+    }
+    try {
+      const bills = await request(`/cook/bills?family_id=${app.globalData.familyId}`)
+      this.setData({
+        recipes: bills.map((bill) => ({
+          id: bill.id,
+          name: bill.menu_name,
+          createdDate: bill.cooked_at ? bill.cooked_at.slice(0, 10) : ''
+        }))
+      })
+    } catch (error) {
+      wx.showToast({ title: '菜单加载失败', icon: 'none' })
+    }
   },
 
-  onDeleteRecipe(e) {
-    const id = Number(e.currentTarget.dataset.id)
-    wx.showModal({
-      title: '删除菜谱',
-      content: '确定删除这道菜吗？',
-      success: (res) => {
-        if (!res.confirm) return
-        const recipes = this.data.recipes.filter((item) => item.id !== id)
-        wx.setStorageSync(RECIPE_STORAGE_KEY, recipes)
-        this.setData({ recipes })
-        wx.showToast({ title: '已删除', icon: 'success' })
-      }
-    })
-  }
 })

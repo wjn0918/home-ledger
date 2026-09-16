@@ -6,3 +6,9 @@ CREATE INDEX `idx_bills_user_posted` ON `bills` (`user_id`, `is_posted`);
 
 ALTER TABLE `cook_menu_images`
   MODIFY COLUMN `image_url` LONGTEXT NOT NULL;
+
+ALTER TABLE `cook_bills`
+  ADD COLUMN `cooked_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP AFTER `menu_id`;
+
+CREATE INDEX `idx_cook_bills_family_cooked_at`
+  ON `cook_bills` (`family_id`, `cooked_at`);

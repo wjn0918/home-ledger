@@ -18,17 +18,8 @@
       <view class="recipe-card-head">
         <view>
           <text class="recipe-name">{{item.name}}</text>
-          <text class="recipe-date">记录于 {{item.createdAt}}</text>
+          <text class="recipe-date">记录于 {{item.createdDate}}</text>
         </view>
-        <view class="delete-btn" data-id="{{item.id}}" bindtap="onDeleteRecipe">删除</view>
-      </view>
-      <view class="recipe-section">
-        <text class="section-label">食材</text>
-        <text class="recipe-content">{{item.ingredients}}</text>
-      </view>
-      <view class="recipe-section">
-        <text class="section-label">做法</text>
-        <text class="recipe-content">{{item.steps}}</text>
       </view>
     </view>
   </view>

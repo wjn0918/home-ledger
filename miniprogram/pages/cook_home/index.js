@@ -9,7 +9,19 @@ Page({
     recipeIngredients: '',
     recipeSteps: '',
     recipeCoverImage: '',
-    recipeCoverBase64: ''
+    recipeCoverBase64: '',
+    recipeCategories: [],
+    recipeCategoryIndex: 0,
+    menuCategories: [],
+    selectedCategoryId: null,
+    menuRows: [],
+    menuCount: 0,
+    showMenuDetailModal: false,
+    menuDetailEditing: false,
+    selectedMenu: null,
+    detailName: '',
+    detailIngredients: '',
+    detailSteps: ''
   },
 
   onSwitchAppMode() {
@@ -17,7 +29,10 @@ Page({
   },
 
   onAddRecipe() {
-    this.setData({ showAddRecipeModal: true })
+    this.setData({
+      showAddRecipeModal: true,
+      recipeCategoryIndex: 0
+    })
   },
 
   closeAddRecipeModal() {
@@ -36,6 +51,145 @@ Page({
 
   onRecipeStepsInput(e) {
     this.setData({ recipeSteps: e.detail.value })
+  },
+
+  onRecipeCategoryChange(e) {
+    this.setData({ recipeCategoryIndex: Number(e.detail.value) })
+  },
+
+  selectMenuCategory(e) {
+    const categoryId = e.currentTarget.dataset.categoryId
+    this.setData({ selectedCategoryId: categoryId === '' ? null : Number(categoryId) })
+    this.refreshMenuRows(categoryId === '' ? null : Number(categoryId))
+  },
+
+  openMenuDetail(e) {
+    const menu = (this.data.menus || []).find((item) => item.id === Number(e.currentTarget.dataset.id))
+    if (!menu) return
+    this.setData({
+      showMenuDetailModal: true,
+      menuDetailEditing: false,
+      selectedMenu: menu,
+      detailName: menu.name,
+      detailIngredients: menu.ingredients,
+      detailSteps: menu.steps
+    })
+  },
+
+  closeMenuDetailModal() {
+    this.setData({ showMenuDetailModal: false, menuDetailEditing: false })
+  },
+
+  enterMenuEdit() {
+    this.setData({ menuDetailEditing: true })
+  },
+
+  stopMenuDetailPropagation() {},
+
+  onDetailNameInput(e) {
+    this.setData({ detailName: e.detail.value })
+  },
+
+  onDetailIngredientsInput(e) {
+    this.setData({ detailIngredients: e.detail.value })
+  },
+
+  onDetailStepsInput(e) {
+    this.setData({ detailSteps: e.detail.value })
+  },
+
+  async saveMenuEdit() {
+    const name = this.data.detailName.trim()
+    const ingredients = this.data.detailIngredients.trim()
+    const steps = this.data.detailSteps.trim()
+    if (!name || !ingredients || !steps) {
+      return wx.showToast({ title: '请完整填写菜单内容', icon: 'none' })
+    }
+    wx.showLoading({ title: '保存中' })
+    try {
+      await request(`/cook/menus/${this.data.selectedMenu.id}`, 'PUT', {
+        name,
+        ingredients,
+        steps
+      })
+      this.setData({ showMenuDetailModal: false, menuDetailEditing: false })
+      await this.loadMenus()
+      wx.showToast({ title: '已保存', icon: 'success' })
+    } catch (error) {
+      wx.showToast({ title: '保存失败，请重试', icon: 'none' })
+    } finally {
+      wx.hideLoading()
+    }
+  },
+
+  async recordCooked() {
+    if (!this.data.selectedMenu) return
+    wx.showLoading({ title: '记录中' })
+    try {
+      await request('/cook/bills', 'POST', {
+        family_id: app.globalData.familyId,
+        menu_id: this.data.selectedMenu.id
+      })
+      this.setData({ showMenuDetailModal: false })
+      wx.showToast({ title: '已记录今天做过', icon: 'success' })
+    } catch (error) {
+      wx.showToast({ title: '记录失败，请重试', icon: 'none' })
+    } finally {
+      wx.hideLoading()
+    }
+  },
+
+  normalizeMenu(menu) {
+    const coverImage = menu.images && menu.images.length ? menu.images[0].image_url : ''
+    return {
+      ...menu,
+      coverImage,
+      createdDate: menu.created_at ? menu.created_at.slice(0, 10) : ''
+    }
+  },
+
+  refreshMenuRows(categoryId = this.data.selectedCategoryId) {
+    const menus = this.data.menus || []
+    const filtered = menus.filter((menu) => menu.category_id === categoryId)
+    const rows = []
+    for (let index = 0; index < filtered.length; index += 2) {
+      rows.push(filtered.slice(index, index + 2))
+    }
+    this.setData({ menuRows: rows })
+  },
+
+  async loadMenus() {
+    if (!app.isLoggedIn() || !app.globalData.familyId) {
+      this.setData({ menuCategories: [], menus: [], menuRows: [], menuCount: 0 })
+      return
+    }
+
+    try {
+      const familyId = app.globalData.familyId
+      const [categories, menus] = await Promise.all([
+        request(`/cook/categories?family_id=${familyId}`),
+        request(`/cook/menus?family_id=${familyId}`)
+      ])
+      const normalizedMenus = menus.map((menu) => this.normalizeMenu(menu))
+      const hasUncategorized = normalizedMenus.some((menu) => menu.category_id === null)
+      const menuCategories = hasUncategorized
+        ? [...categories, { id: null, name: '未分类', icon: '' }]
+        : categories
+      const selectedExists = menuCategories.some((category) => category.id === this.data.selectedCategoryId)
+      const selectedCategoryId = selectedExists
+        ? this.data.selectedCategoryId
+        : (menuCategories.length ? menuCategories[0].id : null)
+      this.setData({
+        menus: normalizedMenus,
+        menuCategories,
+        selectedCategoryId,
+        menuCount: normalizedMenus.length,
+        recipeCategories: categories
+      })
+      this.refreshMenuRows(selectedCategoryId)
+    } catch (error) {
+      wx.showToast({ title: '菜单加载失败', icon: 'none' })
+    }
   },
 
   chooseRecipeCover() {
@@ -97,6 +251,9 @@ Page({
     try {
       const savedMenu = await request('/cook/menus', 'POST', {
         family_id: app.globalData.familyId,
+        category_id: this.data.recipeCategories[this.data.recipeCategoryIndex]
+          ? this.data.recipeCategories[this.data.recipeCategoryIndex].id
+          : null,
         name,
         ingredients,
         steps,
@@ -126,6 +283,7 @@ Page({
         recipeCoverImage: '',
         recipeCoverBase64: ''
       })
+      await this.loadMenus()
       wx.showToast({ title: '已加入菜谱', icon: 'success' })
     } catch (error) {
       wx.showToast({ title: error.statusCode === 403 ? '无权操作当前家庭' : '保存失败，请重试', icon: 'none' })
@@ -136,5 +294,6 @@ Page({
 
   onShow() {
     getApp().setAppMode('cook')
+    this.loadMenus()
   }
 })

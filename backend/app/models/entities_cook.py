@@ -52,3 +52,13 @@ class CookMenuImages(Base):
     image_url: Mapped[str] = mapped_column(LONGTEXT)
     sort_order: Mapped[int] = mapped_column(Integer, default=0)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+class CookBill(Base):
+    __tablename__ = "cook_bills"
+
+    id: Mapped[int] = mapped_column(primary_key=True, index=True)
+    family_id: Mapped[int] = mapped_column(ForeignKey("families.id"), index=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), index=True)
+    menu_id: Mapped[int] = mapped_column(ForeignKey("cook_menus.id"), index=True)
+    cooked_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, index=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)

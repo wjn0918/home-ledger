@@ -1,3 +1,4 @@
+from app.models.entities_cook import CookBill, CookCategory, CookMenu, CookMenuImages
 from fastapi import FastAPI
 
 from app.api.routes import router
