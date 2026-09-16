@@ -272,6 +272,51 @@
   box-sizing: border-box;
 }
 
+.detail-cover-editor {
+  margin-bottom: 18rpx;
+}
+
+.detail-cover-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 220rpx;
+  border-radius: 14rpx;
+  background: var(--page-background);
+  color: var(--text-muted);
+  font-size: 24rpx;
+}
+
+.detail-cover-actions {
+  display: flex;
+  gap: 16rpx;
+  margin-top: 12rpx;
+}
+
+.detail-cover-action {
+  flex: 1;
+  padding: 16rpx;
+  border-radius: 12rpx;
+  background: var(--primary-soft);
+  color: var(--cook-primary);
+  font-size: 24rpx;
+  text-align: center;
+}
+
+.detail-cover-action.danger,
+.menu-detail-delete-btn {
+  color: var(--danger-color);
+}
+
+.menu-detail-delete-btn {
+  margin-top: 16rpx;
+  padding: 20rpx;
+  border: 1rpx solid var(--danger-color);
+  border-radius: 14rpx;
+  font-size: 27rpx;
+  text-align: center;
+}
+
 .category-modal {
   max-width: 620rpx;
 }

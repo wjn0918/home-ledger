@@ -399,6 +399,9 @@ def delete_cook_menu(
     user: User = Depends(get_current_user),
 ):
     menu = get_menu_for_member(db, menu_id, user)
+    db.query(CookBill).filter(
+        CookBill.menu_id == menu.id,
+    ).delete(synchronize_session=False)
     db.query(CookMenuImages).filter(
         CookMenuImages.menu_id == menu.id,
     ).delete(synchronize_session=False)

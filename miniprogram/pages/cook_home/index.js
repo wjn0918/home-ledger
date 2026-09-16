@@ -25,7 +25,10 @@ Page({
     selectedMenu: null,
     detailName: '',
     detailIngredients: '',
-    detailSteps: ''
+    detailSteps: '',
+    detailCoverImage: '',
+    detailCoverBase64: '',
+    detailCoverChanged: false
   },
 
   onSwitchAppMode() {
@@ -120,7 +123,10 @@ Page({
       selectedMenu: menu,
       detailName: menu.name,
       detailIngredients: menu.ingredients,
-      detailSteps: menu.steps
+      detailSteps: menu.steps,
+      detailCoverImage: menu.coverImage || '',
+      detailCoverBase64: '',
+      detailCoverChanged: false
     })
   },
 
@@ -146,6 +152,55 @@ Page({
     this.setData({ detailSteps: e.detail.value })
   },
 
+  chooseDetailCover() {
+    wx.chooseMedia({
+      count: 1,
+      mediaType: ['image'],
+      sourceType: ['album', 'camera'],
+      success: (res) => {
+        const file = res.tempFiles[0]
+        if (!file || !file.tempFilePath) return
+        const mimeType = file.fileType === 'png' ? 'image/png' : 'image/jpeg'
+        wx.compressImage({
+          src: file.tempFilePath,
+          quality: 80,
+          success: (result) => this.readDetailCoverAsBase64(result.tempFilePath, mimeType),
+          fail: () => this.readDetailCoverAsBase64(file.tempFilePath, mimeType)
+        })
+      }
+    })
+  },
+
+  readDetailCoverAsBase64(filePath, mimeType) {
+    const readFile = (readablePath) => wx.getFileSystemManager().readFile({
+      filePath: readablePath,
+      success: (res) => {
+        const base64 = wx.arrayBufferToBase64(res.data)
+        this.setData({
+          detailCoverImage: filePath,
+          detailCoverBase64: `data:${mimeType};base64,${base64}`,
+          detailCoverChanged: true
+        })
+      },
+      fail: () => wx.showToast({ title: '读取封面图失败', icon: 'none' })
+    })
+
+    if (/^https?:\/\/tmp\//.test(filePath)) {
+      wx.downloadFile({
+        url: filePath,
+        success: (res) => readFile(res.tempFilePath),
+        fail: () => wx.showToast({ title: '读取封面图失败', icon: 'none' })
+      })
+      return
+    }
+
+    readFile(filePath)
+  },
+
+  removeDetailCover() {
+    this.setData({ detailCoverImage: '', detailCoverBase64: '', detailCoverChanged: true })
+  },
+
   async saveMenuEdit() {
     const name = this.data.detailName.trim()
     const ingredients = this.data.detailIngredients.trim()
@@ -155,11 +210,15 @@ Page({
     }
     wx.showLoading({ title: '保存中' })
     try {
-      await request(`/cook/menus/${this.data.selectedMenu.id}`, 'PUT', {
+      const payload = {
         name,
         ingredients,
         steps
-      })
+      }
+      if (this.data.detailCoverChanged) {
+        payload.image_urls = this.data.detailCoverBase64 ? [this.data.detailCoverBase64] : []
+      }
+      await request(`/cook/menus/${this.data.selectedMenu.id}`, 'PUT', payload)
       this.setData({ showMenuDetailModal: false, menuDetailEditing: false })
       await this.loadMenus()
       wx.showToast({ title: '已保存', icon: 'success' })
@@ -168,6 +227,29 @@ Page({
     } finally {
       wx.hideLoading()
     }
+  },
+
+  deleteMenu() {
+    if (!this.data.selectedMenu) return
+    wx.showModal({
+      title: '删除菜单',
+      content: `删除“${this.data.selectedMenu.name}”后，相关的做菜记录也会一并删除，确定继续吗？`,
+      confirmColor: '#c24132',
+      success: async (result) => {
+        if (!result.confirm) return
+        wx.showLoading({ title: '删除中' })
+        try {
+          await request(`/cook/menus/${this.data.selectedMenu.id}`, 'DELETE')
+          this.setData({ showMenuDetailModal: false, menuDetailEditing: false })
+          await this.loadMenus()
+          wx.showToast({ title: '菜单已删除', icon: 'success' })
+        } catch (error) {
+          wx.showToast({ title: '删除失败，请重试', icon: 'none' })
+        } finally {
+          wx.hideLoading()
+        }
+      }
+    })
   },
 
   async recordCooked() {
@@ -262,11 +344,7 @@ Page({
   },
 
   readCoverAsBase64(filePath, mimeType) {
-    const readablePath = filePath.replace(
-      /^(https?):\/\/tmp\//,
-      'wxfile://tmp/'
-    )
-    wx.getFileSystemManager().readFile({
+    const readFile = (readablePath) => wx.getFileSystemManager().readFile({
       filePath: readablePath,
       success: (res) => {
         const base64 = wx.arrayBufferToBase64(res.data)
@@ -280,6 +358,20 @@ Page({
         wx.showToast({ title: '读取封面图失败', icon: 'none' })
       }
     })
+
+    if (/^https?:\/\/tmp\//.test(filePath)) {
+      wx.downloadFile({
+        url: filePath,
+        success: (res) => readFile(res.tempFilePath),
+        fail: (error) => {
+          console.error('下载临时封面图失败', error)
+          wx.showToast({ title: '读取封面图失败', icon: 'none' })
+        }
+      })
+      return
+    }
+
+    readFile(filePath)
   },
 
   removeRecipeCover() {

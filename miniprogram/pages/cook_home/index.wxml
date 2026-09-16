@@ -57,10 +57,19 @@
         </view>
       </block>
       <block wx:else>
+        <view class="detail-cover-editor">
+          <image wx:if="{{detailCoverImage}}" class="menu-detail-cover" src="{{detailCoverImage}}" mode="aspectFill" />
+          <view wx:else class="detail-cover-empty">暂无封面图</view>
+          <view class="detail-cover-actions">
+            <view class="detail-cover-action" bindtap="chooseDetailCover">更新封面图</view>
+            <view wx:if="{{detailCoverImage}}" class="detail-cover-action danger" bindtap="removeDetailCover">移除封面</view>
+          </view>
+        </view>
         <input class="recipe-input" value="{{detailName}}" bindinput="onDetailNameInput" placeholder="菜名" />
         <textarea class="menu-detail-input" value="{{detailIngredients}}" bindinput="onDetailIngredientsInput" placeholder="食材" auto-height />
         <textarea class="menu-detail-input" value="{{detailSteps}}" bindinput="onDetailStepsInput" placeholder="做法" auto-height />
         <view class="menu-detail-edit-btn" bindtap="saveMenuEdit">保存修改</view>
+        <view class="menu-detail-delete-btn" bindtap="deleteMenu">删除菜单</view>
       </block>
     </view>
   </view>
