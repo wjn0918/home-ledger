@@ -17,6 +17,12 @@
   font-size: 24rpx;
 }
 
+.mode-switch-cook {
+  border-color: var(--cook-secondary);
+  color: var(--cook-primary);
+  background: var(--cook-surface);
+}
+
 .unposted-summary-card {
   position: relative;
   z-index: 2;

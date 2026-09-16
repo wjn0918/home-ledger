@@ -18,6 +18,12 @@
   font-size: 24rpx;
 }
 
+.mode-switch-ledger {
+  border-color: var(--ledger-secondary);
+  color: var(--ledger-primary);
+  background: var(--ledger-surface);
+}
+
 .cook-title {
   font-size: 40rpx;
   font-weight: 600;

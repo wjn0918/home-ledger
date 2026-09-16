@@ -21,6 +21,12 @@ page {
   --border-soft: #f2f3f5;
   --danger-color: #ff4d4f;
   --danger-surface: #fff5f5;
+  --ledger-primary: #3963bc;
+  --ledger-secondary: #5a8dee;
+  --ledger-surface: #f0f4ff;
+  --cook-primary: #a94f32;
+  --cook-secondary: #c96f4a;
+  --cook-surface: #fffaf3;
   --success-color: #07c160;
   --text-main: #303133;
   --text-sub: #909399;

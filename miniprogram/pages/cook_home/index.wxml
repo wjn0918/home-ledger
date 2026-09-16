@@ -1,5 +1,5 @@
 <view class="cook-home theme-cook">
-  <view class="mode-switch" bindtap="onSwitchAppMode">去记账</view>
+  <view class="mode-switch mode-switch-ledger" bindtap="onSwitchAppMode">去记账</view>
   <view class="cook-title">家庭菜谱</view>
   <view class="cook-empty">暂无菜谱</view>
 </view>
