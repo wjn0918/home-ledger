@@ -1,4 +1,4 @@
-<view class="me-container">
+<view class="me-container theme-{{appMode}}">
   <!-- 用户头部 -->
   <view class="user-header">
     <view class="avatar-container">

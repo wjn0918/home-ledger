@@ -2,15 +2,68 @@
 @import 'styles/iconfont.wxss';
 
 page {
-  background: #f8f9fa;
-  color: #333;
+  background: var(--page-background);
+  color: var(--text-main);
   font-size: 28rpx;
+  --page-background: #f8f9fa;
   --primary-color: #3963bc;
   --secondary-color: #5a8dee;
+  --primary-soft: #f0f4ff;
+  --surface-muted: #f5f7fa;
+  --surface-warm: #fff7ed;
+  --accent-color: #f59e0b;
+  --accent-dark: #f97316;
+  --text-strong: #1f2937;
+  --text-body: #765344;
+  --text-muted: #909399;
+  --placeholder-color: #c0c4cc;
+  --surface-border: #f2f3f5;
+  --border-soft: #f2f3f5;
+  --danger-color: #ff4d4f;
+  --danger-surface: #fff5f5;
+  --success-color: #07c160;
   --text-main: #303133;
   --text-sub: #909399;
   --bg-card: #ffffff;
   --border-color: #f2f3f5;
+}
+
+.theme-ledger {
+  --page-background: #f8f9fa;
+  --primary-color: #3963bc;
+  --secondary-color: #5a8dee;
+  --primary-soft: #f0f4ff;
+  --surface-muted: #f5f7fa;
+  --surface-warm: #fff7ed;
+  --accent-color: #f59e0b;
+  --accent-dark: #f97316;
+  --text-strong: #1f2937;
+  --text-body: #303133;
+  --text-muted: #909399;
+  --placeholder-color: #c0c4cc;
+  --surface-border: #f2f3f5;
+  --border-soft: #f2f3f5;
+  --danger-color: #ff4d4f;
+  --danger-surface: #fff5f5;
+}
+
+.theme-cook {
+  --page-background: #fff7ed;
+  --primary-color: #a94f32;
+  --secondary-color: #c96f4a;
+  --primary-soft: #fff1e8;
+  --surface-muted: #fffaf3;
+  --surface-warm: #fff7ed;
+  --accent-color: #c96f4a;
+  --accent-dark: #b75d43;
+  --text-strong: #5b3a2e;
+  --text-body: #765344;
+  --text-muted: #a78672;
+  --placeholder-color: #c3a898;
+  --surface-border: #f0d9c5;
+  --border-soft: #f4e3d5;
+  --danger-color: #c24132;
+  --danger-surface: #fff1f0;
 }
 
 
@@ -85,7 +138,7 @@ page {
 }
 
 .modern-btn.secondary {
-  background: #f0f4ff;
+  background: var(--primary-soft);
   color: var(--primary-color);
 }
 
@@ -131,7 +184,7 @@ page {
   width: 80rpx;
   height: 80rpx;
   border-radius: 40rpx;
-  background: #f0f4ff;
+  background: var(--primary-soft);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -171,7 +224,7 @@ page {
 }
 
 .bill-amount.income {
-  color: #07c160;
+  color: var(--success-color);
 }
 
 .bill-creator {

@@ -20,7 +20,8 @@ Page({
     userInfo: null, // Add userInfo to store nickname/avatar
     currentFamilyName: '未选择',
     isFamilyOwner: false,
-    settingsOpen: false
+    settingsOpen: false,
+    appMode: 'ledger'
   },
 
   resetLoginState() {
@@ -57,7 +58,14 @@ Page({
     const userId = app.globalData.userId || wx.getStorageSync('userId') || null
     const nickname = wx.getStorageSync('nickname') || null
     const avatarUrl = wx.getStorageSync('avatarUrl') || ''
-    this.setData({ loggedIn: !!token, familyId, userId, nickname, userInfo: { avatarUrl } })
+    this.setData({
+      loggedIn: !!token,
+      familyId,
+      userId,
+      nickname,
+      userInfo: { avatarUrl },
+      appMode: app.globalData.appMode || 'ledger'
+    })
     if (!token) return
     try {
       const data = await syncFamilies(app)

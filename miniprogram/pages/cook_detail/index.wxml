@@ -1,4 +1,4 @@
-<view class="cook-page">
+<view class="cook-page theme-cook">
   <view class="page-heading">
     <view>
       <text class="eyebrow">KITCHEN LOG</text>

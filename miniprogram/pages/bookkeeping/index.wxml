@@ -1,4 +1,4 @@
-<view class="container">
+<view class="container theme-ledger">
   <!-- 初始状态：点击开始记账 -->
   <view class="start-view" wx:if="{{!showCategoryModal && !showDetailModal}}">
     <view class="header">

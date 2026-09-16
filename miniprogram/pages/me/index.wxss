@@ -1,6 +1,6 @@
 .me-container {
   min-height: 100vh;
-  background-color: #f8f9fa;
+  background-color: var(--page-background);
   padding-bottom: 40rpx;
 }
 
@@ -99,7 +99,7 @@
 .switch-btn {
   font-size: 24rpx;
   color: var(--primary-color);
-  background: #f0f4ff;
+  background: var(--primary-soft);
   padding: 10rpx 24rpx;
   border-radius: 30rpx;
   font-weight: 500;
@@ -193,8 +193,8 @@
 }
 
 .member-role.owner {
-  background: #fff0f0;
-  color: #ff4d4f;
+  background: var(--danger-surface);
+  color: var(--danger-color);
 }
 
 .member-role.member {
@@ -204,8 +204,8 @@
 
 .remove-btn {
   font-size: 24rpx;
-  color: #ff4d4f;
-  border: 1rpx solid #ff4d4f;
+  color: var(--danger-color);
+  border: 1rpx solid var(--danger-color);
   padding: 6rpx 20rpx;
   border-radius: 24rpx;
 }
@@ -258,11 +258,11 @@
 }
 
 .logout-card {
-  background: #fff7ed;
+  background: var(--surface-warm);
 }
 
 .settings-card {
-  background: #f5f7ff;
+  background: var(--primary-soft);
 }
 
 .settings-page {
@@ -307,7 +307,7 @@
 .settings-item.danger-section {
   flex-direction: column;
   align-items: flex-start;
-  background: #fff5f5;
+  background: var(--danger-surface);
 }
 
 .settings-item-title {
@@ -334,7 +334,7 @@
   justify-content: center;
   padding: 14rpx 0;
   border-radius: 18rpx;
-  background: #ff4d4f;
+  background: var(--danger-color);
   color: #ffffff;
   font-size: 26rpx;
   font-weight: 600;
@@ -415,7 +415,7 @@
 }
 
 .btn-reject {
-  background-color: #f5f7fa;
+  background-color: var(--surface-muted);
   color: var(--text-sub);
 }
 

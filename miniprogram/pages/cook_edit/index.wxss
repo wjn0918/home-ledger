@@ -2,7 +2,7 @@
   min-height: 100vh;
   padding: 44rpx 32rpx 132rpx;
   box-sizing: border-box;
-  background: #fff7ed;
+  background: var(--page-background);
 }
 
 .page-heading {
@@ -12,14 +12,14 @@
 .eyebrow {
   display: block;
   margin-bottom: 8rpx;
-  color: #c96f4a;
+  color: var(--accent-color);
   font-size: 20rpx;
   letter-spacing: 2rpx;
 }
 
 .page-title {
   display: block;
-  color: #5b3a2e;
+  color: var(--text-strong);
   font-size: 42rpx;
   font-weight: 600;
 }
@@ -27,16 +27,16 @@
 .page-copy {
   display: block;
   margin-top: 12rpx;
-  color: #a78672;
+  color: var(--text-muted);
   font-size: 24rpx;
   line-height: 1.5;
 }
 
 .edit-form {
   padding: 28rpx;
-  border: 1rpx solid #f0d9c5;
+  border: 1rpx solid var(--surface-border);
   border-radius: 20rpx;
-  background: #fffaf3;
+  background: var(--surface-muted);
   box-shadow: 0 6rpx 20rpx rgba(137, 78, 43, 0.06);
 }
 
@@ -47,7 +47,7 @@
 .field-label {
   display: block;
   margin-bottom: 12rpx;
-  color: #765344;
+  color: var(--text-body);
   font-size: 26rpx;
   font-weight: 600;
 }
@@ -57,10 +57,10 @@
   width: 100%;
   box-sizing: border-box;
   padding: 22rpx;
-  border: 1rpx solid #efd7c3;
+  border: 1rpx solid var(--surface-border);
   border-radius: 14rpx;
-  background: #fff7ed;
-  color: #5b3a2e;
+  background: var(--page-background);
+  color: var(--text-strong);
   font-size: 27rpx;
 }
 
@@ -78,20 +78,20 @@
 }
 
 .placeholder {
-  color: #c3a898;
+  color: var(--placeholder-color);
 }
 
 .save-btn {
   margin-top: 12rpx;
   padding: 24rpx;
   border-radius: 14rpx;
-  background: #c96f4a;
-  color: #fffaf3;
+  background: var(--accent-color);
+  color: var(--surface-muted);
   font-size: 29rpx;
   font-weight: 600;
   text-align: center;
 }
 
 .save-btn:active {
-  background: #b75d43;
+  background: var(--accent-dark);
 }
