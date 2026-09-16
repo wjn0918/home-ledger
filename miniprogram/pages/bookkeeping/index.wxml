@@ -2,7 +2,7 @@
   <!-- 初始状态：点击开始记账 -->
   <view class="start-view" wx:if="{{!showCategoryModal && !showDetailModal}}">
     <view class="header">
-      <view class="mode-switch" bindtap="onSwitchAppMode">切换菜谱</view>
+      <view class="mode-switch" bindtap="onSwitchAppMode">去做饭</view>
       <view class="modern-subtitle" style="color: rgba(255,255,255,0.8); margin-bottom: 10rpx;">每一笔支出都值得被记录</view>
       <view class="modern-title" style="color: #fff; margin-bottom: 0;">{{currentFamilyName || '未选择家庭'}}</view>
     </view>

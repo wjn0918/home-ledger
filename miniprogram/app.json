@@ -1,13 +1,13 @@
 {
   "pages": [
-    "pages/cook_home/index",
-    "pages/cook_detail/index",
-    "pages/cook_edit/index",
-    "pages/cook_public/index",
     "pages/bookkeeping/index",
     "pages/detail/index",
     "pages/chart/index",
-    "pages/me/index"
+    "pages/me/index",
+    "pages/cook_home/index",
+    "pages/cook_detail/index",
+    "pages/cook_edit/index",
+    "pages/cook_public/index"
   ],
   "window": {
     "navigationBarTitleText": "家庭记账"
@@ -15,14 +15,14 @@
   "tabBar": {
     "custom": true,
     "list": [
-      {"pagePath": "pages/cook_home/index", "text": "菜谱"},
-      {"pagePath": "pages/cook_detail/index", "text": "烹饪明细"},
-      {"pagePath": "pages/cook_edit/index", "text": "加菜"},
-      {"pagePath": "pages/cook_public/index", "text": "公开菜谱"},
       {"pagePath": "pages/bookkeeping/index", "text": "记账"},
       {"pagePath": "pages/detail/index", "text": "明细"},
       {"pagePath": "pages/chart/index", "text": "图表"},
-      {"pagePath": "pages/me/index", "text": "我的"}
+      {"pagePath": "pages/me/index", "text": "我的"},
+      {"pagePath": "pages/cook_home/index", "text": "菜谱"},
+      {"pagePath": "pages/cook_detail/index", "text": "烹饪明细"},
+      {"pagePath": "pages/cook_edit/index", "text": "加菜"},
+      {"pagePath": "pages/cook_public/index", "text": "公开菜谱"}
     ]
   }
 }
