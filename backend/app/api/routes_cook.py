@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 
 from app.api.deps import get_current_user
 from app.db.session import get_db
-from app.models.entities import FamilyMember, User
+from app.models.entities import Family, FamilyMember, User
 from app.models.entities_cook import CookBill, CookCategory, CookMenu, CookMenuImages
 from app.schemas.dto import (
     CookCategoryCreateIn,
@@ -323,11 +323,19 @@ def list_public_cook_menus(
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
 ):
-    menus = db.query(CookMenu).filter(CookMenu.is_public == True).order_by(
+    rows = db.query(CookMenu, Family.name).join(
+        Family,
+        Family.id == CookMenu.family_id,
+    ).filter(CookMenu.is_public == True).order_by(
         CookMenu.updated_at.desc(),
         CookMenu.id.desc(),
     ).all()
-    return [build_menu_out(db, menu) for menu in menus]
+    result = []
+    for menu, family_name in rows:
+        item = build_menu_out(db, menu)
+        item["source_family_name"] = family_name
+        result.append(item)
+    return result
 
 
 @router.get("/cook/menus/{menu_id}")

@@ -10,6 +10,7 @@ Page({
     recipeSteps: '',
     recipeCoverImage: '',
     recipeCoverBase64: '',
+    recipeIsPublic: false,
     recipeCategories: [],
     recipeCategoryIndex: 0,
     menuCategories: [],
@@ -26,6 +27,7 @@ Page({
     detailName: '',
     detailIngredients: '',
     detailSteps: '',
+    detailIsPublic: false,
     detailCoverImage: '',
     detailCoverBase64: '',
     detailCoverChanged: false
@@ -104,6 +106,14 @@ Page({
     this.setData({ recipeSteps: e.detail.value })
   },
 
+  onRecipePublicChange(e) {
+    this.setData({ recipeIsPublic: e.detail.value })
+  },
+
+  onDetailPublicChange(e) {
+    this.setData({ detailIsPublic: e.detail.value })
+  },
+
   onRecipeCategoryChange(e) {
     this.setData({ recipeCategoryIndex: Number(e.detail.value) })
   },
@@ -124,6 +134,7 @@ Page({
       detailName: menu.name,
       detailIngredients: menu.ingredients,
       detailSteps: menu.steps,
+      detailIsPublic: !!menu.is_public,
       detailCoverImage: menu.coverImage || '',
       detailCoverBase64: '',
       detailCoverChanged: false
@@ -213,7 +224,8 @@ Page({
       const payload = {
         name,
         ingredients,
-        steps
+        steps,
+        is_public: this.data.detailIsPublic
       }
       if (this.data.detailCoverChanged) {
         payload.image_urls = this.data.detailCoverBase64 ? [this.data.detailCoverBase64] : []
@@ -398,7 +410,7 @@ Page({
         name,
         ingredients,
         steps,
-        is_public: false,
+        is_public: this.data.recipeIsPublic,
         image_urls: this.data.recipeCoverBase64 ? [this.data.recipeCoverBase64] : []
       })
 
@@ -422,7 +434,8 @@ Page({
         recipeIngredients: '',
         recipeSteps: '',
         recipeCoverImage: '',
-        recipeCoverBase64: ''
+        recipeCoverBase64: '',
+        recipeIsPublic: false
       })
       await this.loadMenus()
       wx.showToast({ title: '已加入菜谱', icon: 'success' })

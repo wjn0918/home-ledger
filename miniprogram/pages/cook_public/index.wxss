@@ -29,3 +29,149 @@
   text-align: center;
   color: var(--text-muted);
 }
+
+.public-menu-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20rpx;
+  margin-top: 36rpx;
+  padding-bottom: 140rpx;
+}
+
+.public-menu-card {
+  overflow: hidden;
+  border: 1rpx solid var(--surface-border);
+  border-radius: 18rpx;
+  background: var(--surface-muted);
+}
+
+.public-menu-cover {
+  display: block;
+  width: 100%;
+  height: 220rpx;
+}
+
+.public-menu-cover-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--primary-soft);
+  font-size: 54rpx;
+}
+
+.public-menu-body {
+  padding: 18rpx;
+}
+
+.public-menu-name,
+.public-menu-source,
+.public-menu-ingredients {
+  display: block;
+}
+
+.public-menu-name {
+  overflow: hidden;
+  color: var(--text-strong);
+  font-size: 28rpx;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.public-menu-source {
+  margin-top: 8rpx;
+  color: var(--cook-secondary);
+  font-size: 22rpx;
+}
+
+.public-menu-ingredients {
+  display: -webkit-box;
+  margin-top: 10rpx;
+  overflow: hidden;
+  color: var(--text-muted);
+  font-size: 22rpx;
+  line-height: 1.5;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.public-detail-mask {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32rpx 24rpx calc(140rpx + env(safe-area-inset-bottom, 0px));
+  background: rgba(42, 24, 17, 0.42);
+  box-sizing: border-box;
+}
+
+.public-detail-modal {
+  width: 100%;
+  max-height: calc(100vh - 220rpx);
+  padding: 32rpx;
+  overflow-y: auto;
+  border-radius: 24rpx;
+  background: var(--surface-muted);
+  box-sizing: border-box;
+}
+
+.public-detail-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 24rpx;
+}
+
+.public-detail-title,
+.public-detail-source {
+  display: block;
+}
+
+.public-detail-title {
+  color: var(--text-strong);
+  font-size: 36rpx;
+  font-weight: 600;
+}
+
+.public-detail-source {
+  margin-top: 8rpx;
+  color: var(--cook-secondary);
+  font-size: 23rpx;
+}
+
+.public-detail-close {
+  padding: 4rpx 12rpx;
+  color: var(--text-muted);
+  font-size: 44rpx;
+  line-height: 1;
+}
+
+.public-detail-cover {
+  display: block;
+  width: 100%;
+  height: 300rpx;
+  margin-bottom: 24rpx;
+  border-radius: 16rpx;
+}
+
+.public-detail-section {
+  margin-bottom: 24rpx;
+}
+
+.public-detail-label {
+  display: block;
+  margin-bottom: 8rpx;
+  color: var(--cook-secondary);
+  font-size: 24rpx;
+  font-weight: 600;
+}
+
+.public-detail-text {
+  display: block;
+  color: var(--text-body);
+  font-size: 27rpx;
+  line-height: 1.7;
+  white-space: pre-wrap;
+}

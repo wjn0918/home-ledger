@@ -1,5 +1,37 @@
 <view class="cook-home theme-cook">
-  <view class="mode-switch" bindtap="onSwitchAppMode">切换账单</view>
   <view class="cook-title">公共厨房</view>
-  <view class="cook-empty">暂无菜谱</view>
+  <view wx:if="{{loading}}" class="cook-empty">加载中...</view>
+  <view wx:elif="{{!menus.length}}" class="cook-empty">暂无共享菜谱</view>
+  <view wx:else class="public-menu-grid">
+    <view wx:for="{{menus}}" wx:key="id" class="public-menu-card" data-id="{{item.id}}" bindtap="openMenuDetail">
+      <image wx:if="{{item.coverImage}}" class="public-menu-cover" src="{{item.coverImage}}" mode="aspectFill" />
+      <view wx:else class="public-menu-cover public-menu-cover-empty">🍲</view>
+      <view class="public-menu-body">
+        <text class="public-menu-name">{{item.name}}</text>
+        <text class="public-menu-source">来源：{{item.source_family_name}}</text>
+        <text class="public-menu-ingredients">{{item.ingredients}}</text>
+      </view>
+    </view>
+  </view>
+
+  <view wx:if="{{showDetailModal}}" class="public-detail-mask" bindtap="closeMenuDetail">
+    <view class="public-detail-modal" catchtap="stopDetailPropagation">
+      <view class="public-detail-header">
+        <view>
+          <text class="public-detail-title">{{selectedMenu.name}}</text>
+          <text class="public-detail-source">来源：{{selectedMenu.source_family_name}}</text>
+        </view>
+        <text class="public-detail-close" bindtap="closeMenuDetail">×</text>
+      </view>
+      <image wx:if="{{selectedMenu.coverImage}}" class="public-detail-cover" src="{{selectedMenu.coverImage}}" mode="aspectFill" />
+      <view class="public-detail-section">
+        <text class="public-detail-label">食材</text>
+        <text class="public-detail-text">{{selectedMenu.ingredients}}</text>
+      </view>
+      <view class="public-detail-section">
+        <text class="public-detail-label">做法</text>
+        <text class="public-detail-text">{{selectedMenu.steps}}</text>
+      </view>
+    </view>
+  </view>
 </view>

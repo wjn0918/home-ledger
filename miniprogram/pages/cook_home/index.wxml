@@ -68,6 +68,10 @@
         <input class="recipe-input" value="{{detailName}}" bindinput="onDetailNameInput" placeholder="菜名" />
         <textarea class="menu-detail-input" value="{{detailIngredients}}" bindinput="onDetailIngredientsInput" placeholder="食材" auto-height />
         <textarea class="menu-detail-input" value="{{detailSteps}}" bindinput="onDetailStepsInput" placeholder="做法" auto-height />
+        <view class="share-setting">
+          <text>共享到公开菜谱</text>
+          <switch checked="{{detailIsPublic}}" bindchange="onDetailPublicChange" color="#c96f4a" />
+        </view>
         <view class="menu-detail-edit-btn" bindtap="saveMenuEdit">保存修改</view>
         <view class="menu-detail-delete-btn" bindtap="deleteMenu">删除菜单</view>
       </block>
@@ -175,6 +179,10 @@
           maxlength="1000"
           auto-height
         />
+      </view>
+      <view class="share-setting">
+        <text>共享到公开菜谱</text>
+        <switch checked="{{recipeIsPublic}}" bindchange="onRecipePublicChange" color="#c96f4a" />
       </view>
       <view class="recipe-save-btn" bindtap="saveRecipe">保存菜谱</view>
     </view>

@@ -1,66 +1,44 @@
-// pages/cook_public/index.js
+const { request } = require('../../utils/request')
+
 Page({
-
-  /**
-   * 页面的初始数据
-   */
   data: {
-
+    menus: [],
+    loading: false,
+    showDetailModal: false,
+    selectedMenu: null
   },
 
-  /**
-   * 生命周期函数--监听页面加载
-   */
-  onLoad(options) {
-
-  },
-
-  /**
-   * 生命周期函数--监听页面初次渲染完成
-   */
-  onReady() {
-
-  },
-
-  /**
-   * 生命周期函数--监听页面显示
-   */
   onShow() {
-
+    getApp().setAppMode('cook')
+    this.loadPublicMenus()
   },
 
-  /**
-   * 生命周期函数--监听页面隐藏
-   */
-  onHide() {
-
+  async loadPublicMenus() {
+    this.setData({ loading: true })
+    try {
+      const menus = await request('/cook/menus/public')
+      this.setData({
+        menus: menus.map((menu) => ({
+          ...menu,
+          coverImage: menu.images && menu.images.length ? menu.images[0].image_url : ''
+        }))
+      })
+    } catch (error) {
+      wx.showToast({ title: '公开菜谱加载失败', icon: 'none' })
+    } finally {
+      this.setData({ loading: false })
+    }
   },
 
-  /**
-   * 生命周期函数--监听页面卸载
-   */
-  onUnload() {
-
+  openMenuDetail(e) {
+    const menu = this.data.menus.find((item) => item.id === Number(e.currentTarget.dataset.id))
+    if (!menu) return
+    this.setData({ showDetailModal: true, selectedMenu: menu })
   },
 
-  /**
-   * 页面相关事件处理函数--监听用户下拉动作
-   */
-  onPullDownRefresh() {
-
+  closeMenuDetail() {
+    this.setData({ showDetailModal: false, selectedMenu: null })
   },
 
-  /**
-   * 页面上拉触底事件的处理函数
-   */
-  onReachBottom() {
-
-  },
-
-  /**
-   * 用户点击右上角分享
-   */
-  onShareAppMessage() {
-
-  }
+  stopDetailPropagation() {}
 })

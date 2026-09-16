@@ -272,6 +272,15 @@
   box-sizing: border-box;
 }
 
+.share-setting {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 18rpx 0;
+  color: var(--text-body);
+  font-size: 26rpx;
+}
+
 .detail-cover-editor {
   margin-bottom: 18rpx;
 }
