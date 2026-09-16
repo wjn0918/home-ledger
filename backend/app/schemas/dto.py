@@ -1,6 +1,6 @@
 from datetime import datetime
 from decimal import Decimal
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class LoginByCodeIn(BaseModel):
@@ -95,3 +95,32 @@ class JoinRequestReviewIn(BaseModel):
 class FamilyCategoryCreateIn(BaseModel):
     name: str
     icon: str = ""
+
+
+class CookCategoryCreateIn(BaseModel):
+    name: str
+    icon: str = ""
+
+
+class CookMenuCreateIn(BaseModel):
+    family_id: int
+    category_id: int | None = None
+    name: str
+    ingredients: str = ""
+    steps: str = ""
+    is_public: bool = False
+    image_urls: list[str] = Field(default_factory=list)
+
+
+class CookMenuUpdateIn(BaseModel):
+    category_id: int | None = None
+    name: str | None = None
+    ingredients: str | None = None
+    steps: str | None = None
+    is_public: bool | None = None
+    image_urls: list[str] | None = None
+
+
+class CookMenuImageCreateIn(BaseModel):
+    image_url: str
+    sort_order: int = 0

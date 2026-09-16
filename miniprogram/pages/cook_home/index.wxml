@@ -2,4 +2,69 @@
   <view class="mode-switch mode-switch-ledger" bindtap="onSwitchAppMode">去记账</view>
   <view class="cook-title">家庭菜谱</view>
   <view class="cook-empty">暂无菜谱</view>
+  <view class="fab-btn" bindtap="onAddRecipe" aria-label="加菜">
+    <text class="fab-icon">+</text>
+  </view>
+
+  <view
+    wx:if="{{showAddRecipeModal}}"
+    class="recipe-modal-mask"
+    bindtap="closeAddRecipeModal"
+  >
+    <view class="recipe-modal" catchtap="stopModalPropagation">
+      <view class="recipe-modal-header">
+        <text class="recipe-modal-title">新增菜谱</text>
+        <text class="recipe-modal-close" bindtap="closeAddRecipeModal">×</text>
+      </view>
+      <view class="recipe-field">
+        <text class="recipe-field-label">菜名</text>
+        <input
+          class="recipe-input"
+          placeholder="例如：番茄炖牛腩"
+          value="{{recipeName}}"
+          bindinput="onRecipeNameInput"
+          maxlength="40"
+        />
+      </view>
+      <view class="recipe-field">
+        <text class="recipe-field-label">封面图</text>
+        <view class="cover-picker" bindtap="chooseRecipeCover">
+          <image
+            wx:if="{{recipeCoverImage}}"
+            class="cover-preview"
+            src="{{recipeCoverImage}}"
+            mode="aspectFill"
+          />
+          <view wx:else class="cover-placeholder">
+            <text class="cover-placeholder-icon">+</text>
+            <text>选择封面图</text>
+          </view>
+        </view>
+        <view wx:if="{{recipeCoverImage}}" class="cover-remove" bindtap="removeRecipeCover">移除封面图</view>
+      </view>
+      <view class="recipe-field">
+        <text class="recipe-field-label">食材</text>
+        <textarea
+          class="recipe-textarea"
+          placeholder="写下主要食材和用量"
+          value="{{recipeIngredients}}"
+          bindinput="onRecipeIngredientsInput"
+          maxlength="500"
+          auto-height
+        />
+      </view>
+      <view class="recipe-field">
+        <text class="recipe-field-label">做法</text>
+        <textarea
+          class="recipe-textarea recipe-steps"
+          placeholder="按顺序写下烹饪步骤"
+          value="{{recipeSteps}}"
+          bindinput="onRecipeStepsInput"
+          maxlength="1000"
+          auto-height
+        />
+      </view>
+      <view class="recipe-save-btn" bindtap="saveRecipe">保存菜谱</view>
+    </view>
+  </view>
 </view>

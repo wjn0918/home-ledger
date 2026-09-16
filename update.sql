@@ -3,3 +3,6 @@ ALTER TABLE `bills`
 
 CREATE INDEX `idx_bills_family_posted` ON `bills` (`family_id`, `is_posted`);
 CREATE INDEX `idx_bills_user_posted` ON `bills` (`user_id`, `is_posted`);
+
+ALTER TABLE `cook_menu_images`
+  MODIFY COLUMN `image_url` LONGTEXT NOT NULL;

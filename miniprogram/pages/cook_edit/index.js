@@ -1,43 +1,66 @@
-const RECIPE_STORAGE_KEY = 'homeLedgerRecipes'
-
+// pages/cook_edit/index.js
 Page({
+
+  /**
+   * 页面的初始数据
+   */
   data: {
-    name: '',
-    ingredients: '',
-    steps: ''
+
   },
 
+  /**
+   * 生命周期函数--监听页面加载
+   */
+  onLoad(options) {
+
+  },
+
+  /**
+   * 生命周期函数--监听页面初次渲染完成
+   */
+  onReady() {
+
+  },
+
+  /**
+   * 生命周期函数--监听页面显示
+   */
   onShow() {
-    getApp().setAppMode('cook')
+
   },
 
-  onNameInput(e) {
-    this.setData({ name: e.detail.value })
+  /**
+   * 生命周期函数--监听页面隐藏
+   */
+  onHide() {
+
   },
 
-  onIngredientsInput(e) {
-    this.setData({ ingredients: e.detail.value })
+  /**
+   * 生命周期函数--监听页面卸载
+   */
+  onUnload() {
+
   },
 
-  onStepsInput(e) {
-    this.setData({ steps: e.detail.value })
+  /**
+   * 页面相关事件处理函数--监听用户下拉动作
+   */
+  onPullDownRefresh() {
+
   },
 
-  saveRecipe() {
-    const name = this.data.name.trim()
-    const ingredients = this.data.ingredients.trim()
-    const steps = this.data.steps.trim()
-    if (!name) return wx.showToast({ title: '请填写菜名', icon: 'none' })
-    if (!ingredients) return wx.showToast({ title: '请填写食材', icon: 'none' })
-    if (!steps) return wx.showToast({ title: '请填写做法', icon: 'none' })
+  /**
+   * 页面上拉触底事件的处理函数
+   */
+  onReachBottom() {
 
-    const now = new Date()
-    const createdAt = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`
-    const recipes = wx.getStorageSync(RECIPE_STORAGE_KEY) || []
-    recipes.unshift({ id: Date.now(), name, ingredients, steps, createdAt })
-    wx.setStorageSync(RECIPE_STORAGE_KEY, recipes)
-    wx.showToast({ title: '已加入菜谱', icon: 'success' })
-    this.setData({ name: '', ingredients: '', steps: '' })
-    setTimeout(() => wx.switchTab({ url: '/pages/cook_detail/index' }), 500)
+  },
+
+  /**
+   * 用户点击右上角分享
+   */
+  onShareAppMessage() {
+
   }
 })
