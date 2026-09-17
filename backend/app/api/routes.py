@@ -715,5 +715,5 @@ def delete_family_category(
 
 
 @router.get("/categories/default-icons")
-def list_default_category_icons(user: User = Depends(get_current_user)):
+def list_default_category_icons():
     return [{"icon": icon} for icon in DEFAULT_CATEGORY_ICONS]

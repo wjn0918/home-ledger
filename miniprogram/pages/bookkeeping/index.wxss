@@ -314,6 +314,8 @@
   left: 0;
   right: 0;
   bottom: 0;
+  box-sizing: border-box;
+  padding-bottom: calc(100rpx + env(safe-area-inset-bottom));
   background: rgba(0, 0, 0, 0.6);
   z-index: 1000;
   display: flex;
