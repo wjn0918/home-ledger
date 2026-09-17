@@ -321,7 +321,6 @@ def list_cook_menus(
 @router.get("/cook/menus/public")
 def list_public_cook_menus(
     db: Session = Depends(get_db),
-    user: User = Depends(get_current_user),
 ):
     rows = db.query(CookMenu, Family.name).join(
         Family,
